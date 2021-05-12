@@ -33,7 +33,7 @@ const tsPlugin = ts({
 // })
 
 // 基础配置
-const commonConf = (input, output) => {
+const commonConf = (input, output, inputCss) => {
   if(!input) return;
   
   return {
@@ -45,7 +45,8 @@ const commonConf = (input, output) => {
         compileTemplate: true
       }),
       less({
-        output: output ? output : false, 
+        rootpath: inputCss,
+        output: output || false,
         insert: !output, // 自动 添加到 header 标签内
       }),
       tsPlugin,

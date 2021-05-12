@@ -1,6 +1,7 @@
 <template>
   <h1 class="a">{{ msg }}</h1>
     <button @click="count++">count is: {{ count }}</button>
+    <a href="#">link</a>
 </template>
 
 <script lang="ts">
@@ -21,8 +22,13 @@ export default defineComponent({
 </script>
 
 <style scoped lang="less">
+@import url('../style/var.less');
+
 a {
-  color: #42b983;
+  color: @link-color;
+  &:hover {
+    color: @highlight-text-color
+  }
 }
 
 label {
@@ -34,6 +40,6 @@ code {
   background-color: #eee;
   padding: 2px 4px;
   border-radius: 4px;
-  color: #304455;
+  color: @primary-text-color;
 }
 </style>
