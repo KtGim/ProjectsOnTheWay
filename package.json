@@ -1,6 +1,6 @@
 {
   "name": "tenantui",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "租客端 移动移动组件库",
   "main": "lib/index.esm.js",
   "scripts": {
