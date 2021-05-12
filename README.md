@@ -7,12 +7,9 @@
 <p align="center">移动端组件库(Vue)</p>
 
 <p align="center">
-    <img src="https://img.shields.io/npm/v/vant.svg?style=flat-square" alt="npm version" />
-    <img src="https://img.shields.io/github/workflow/status/youzan/vant/CI/dev?style=flat-square" alt="npm version" />
-    <img src="https://img.shields.io/codecov/c/github/youzan/vant/dev.svg?style=flat-square&color=#4fc08d" alt="Coverage Status" />
-    <img src="https://img.shields.io/npm/dm/vant.svg?style=flat-square&color=#4fc08d" alt="downloads" />
-    <img src="https://img.shields.io/jsdelivr/npm/hm/vant?style=flat-square" alt="Jsdelivr Hits">
-    <img src="https://img.badgesize.io/https://unpkg.com/vant/lib/vant.min.js?compression=gzip&style=flat-square&label=gzip%20size&color=#4fc08d" alt="Gzip Size" />
+    <img src="https://img.shields.io/badge/npm-v6.14.10-yellow" alt="npm version" />
+    <img src="https://img.shields.io/badge/vite-v2.2.3-yellow" alt="vite version" />
+    <img src="https://img.shields.io/badge/rollup-v2.46.0-yellow" alt="rollup version" />
 </p>
 
 <p align="center">
@@ -37,10 +34,12 @@ import { Demo } from 'tenant';
 import 'tenant/lib/Demo/index.css';
 
 const app = createApp();
-app.use(Button);
+app.use(Demo);
 ```
 
-## 按需加载 （vite）
+## 按需加载
+
+- vite
 
 ```bash
 # 安装 vite 按需加载的包 vite-plugin-imp
@@ -65,6 +64,29 @@ npm i -D vite-plugin-imp
     ...
   ]
 }
+```
+
+- vue-cli
+
+```bash
+# 安装 vue-cli 按需加载的包 babel-plugin-import
+npm i -D vite-plugin-imp
+
+# 在 babel.config.js 中配置依赖, 注意组件名称(name)会被转换成 小写横线的形式如： HelloWorld -> hello-world 需要转换成驼峰
+
+module.exports = {
+  presets: [
+    '@vue/cli-plugin-babel/preset'
+  ],
+  plugins: [
+    ['import', {
+      libraryName: 'tenant',
+      libraryDirectory: 'lib',
+      style: (name) => `tenant/lib/${name}/style/index.css`
+    }]
+  ]
+}
+
 ```
 
 ## Browser Support
