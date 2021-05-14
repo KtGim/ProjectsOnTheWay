@@ -1,0 +1,30 @@
+@import url('../../assets/less/index.less');
+
+.tenant {
+  &__menu {
+    list-style-type: none;
+    &__item {
+  
+      line-height: 32px;
+  
+      a {
+        text-decoration: none;
+        color: @list-title-color;
+      }
+      
+      a:hover {
+        color: @link-color;
+      }
+    }
+  }
+
+  &__side {
+    height: 100vh;
+    overflow-y: scroll;
+    width: 15%;
+    padding-left: 3%;
+    float: left;
+    border-right: 1px solid @divider-color;
+    min-width: 130px;
+  }
+}

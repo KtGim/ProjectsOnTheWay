@@ -59,7 +59,7 @@ watcher
           break;
       }
       buildRoutes(buildRoutesTemplate(leadingInNames), 'modified');
-      buildDoc(dir, buildMdTemplate(dir), event);
+      // buildDoc(dir, buildMdTemplate(dir), event);
       // console.log(leadingInNames, 'out');
       // console.log(buildRoutesTemplate(leadingInNames));
     }

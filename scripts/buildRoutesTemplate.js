@@ -25,7 +25,7 @@ const buildTemplate = (leadingInNames) => {
     const routes: Array<RouteRecordRaw> = [
       ${leadingInNames.map((name) => `{
         path: '/${name}',
-        name: ${name},
+        name: '${name}',
         component: ${name},
       }`)}
     ]
