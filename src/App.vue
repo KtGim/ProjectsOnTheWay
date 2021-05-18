@@ -9,7 +9,7 @@
         <router-view/>
       </setction>
       <footer class="footer">
-        <Footer />
+        <!-- <Footer /> -->
       </footer>
     </div>
   </div>
@@ -28,8 +28,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style>
-@import url('./assets/less/site.less');
-
-</style>

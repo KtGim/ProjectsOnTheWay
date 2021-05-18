@@ -21,7 +21,7 @@
     ],
     "@/lib/*": [
       "lib/*"
-    ],
+    ]
   },
   "include": [
     "src/**/*.ts",
@@ -31,6 +31,6 @@
     "components/**/*.ts",
     "components/**/*.d.ts",
     "components/**/*.tsx",
-    "components/**/*.vue",
+    "components/**/*.vue"
   ]
 }

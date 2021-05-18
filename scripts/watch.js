@@ -45,6 +45,8 @@ watcher
   // .on('error', error => log(`Watcher error: ${error}`))
   .on('ready', () => {
     leadingInNames.length && buildRoutes(buildRoutesTemplate(leadingInNames), 'created');
+    const dir = leadingInNames[0];
+    buildDoc(dir, buildMdTemplate(dir), 'modified');
   })
   .on('raw', (event, path, {type}) => { // internal
     if(type === 'directory') {
@@ -59,8 +61,7 @@ watcher
           break;
       }
       buildRoutes(buildRoutesTemplate(leadingInNames), 'modified');
-      // buildDoc(dir, buildMdTemplate(dir), event);
+      buildDoc(dir, buildMdTemplate(dir), event);
       // console.log(leadingInNames, 'out');
-      // console.log(buildRoutesTemplate(leadingInNames));
     }
   })

@@ -1,5 +1,22 @@
+const path = require('path');
+const parseTsFile = require('./parseTsFile');
+
 const stringMd = '```';
 const buildMdTemplate = (componentName) => {
+  if (!componentName) {
+    return;
+  }
+  const {
+    propAlias,
+    typeAlias
+  } = parseTsFile(path.resolve(__dirname, `../components/${componentName}/index.tsx`));
+  // console.log(propAlias, typeAlias);
+
+let propsCellsInfo = '';
+Object.keys(propAlias).forEach(key => {
+  propsCellsInfo += `| ${key} | ${propAlias[key]} | - |\n`;
+})
+
   return `# ${componentName}
 
 ${stringMd}vue demo
@@ -17,7 +34,10 @@ ${stringMd}vue demo
   })
 </script>
 ${stringMd}
-  `
-}
+
+## 组件属性
+|名称  | 类型 |default|
+|--|--|--|
+${propsCellsInfo}`}
 
 module.exports = buildMdTemplate;
