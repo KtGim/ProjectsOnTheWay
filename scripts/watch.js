@@ -48,9 +48,10 @@ watcher
     }
   })
   .on('raw', (event, path, {type}) => { // internal
+    let dir = path.split('/').pop();
     if(type === 'directory') {
       // console.log(leadingInNames, 'in', event);
-      const dir = path.split('/').pop();
+      
       switch(event) {
         case 'created':
           leadingInNames.push(dir);
@@ -62,5 +63,8 @@ watcher
 
       buildDoc(dir, event);
       buildRoutes(buildRoutesTemplate(leadingInNames), 'modified')
+    } else {
+      dir = resolve(path, '..').split('/').pop();
+      buildDoc(dir, event);
     }
   })

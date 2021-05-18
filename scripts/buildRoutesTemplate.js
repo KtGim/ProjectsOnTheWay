@@ -20,9 +20,15 @@ const buildTemplate = (leadingInNames) => {
   });
   return `
     import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+    import ReadMe from '../../README.md';
     ${imports}
 
     const routes: Array<RouteRecordRaw> = [
+      {
+        path: '/',
+        name: 'ReadMe',
+        component: ReadMe,
+      },
       ${leadingInNames.map((name) => `{
         path: '/${name}',
         name: '${name}',

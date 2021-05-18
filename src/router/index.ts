@@ -1,10 +1,16 @@
 
     import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+    import ReadMe from '../../README.md';
     import Demo from '@/docs/Demo/index.md';
     import HelloWorld from '@/docs/HelloWorld/index.md';
 
 
     const routes: Array<RouteRecordRaw> = [
+      {
+        path: '/',
+        name: '开始起步',
+        component: ReadMe,
+      },
       {
         path: '/Demo',
         name: 'Demo',

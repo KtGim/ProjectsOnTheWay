@@ -40,7 +40,11 @@ module.exports = (componentNames, type) => {
   const components = typeof componentNames === 'string' ? [componentNames] : componentNames;
   components.forEach((componentName) => {
     const template = buildMdTemplate(componentName)
-    initDocs(componentName, template, type)
+    if (!fs.existsSync(resolve(routersRoot, `${componentName}/index.md`)) && type === 'created') {
+      initDocs(componentName, template, type)
+    } else if (fs.existsSync(resolve(routersRoot, `${componentName}/index.md`)) && type !== 'created') {
+      initDocs(componentName, template, type)
+    }
   })
 }
 
