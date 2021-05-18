@@ -6,7 +6,7 @@
 </template>
 <script>
   import { defineComponent } from 'vue'
-  import { HelloWorld } from 'tenantui'
+  import { HelloWorld } from '@/components'
   export default defineComponent({
     name: 'App',
     components: {

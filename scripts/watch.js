@@ -8,16 +8,12 @@ const buildRoutesTemplate = require('./buildRoutesTemplate')
 const buildRoutes = require('./buildRoutes');
 const buildDoc = require('./buildDoc');
 
-const { danger } = require('./chalkLog');
-
 const watcher = chokidar.watch(resolve(__dirname, '../components'), {
   ignored: /(^|[\/\\])\../, // ignore dotfiles
   persistent: true
 });
 
 const root = resolve(__dirname, '../components');
-const docDir = resolve(__dirname, '../docs');
-const routes = resolve(__dirname, '../routes');
 
 let leadingInNames = fs.readdirSync(root)
   .filter((f) =>

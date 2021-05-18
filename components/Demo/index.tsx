@@ -13,7 +13,7 @@ type M = '1' | '2' | '3'
 const Demo = defineComponent({
   name: 'Demo',
   setup(props:Props) {
-    return () => <div class={createBEM('demo')}>
+    return () => <div class={createBEM('demo')()}>
       Demo
     </div>
   }

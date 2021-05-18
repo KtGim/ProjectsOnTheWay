@@ -1,15 +1,10 @@
-// const path = require('path');
-// const fs = require('fs');
-// const root = path.resolve(__dirname, '../components');
+const { argv } = require('argvs');
 
 const buildTemplate = (leadingInNames) => {
-  // const leadingInNames.map(name => `import ${name} from '@/docs/${name}/index.md';\n`) = fs.readdirSync(root)
-  //   .filter((f) =>
-  //     fs.statSync(path.join(root, f)).isDirectory() && f !== 'style'
-  //   )
-  
-  // (leadingInNames.indexOf(addName) === -1) && leadingInNames.push(addName);
 
+  if (argv.env === 'pro') {
+    leadingInNames = leadingInNames.filter(name => name !== 'Demo' && name !== 'HelloWorld')
+  }
   let imports = '';
   leadingInNames.forEach((name, index) => {
     if (index === 0) {

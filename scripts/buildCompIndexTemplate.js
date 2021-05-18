@@ -1,6 +1,7 @@
 const buildCompIndexTemplate = (componentName) => {
 
   return `import { App, defineComponent } from 'vue';
+import './index.less'
 import { createBEM } from '../../utils/createBem';
 
 interface Props {
@@ -12,7 +13,7 @@ type M = '1' | '2' | '3'
 const ${componentName} = defineComponent({
   name: '${componentName}',
   setup(props:Props) {
-    return () => <div class={createBEM('${componentName.toLowerCase()}')}>
+    return () => <div class={createBEM('${componentName.toLowerCase()}')()}>
       ${componentName}
     </div>
   }

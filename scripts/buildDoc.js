@@ -2,6 +2,7 @@ const {resolve} = require('path');
 const fs = require('fs');
 const buildMdTemplate = require('./buildMdTemplate')
 const { done, warn, danger } = require('./chalkLog');
+const { argv } = require('argvs');
 
 const routersRoot = resolve(__dirname, '../docs')
 
@@ -40,7 +41,7 @@ module.exports = (componentNames, type) => {
   const components = typeof componentNames === 'string' ? [componentNames] : componentNames;
   components.forEach((componentName) => {
     const template = buildMdTemplate(componentName)
-    if (!fs.existsSync(resolve(routersRoot, `${componentName}/index.md`)) && type === 'created') {
+    if (type === 'created') {
       initDocs(componentName, template, type)
     } else if (fs.existsSync(resolve(routersRoot, `${componentName}/index.md`)) && type !== 'created') {
       initDocs(componentName, template, type)

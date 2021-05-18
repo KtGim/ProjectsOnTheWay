@@ -29,7 +29,8 @@
    );
  }
  
- export function createBEM(name: string = 'tenant') {
+ export function createBEM(name: string) {
+   name = `tenant-${name}`;
    return function (el?: Mods, mods?: Mods): Mods {
      if (el && typeof el !== 'string') {
        mods = el;

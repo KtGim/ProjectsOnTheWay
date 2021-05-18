@@ -2,6 +2,7 @@ const path = require('path');
 const parseTsFile = require('./parseTsFile');
 const fs = require('fs');
 const { yellow } = require('./chalkLog');
+const { argv } = require('argvs');
 
 const stringMd = '```';
 const buildMdTemplate = (componentName) => {
@@ -41,7 +42,7 @@ ${stringMd}vue demo
 </template>
 <script>
   import { defineComponent } from 'vue'
-  import { ${instanceName} } from 'tenantui'
+  import { ${instanceName} } from '${argv.env === 'pro' ? 'tenantui' : '@/components'}'
   export default defineComponent({
     name: 'App',
     components: {
