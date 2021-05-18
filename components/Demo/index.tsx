@@ -4,6 +4,7 @@ import './index.less';
 interface Props {
   a: number;
   b: string;
+  c: M;
 }
 
 type M = '1' | '2' | '3'

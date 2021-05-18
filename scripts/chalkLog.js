@@ -51,7 +51,7 @@ module.exports = {
   format,
   red: format('red'),
   blue: format('blue'),
-  yellow: format('blue'),
+  yellow: format('yellow'),
   danger: format('bold', 'bgRed'),
   warn: format('bold', 'bgYellowBright'),
   done: format('bold', 'bgGreenBright'),

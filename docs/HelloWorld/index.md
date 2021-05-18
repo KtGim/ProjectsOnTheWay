@@ -1,9 +1,8 @@
 # HelloWorld
-用于展示
 
 ```vue demo
 <template>
-  <HelloWorld msg="好想爱这个世界啊！！" />
+  <HelloWorld />
 </template>
 <script>
   import { defineComponent } from 'vue'
@@ -17,22 +16,7 @@
 </script>
 ```
 
-## 这是
+## 组件属性
 
-```vue demo
-<template>
-  <HelloWorld msg="我也是" />
-</template>
-```
-
-```vue demo
-<template>
-  <HelloWorld msg="你也是" />
-</template>
-```
-
-```vue demo
-<template>
-  <HelloWorld msg="他也是" />
-</template>
-```
+|名称  | 描述 | 类型 |default|
+|--|--|--|--|

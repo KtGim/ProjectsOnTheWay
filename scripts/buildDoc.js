@@ -1,5 +1,6 @@
 const {resolve} = require('path');
 const fs = require('fs');
+const buildMdTemplate = require('./buildMdTemplate')
 const { done, warn, danger } = require('./chalkLog');
 
 const routersRoot = resolve(__dirname, '../docs')
@@ -35,8 +36,15 @@ const removeDir = (path) => {
   }
 }
 
-module.exports = (componentName, template, type) => {
-  // console.log(componentName, template, type)
+module.exports = (componentNames, type) => {
+  const components = typeof componentNames === 'string' ? [componentNames] : componentNames;
+  components.forEach((componentName) => {
+    const template = buildMdTemplate(componentName)
+    initDocs(componentName, template, type)
+  })
+}
+
+function initDocs (componentName, template, type) {
   if (componentName && template) {
     const action = modifyInfo[type]
     const dirPath = resolve(routersRoot, `${componentName}`);

@@ -2,13 +2,11 @@ const chokidar = require('chokidar');
 const fs = require('fs');
 const {resolve, join} = require('path');
 const buildRoutesTemplate = require('./buildRoutesTemplate')
-const buildMdTemplate = require('./buildMdTemplate')
 
 const buildRoutes = require('./buildRoutes');
 const buildDoc = require('./buildDoc');
 
-
-const {log} = console;
+const { danger } = require('./chalkLog');
 
 const watcher = chokidar.watch(resolve(__dirname, '../components'), {
   ignored: /(^|[\/\\])\../, // ignore dotfiles
@@ -44,9 +42,10 @@ watcher
   // .on('unlinkDir', path => log(`Directory ${path} has been removed`))
   // .on('error', error => log(`Watcher error: ${error}`))
   .on('ready', () => {
-    leadingInNames.length && buildRoutes(buildRoutesTemplate(leadingInNames), 'created');
-    const dir = leadingInNames[0];
-    buildDoc(dir, buildMdTemplate(dir), 'modified');
+    if (leadingInNames.length) {
+      buildDoc(leadingInNames, 'created')
+      buildRoutes(buildRoutesTemplate(leadingInNames), 'created');
+    }
   })
   .on('raw', (event, path, {type}) => { // internal
     if(type === 'directory') {
@@ -60,8 +59,8 @@ watcher
           leadingInNames = leadingInNames.filter(name => name !== dir);
           break;
       }
-      buildRoutes(buildRoutesTemplate(leadingInNames), 'modified');
-      buildDoc(dir, buildMdTemplate(dir), event);
-      // console.log(leadingInNames, 'out');
+
+      buildDoc(dir, event);
+      buildRoutes(buildRoutesTemplate(leadingInNames), 'modified')
     }
   })
