@@ -59,6 +59,11 @@ export default defineConfig({
           find: '@/lib',
           replacement: path.resolve(projectRootDir, 'lib')
           // OR place `customResolver` here. See explanation below.
+        },
+        {
+          find: '@/utils',
+          replacement: path.resolve(projectRootDir, 'utils')
+          // OR place `customResolver` here. See explanation below.
         }
       ],
       // customResolver,

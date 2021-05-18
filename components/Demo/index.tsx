@@ -1,4 +1,5 @@
 import { App, defineComponent } from 'vue';
+import { createBEM } from '../../utils/createBem';
 import './index.less';
 
 interface Props {
@@ -12,8 +13,7 @@ type M = '1' | '2' | '3'
 const Demo = defineComponent({
   name: 'Demo',
   setup(props:Props) {
-    console.log(props.a);
-    return () => <div class="demo">
+    return () => <div class={createBEM('demo')}>
       Demo
     </div>
   }

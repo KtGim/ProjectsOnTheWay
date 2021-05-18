@@ -8,7 +8,7 @@
     const routes: Array<RouteRecordRaw> = [
       {
         path: '/',
-        name: '开始起步',
+        name: 'ReadMe',
         component: ReadMe,
       },
       {

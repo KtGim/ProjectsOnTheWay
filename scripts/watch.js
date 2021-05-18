@@ -1,6 +1,8 @@
 const chokidar = require('chokidar');
 const fs = require('fs');
 const {resolve, join} = require('path');
+
+const buildIndex = require('./buildIndex');
 const buildRoutesTemplate = require('./buildRoutesTemplate')
 
 const buildRoutes = require('./buildRoutes');
@@ -61,10 +63,17 @@ watcher
           break;
       }
 
-      buildDoc(dir, event);
+      buildIndex(dir, leadingInNames, event);
+      // components/index.ts 变动时不触发
+      if (dir !== 'components') {
+        buildDoc(dir, event);
+      }
       buildRoutes(buildRoutesTemplate(leadingInNames), 'modified')
     } else {
+      // components/index.ts 变动时不触发
       dir = resolve(path, '..').split('/').pop();
-      buildDoc(dir, event);
+      if (dir !== 'components') {
+        buildDoc(dir, event);
+      }
     }
   })

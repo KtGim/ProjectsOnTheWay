@@ -1,10 +1,10 @@
 import { App } from 'vue'
-import Demo from './Demo'
-import HelloWorld from './HelloWorld'
+import Demo from './Demo';
+import HelloWorld from './HelloWorld';
+
 
 const components = [
-  Demo,
-  HelloWorld,
+  Demo,HelloWorld
 ]
 
 const install = function (Vue: App) {
@@ -21,6 +21,5 @@ if (typeof window !== 'undefined' && window.Vue) {
 }
 
 export {
-  Demo,
-  HelloWorld
+  Demo,HelloWorld
 }

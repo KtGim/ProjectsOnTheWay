@@ -21,6 +21,9 @@
     ],
     "@/lib/*": [
       "lib/*"
+    ],
+    "@/utils/*": [
+      "utils/*"
     ]
   },
   "include": [
@@ -29,6 +32,7 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "components/**/*.ts",
+    "utils/**/*.ts",
     "components/**/*.d.ts",
     "components/**/*.tsx",
     "components/**/*.vue"
