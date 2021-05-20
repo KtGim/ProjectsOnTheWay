@@ -10,7 +10,8 @@
     "esModuleInterop": true,
     "lib": ["esnext", "dom"],
     "types": ["vite/client", "node"],
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true
   },
   "paths": {
     "@/src/*": [
@@ -35,6 +36,8 @@
     "utils/**/*.ts",
     "components/**/*.d.ts",
     "components/**/*.tsx",
-    "components/**/*.vue"
+    "components/**/*.vue",
+    "scripts/buildDocs/**/*.ts",
+    "scripts/utils/*.ts"
   ]
 }

@@ -1,4 +1,4 @@
-const buildIndexTemplate = (componentName, componentNames) => {
+const buildIndexTemplate = (componentNames) => {
 
   let imports = '';
   componentNames.forEach((name, index) => {

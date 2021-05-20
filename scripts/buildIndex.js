@@ -18,7 +18,7 @@ module.exports = (componentName, componentNames, type) => {
   }
 
   // 修改 index.ts 文件
-  const indexTemplate = buildIndexTemplate(componentName, componentNames);
+  const indexTemplate = buildIndexTemplate(componentNames);
   fs.writeFileSync(resolve(routersRoot, 'index.ts'), indexTemplate, 'utf-8');
   done(`components/index.ts  更新完毕!`)
 }

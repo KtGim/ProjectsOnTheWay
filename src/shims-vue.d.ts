@@ -10,3 +10,5 @@ declare module "*.md" {
 }
 
 declare module 'tenantui'
+
+declare module 'argvs'

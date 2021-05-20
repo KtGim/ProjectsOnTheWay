@@ -3,7 +3,6 @@
     import ReadMe from '../../README.md';
     import Demo from '@/docs/Demo/index.md';
     import HelloWorld from '@/docs/HelloWorld/index.md';
-    import Demo1 from '@/docs/Demo1/index.md';
 
 
     const routes: Array<RouteRecordRaw> = [
@@ -20,10 +19,6 @@
         path: '/HelloWorld',
         name: 'HelloWorld',
         component: HelloWorld,
-      },{
-        path: '/Demo1',
-        name: 'Demo1',
-        component: Demo1,
       }
     ]
     

@@ -97,3 +97,4 @@ module.exports = {
 
 - [Documentation](https://youzan.github.io/vant)
 - [Changelog](https://youzan.github.io/vant#/en-US/changelog)
+- [diff文案](https://github.com/kpdecker/jsdiff#api)

@@ -6,7 +6,8 @@ const buildIndex = require('./buildIndex');
 const buildRoutesTemplate = require('./buildRoutesTemplate')
 
 const buildRoutes = require('./buildRoutes');
-const buildDoc = require('./buildDoc');
+// const buildDoc = require('./buildDoc');
+const BuildDoc = require('./buildDocs').default;
 
 const watcher = chokidar.watch(resolve(__dirname, '../components'), {
   ignored: /(^|[\/\\])\../, // ignore dotfiles
@@ -20,6 +21,7 @@ let leadingInNames = fs.readdirSync(root)
     (fs.statSync(join(root, f)).isDirectory()) && (f !== 'style')
   )
 
+const buildDocs = new BuildDoc(leadingInNames, 'initial');
 // type ActionType = 'created' | 'moved' | 'modified';
 watcher
   // .on('add', path => log(`File ${path} has been added`))
@@ -41,7 +43,8 @@ watcher
   // .on('error', error => log(`Watcher error: ${error}`))
   .on('ready', () => {
     if (leadingInNames.length) {
-      buildDoc(leadingInNames, 'created')
+      // buildDoc(leadingInNames, 'initial')
+      buildDocs.init();
       buildRoutes(buildRoutesTemplate(leadingInNames), 'created');
     }
   })
@@ -62,14 +65,16 @@ watcher
       buildIndex(dir, leadingInNames, event);
       // components/index.ts 变动时不触发
       if (dir !== 'components') {
-        buildDoc(dir, event);
+        // buildDoc(dir, event);
+        buildDocs.processDocs(dir, events);
       }
       buildRoutes(buildRoutesTemplate(leadingInNames), 'modified')
     } else {
       // components/index.ts 变动时不触发
       dir = resolve(path, '..').split('/').pop();
       if (dir !== 'components') {
-        buildDoc(dir, event);
+        // buildDoc(dir, event);
+        buildDocs.processDocs(dir, event);
       }
     }
   })
