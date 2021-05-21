@@ -1,6 +1,6 @@
 const { argv } = require('argvs');
 
-const buildTemplate = (leadingInNames) => {
+const buildTemplate = (leadingInNames: string[]) => {
 
   if (argv.env === 'pro') {
     leadingInNames = leadingInNames.filter(name => name !== 'Demo' && name !== 'HelloWorld')
@@ -56,4 +56,4 @@ const buildTemplate = (leadingInNames) => {
   `
 }
 
-module.exports = buildTemplate;
+export default buildTemplate;

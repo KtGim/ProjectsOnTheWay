@@ -1,10 +1,14 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
-var resolve = require('path').resolve;
-var fs = require('fs');
+var path_1 = require("path");
+var fs_1 = __importDefault(require("fs"));
 var type_1 = require("./type");
+var actionsInfo_1 = require("./actionsInfo");
 var utils_1 = require("../utils");
-var buildTemplate_1 = require("./buildTemplate");
+var buildTemplate_1 = __importDefault(require("./buildTemplate"));
 var BuildDocs = /** @class */ (function () {
     function BuildDocs(components, type) {
         this.type = type_1.transformModifyType[type];
@@ -22,8 +26,8 @@ var BuildDocs = /** @class */ (function () {
             var _a = _this, tsxFiles = _a.tsxFiles, docsFiles = _a.docsFiles;
             var tsxPath = _this.getTsxPath(componentName);
             var docsPath = _this.getDocsPath(componentName);
-            var isTsxExist = fs.existsSync(tsxPath);
-            var isMdExist = fs.existsSync(docsPath);
+            var isTsxExist = fs_1["default"].existsSync(tsxPath);
+            var isMdExist = fs_1["default"].existsSync(docsPath);
             if (!tsxFiles[componentName] && isTsxExist) {
                 _this.collectTsxFiles(componentName, tsxPath);
             }
@@ -33,16 +37,16 @@ var BuildDocs = /** @class */ (function () {
         });
     };
     BuildDocs.prototype.getTsxPath = function (componentName) {
-        return resolve(__dirname, '../../components', componentName + "/index.tsx");
+        return path_1.resolve(__dirname, '../../components', componentName + "/index.tsx");
     };
     BuildDocs.prototype.getDocsPath = function (componentName) {
-        return resolve(__dirname, '../../docs', componentName + "/index.md");
+        return path_1.resolve(__dirname, '../../docs', componentName + "/index.md");
     };
     BuildDocs.prototype.collectTsxFiles = function (componentName, path) {
-        this.tsxFiles[componentName] = fs.readFileSync(path, 'utf-8');
+        this.tsxFiles[componentName] = fs_1["default"].readFileSync(path, 'utf-8');
     };
     BuildDocs.prototype.collectDocsFiles = function (componentName, path) {
-        this.docsFiles[componentName] = fs.readFileSync(path, 'utf-8');
+        this.docsFiles[componentName] = fs_1["default"].readFileSync(path, 'utf-8');
     };
     BuildDocs.prototype.processDocs = function (componentName, type) {
         var components = this.components;
@@ -66,7 +70,7 @@ var BuildDocs = /** @class */ (function () {
         }
         else if (this.type === 'MOVED') {
             components = components.filter(function (comp) { return comp !== componentName; });
-            utils_1.removeDir(resolve(docsPath, '..'));
+            utils_1.removeDir(path_1.resolve(docsPath, '..'));
         }
         else if (this.type === 'MODIFIED') {
             buildTemplate_1["default"]({
@@ -80,6 +84,8 @@ var BuildDocs = /** @class */ (function () {
             this.collectTsxFiles(componentName, tsxPath);
             this.collectDocsFiles(componentName, docsPath);
         }
+        var action = actionsInfo_1.modifyActions[this.type];
+        action.log("componentName\u76F8\u5173\u6587\u6863 " + action.text + " \u5B8C\u6210\uFF01");
         // let newFile = null;
         // const isMdExist = fs.existsSync(resolve(docsRoot, `${componentName}/index.md`));
         // const isTsxExist = fs.existsSync(resolve(docsRoot, `${componentName}/index.md`));

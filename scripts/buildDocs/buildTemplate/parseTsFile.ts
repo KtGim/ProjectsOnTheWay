@@ -1,7 +1,6 @@
-const fs  = require('fs');
-const ts = require("typescript");
+import ts from "typescript";
 
-module.exports = function (pathname) {
+export default function (pathname: string) {
   // console.log(pathname)
   const options = {
     target: ts.ScriptTarget.ES5,
@@ -36,10 +35,10 @@ module.exports = function (pathname) {
   };
 
   // 用于将 { a: number } 类型的字符串 准换成对象
-  function initObjectAlias (objectStr) {
-    let props = {};
+  function initObjectAlias (objectStr: string) {
+    let props: {[key in string]: string} = {};
     if (objectStr) {
-      const containerStr = objectStr.match(/{(.*?)}/msg)[0].replace(/;/g, '').split('\n').slice(1, -1).map(propStr => propStr.trim());
+      const containerStr: string[] = (objectStr.match(/{(.*?)}/msg) || [])[0].replace(/;/g, '').split('\n').slice(1, -1).map(propStr => propStr.trim());
       containerStr.forEach(prop => {
         if (prop) {
           const propsAndType = prop.split(':');
@@ -51,7 +50,7 @@ module.exports = function (pathname) {
   }
 
   /** visit nodes finding exported classes */
-  function visit(node) {
+  function visit(node: any) {
     
     // Only consider exported nodes
     if (!isNodeExported(node)) {
@@ -74,9 +73,12 @@ module.exports = function (pathname) {
       // if (symbol) {
       //   output.push(serializeClass(symbol));
       // }
-      const propsStr = printer.printNode(ts.EmitHint.Unspecified, node, sourceNodeFile);
+      const propsStr = printer.printNode(ts.EmitHint.Unspecified, node, sourceNodeFile!);
       
-      let props = '';
+      let props: string | {
+        [x: string]: string
+      } = '';
+
       if (!propsStr.match(/{(.*?)}/msg)) {
         // 匹配 type A = '1' | '2' | '3'
         props = propsStr.split("=")[1].replace(/;/g, '').trim()
@@ -85,7 +87,7 @@ module.exports = function (pathname) {
       }
       typeAlias.set(node.name.escapedText, props);
     } else if(ts.isInterfaceDeclaration(node)) {
-      const props = printer.printNode(ts.EmitHint.Unspecified, node, sourceNodeFile);
+      const props = printer.printNode(ts.EmitHint.Unspecified, node, sourceNodeFile!);
 
       propAlias = {
         ...propAlias,
@@ -99,7 +101,7 @@ module.exports = function (pathname) {
   }
 
   /** Serialize a symbol into a json object */
-  function serializeSymbol(symbol) {
+  function serializeSymbol(symbol: any) {
     return {
       name: symbol.getName(),
       documentation: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
@@ -110,7 +112,7 @@ module.exports = function (pathname) {
   }
 
   /** Serialize a class symbol information */
-  function serializeClass(symbol) {
+  function serializeClass(symbol: any) {
     let details = serializeSymbol(symbol);
 
     // Get the construct signatures
@@ -118,6 +120,7 @@ module.exports = function (pathname) {
       symbol,
       symbol.valueDeclaration
     );
+    // @ts-ignore
     details.constructors = constructorType
       .getConstructSignatures()
       .map(serializeSignature);
@@ -125,7 +128,7 @@ module.exports = function (pathname) {
   }
 
   /** Serialize a signature (call or construct) */
-  function serializeSignature(signature) {
+  function serializeSignature(signature: any) {
     return {
       parameters: signature.parameters.map(serializeSymbol),
       returnType: checker.typeToString(signature.getReturnType()),
@@ -134,7 +137,7 @@ module.exports = function (pathname) {
   }
 
   /** True if this is visible outside this file, false otherwise */
-  function isNodeExported(node) {
+  function isNodeExported(node: any) {
     return (
       (ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) !== 0 ||
       (!!node.parent && node.parent.kind === ts.SyntaxKind.SourceFile)

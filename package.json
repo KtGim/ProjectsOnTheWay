@@ -10,10 +10,11 @@
     "build": "rm -rf lib && rollup --config",
     "build:doc": "vite build",
     "serve": "vite preview",
-    "run:dev": "node ./scripts/watch.js env=dev",
-    "run:pro": "node ./scripts/buildPro.js env=pro",
+    "run:dev": "node ./builds/watch.js env=dev",
+    "run:pro": "node ./builds/buildPro.js env=pro",
     "dev": "npm-run-all --parallel run:dev local",
-    "pro": "npm-run-all --parallel run:pro build:doc"
+    "pro": "npm-run-all --parallel run:pro build:doc",
+    "watch": "tsc --esModuleInterop --outDir ./builds ./scripts/watch.ts -w"
   },
   "author": "gim",
   "license": "ISC",

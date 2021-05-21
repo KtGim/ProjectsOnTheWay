@@ -1,21 +1,21 @@
-const {resolve} = require('path');
-const fs = require('fs');
-const { done, warn } = require('./chalkLog');
+import {resolve} from 'path';
+import fs from 'fs';
+import chalkLog from './chalkLog';
 
 const routersRoot = resolve(__dirname, '../src/router/index.ts')
 
 const modifyInfo = {
   created: {
     text: '创建',
-    log: done
+    log: chalkLog.done
   },
   modified: {
     text: '更新',
-    log: warn
+    log: chalkLog.warn
   }
 }
 
-module.exports = (template, type) => {
+export default (template, type) => {
   if (template) {
     fs.writeFileSync(routersRoot, template, 'utf-8');
     const action = modifyInfo[type];

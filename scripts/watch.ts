@@ -1,13 +1,15 @@
-const chokidar = require('chokidar');
-const fs = require('fs');
-const {resolve, join} = require('path');
+import chokidar from 'chokidar';
+import fs from 'fs';
+import {resolve, join} from 'path';
 
-const buildIndex = require('./buildIndex');
-const buildRoutesTemplate = require('./buildRoutesTemplate')
+import buildIndex from './buildIndex';
+import buildRoutesTemplate from './buildRoutesTemplate';
 
-const buildRoutes = require('./buildRoutes');
-// const buildDoc = require('./buildDoc');
-const BuildDoc = require('./buildDocs').default;
+import buildRoutes from './buildRoutes';
+import BuildDoc from './buildDocs';
+import { originType } from './buildDocs/type';
+
+
 
 const watcher = chokidar.watch(resolve(__dirname, '../components'), {
   ignored: /(^|[\/\\])\../, // ignore dotfiles
@@ -43,7 +45,6 @@ watcher
   // .on('error', error => log(`Watcher error: ${error}`))
   .on('ready', () => {
     if (leadingInNames.length) {
-      // buildDoc(leadingInNames, 'initial')
       buildDocs.init();
       buildRoutes(buildRoutesTemplate(leadingInNames), 'created');
     }
@@ -62,19 +63,17 @@ watcher
           break;
       }
 
-      buildIndex(dir, leadingInNames, event);
+      buildIndex(dir, leadingInNames, event as originType);
       // components/index.ts 变动时不触发
       if (dir !== 'components') {
-        // buildDoc(dir, event);
-        buildDocs.processDocs(dir, events);
+        buildDocs.processDocs(dir, event as originType);
       }
       buildRoutes(buildRoutesTemplate(leadingInNames), 'modified')
     } else {
       // components/index.ts 变动时不触发
       dir = resolve(path, '..').split('/').pop();
       if (dir !== 'components') {
-        // buildDoc(dir, event);
-        buildDocs.processDocs(dir, event);
+        buildDocs.processDocs(dir, event as originType);
       }
     }
   })

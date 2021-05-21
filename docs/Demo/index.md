@@ -32,9 +32,21 @@
 </script>
 ```
 
-
-
-
+```vue demo
+<template>
+  <Demo />
+</template>
+<script>
+  import { defineComponent } from 'vue'
+  import { Demo } from '@/components'
+  export default defineComponent({
+    name: 'App',
+    components: {
+      Demo,
+    }
+  })
+</script>
+```
 
 ## 组件属性
 
@@ -42,4 +54,4 @@
 |--|--|--|--|
 | a | - | number | - |
 | b | - | string | - |
-| c | - | M (取值为: '1' , '2' , '3') | - |
+| c | - | M (取值为: '1' , '2' , '3' , '4') | - |

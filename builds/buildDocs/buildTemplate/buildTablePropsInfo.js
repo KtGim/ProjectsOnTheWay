@@ -1,9 +1,11 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
-var parseTsFile = require('../../parseTsFile');
+var parseTsFile_1 = __importDefault(require("./parseTsFile"));
 var buildTablePropsInfo = function (tsxPath) {
-    console.log(parseTsFile);
-    var _a = parseTsFile(tsxPath), propAlias = _a.propAlias, typeAlias = _a.typeAlias;
+    var _a = parseTsFile_1["default"](tsxPath), propAlias = _a.propAlias, typeAlias = _a.typeAlias;
     var propsCellsInfo = '';
     Object.keys(propAlias).forEach(function (key) {
         // @ts-ignore
@@ -19,7 +21,6 @@ var buildTablePropsInfo = function (tsxPath) {
             propsCellsInfo += "| " + key + " | - | " + propsInfos + " | - |\n";
         }
     });
-    console.log(propsCellsInfo);
     return "## \u7EC4\u4EF6\u5C5E\u6027\n\n|\u540D\u79F0  | \u63CF\u8FF0 | \u7C7B\u578B |default|\n|--|--|--|--|\n" + propsCellsInfo;
 };
 exports["default"] = buildTablePropsInfo;

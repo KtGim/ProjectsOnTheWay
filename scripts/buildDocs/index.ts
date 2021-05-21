@@ -1,5 +1,5 @@
-const {resolve} = require('path');
-const fs = require('fs');
+import {resolve} from 'path';
+import fs from 'fs';
 
 import { actionType, cacheFiles, transformModifyType } from './type';
 import { modifyActions } from './actionsInfo';
@@ -102,6 +102,10 @@ class BuildDocs {
       this.collectTsxFiles(componentName, tsxPath);
       this.collectDocsFiles(componentName, docsPath);
     }
+
+    const action = modifyActions[this.type];
+
+    action.log(`componentName相关文档 ${action.text} 完成！`)
     
     
     

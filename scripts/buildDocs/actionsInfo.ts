@@ -1,5 +1,7 @@
 import {Actions} from './type';
-const { done, warn, danger } = require('./chalkLog');
+import chalkLog from '../chalkLog';
+
+const { done, warn, danger } = chalkLog;
 
 const modifyActions: Actions = {
   INITIAL: {

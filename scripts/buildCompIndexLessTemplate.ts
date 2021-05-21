@@ -1,4 +1,4 @@
-const buildCompIndexLessTemplate = (componentName) => {
+const buildCompIndexLessTemplate: (componentName: string) => string = (componentName) => {
 
   return `@import url('../style/var.less');
 
@@ -8,4 +8,4 @@ const buildCompIndexLessTemplate = (componentName) => {
   }
 }`}
 
-module.exports = buildCompIndexLessTemplate;
+export default buildCompIndexLessTemplate;

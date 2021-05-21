@@ -1,7 +1,11 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
 exports.modifyActions = void 0;
-var _a = require('./chalkLog'), done = _a.done, warn = _a.warn, danger = _a.danger;
+var chalkLog_1 = __importDefault(require("../chalkLog"));
+var done = chalkLog_1["default"].done, warn = chalkLog_1["default"].warn, danger = chalkLog_1["default"].danger;
 var modifyActions = {
     INITIAL: {
         text: '初始化',

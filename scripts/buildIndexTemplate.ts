@@ -1,4 +1,4 @@
-const buildIndexTemplate = (componentNames) => {
+const buildIndexTemplate: (componentNames: string[]) => string = (componentNames) => {
 
   let imports = '';
   componentNames.forEach((name, index) => {
@@ -37,4 +37,4 @@ export {
   }
 }`}
 
-module.exports = buildIndexTemplate;
+export default buildIndexTemplate;

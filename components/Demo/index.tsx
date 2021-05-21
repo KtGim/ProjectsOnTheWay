@@ -8,7 +8,7 @@ interface Props {
   c: M;
 }
 
-type M = '1' | '2' | '3'
+type M = '1' | '2' | '3' | '4'
 
 const Demo = defineComponent({
   name: 'Demo',

@@ -15,6 +15,8 @@ export enum transformModifyType {
 
 export type actionType = keyof actionTypeEnum;
 
+export type originType = keyof typeof transformModifyType;
+
 // diff 文件结果类型 添加 | 删除
 export type fileChangedType = 'added' | 'removed';
 

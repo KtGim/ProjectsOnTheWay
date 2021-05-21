@@ -1,4 +1,4 @@
-const buildCompIndexTemplate = (componentName) => {
+const buildCompIndexTemplate: (componentName: string) => string = (componentName: string) => {
 
   return `import { App, defineComponent } from 'vue';
 import './index.less'
@@ -26,4 +26,4 @@ ${componentName}.install = function (Vue: App) {
 export default ${componentName};`
 }
 
-module.exports = buildCompIndexTemplate;
+export default buildCompIndexTemplate;

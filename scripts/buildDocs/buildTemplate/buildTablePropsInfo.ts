@@ -1,4 +1,4 @@
-const parseTsFile = require('../../parseTsFile');
+import parseTsFile from './parseTsFile'
 
 const buildTablePropsInfo = (tsxPath: string) => {
   const {

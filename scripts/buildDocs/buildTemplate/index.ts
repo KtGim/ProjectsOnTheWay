@@ -45,7 +45,7 @@ const diffFiles = (oldFile: string, newFile: string, cb?: Function) => {
   const diff = Diff.diffTrimmedLines(oldFile, newFile);
 
   diff.forEach((part: any) => {
-    console.log(part, '====ppp====')
+    console.log(part)
   });
 
   cb && cb();
