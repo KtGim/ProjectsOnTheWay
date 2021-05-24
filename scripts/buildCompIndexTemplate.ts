@@ -13,7 +13,8 @@ type M = '1' | '2' | '3'
 const ${componentName} = defineComponent({
   name: '${componentName}',
   setup(props:Props) {
-    return () => <div class={createBEM('${componentName.toLowerCase()}')()}>
+    const baseClass = createBEM('${componentName.toLowerCase()}')();
+    return () => <div class={baseClass}>
       ${componentName}
     </div>
   }
