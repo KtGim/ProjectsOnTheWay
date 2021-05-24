@@ -71,9 +71,10 @@ function default_1(pathname) {
         }
         if (typescript_1["default"].isClassDeclaration(node) && node.name) {
             // This is a top level class, get its symbol
-            var symbol = checker.getSymbolAtLocation(node.name);
-            if (symbol) {
-                output.push(serializeClass(symbol));
+            var symbol_1 = checker.getSymbolAtLocation(node.name);
+            if (symbol_1) {
+                // output.push(serializeClass(symbol));
+                console.log(serializeClass(symbol_1).documentation);
             }
             // No need to walk any further, class expressions/inner declarations
             // cannot be exported
@@ -105,6 +106,11 @@ function default_1(pathname) {
         else if (typescript_1["default"].isEnumDeclaration(node)) {
             // const props = printer.printNode(ts.EmitHint.Unspecified, node, sourceNodeFile);
             // console.log(props.match(/{(.*?)}/msg)[0]);
+        }
+        var symbol = checker.getSymbolAtLocation(node.name);
+        if (symbol) {
+            // output.push(serializeClass(symbol));
+            console.log(serializeClass(symbol).documentation);
         }
     }
     /** Serialize a symbol into a json object */

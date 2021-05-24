@@ -36,7 +36,7 @@ ${buildTablePropsInfo(tsxPath)}`;
       fs.writeFileSync(docsPath, template, 'utf-8');
 
       // @ts-ignore
-      diffFiles(tsxFiles[componentName], newFile);
+      // diffFiles(tsxFiles[componentName], newFile);
 
     }
 }

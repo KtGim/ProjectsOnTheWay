@@ -61,7 +61,8 @@ export default function (pathname: string) {
       // This is a top level class, get its symbol
       let symbol = checker.getSymbolAtLocation(node.name);
       if (symbol) {
-        output.push(serializeClass(symbol));
+        // output.push(serializeClass(symbol));
+        console.log(serializeClass(symbol).documentation);
       }
       // No need to walk any further, class expressions/inner declarations
       // cannot be exported
@@ -97,6 +98,12 @@ export default function (pathname: string) {
     } else if(ts.isEnumDeclaration(node)) {
       // const props = printer.printNode(ts.EmitHint.Unspecified, node, sourceNodeFile);
       // console.log(props.match(/{(.*?)}/msg)[0]);
+    }
+
+    let symbol = checker.getSymbolAtLocation(node.name);
+    if (symbol) {
+      // output.push(serializeClass(symbol));
+      console.log(serializeClass(symbol).documentation);
     }
   }
 

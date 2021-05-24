@@ -19,7 +19,7 @@ var buildMdTemplate = function (_a) {
         var template = oldDocsFile.split('## 组件属性')[0] + "\n" + buildTablePropsInfo_1["default"](tsxPath);
         fs.writeFileSync(docsPath, template, 'utf-8');
         // @ts-ignore
-        diffFiles(tsxFiles[componentName], newFile);
+        // diffFiles(tsxFiles[componentName], newFile);
     }
 };
 var diffFiles = function (oldFile, newFile, cb) {

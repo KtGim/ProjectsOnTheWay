@@ -3,12 +3,11 @@ import { createBEM } from '../../utils/createBem';
 import './index.less';
 
 interface Props {
-  a: number;
+  a: number; 
   b: string;
   c: M;
 }
-
-type M = '1' | '2' | '3' | '4'
+type M = '1' | '2' | '3'
 
 const Demo = defineComponent({
   name: 'Demo',
