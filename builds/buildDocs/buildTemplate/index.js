@@ -16,7 +16,7 @@ var buildMdTemplate = function (_a) {
     else if (type === 'MODIFIED') {
         var newFile = fs.readFileSync(tsxPath, 'utf-8');
         var oldDocsFile = fs.readFileSync(docsPath, 'utf-8');
-        var template = oldDocsFile.split('## 组件属性')[0] + "\n" + buildTablePropsInfo_1["default"](tsxPath);
+        var template = "" + oldDocsFile.split('## 组件属性')[0] + buildTablePropsInfo_1["default"](tsxPath);
         fs.writeFileSync(docsPath, template, 'utf-8');
         // @ts-ignore
         // diffFiles(tsxFiles[componentName], newFile);

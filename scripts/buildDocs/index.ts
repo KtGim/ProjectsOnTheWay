@@ -105,7 +105,7 @@ class BuildDocs {
 
     const action = modifyActions[this.type];
 
-    action.log(`componentName相关文档 ${action.text} 完成！`)
+    action.log(`${componentName}相关文档 ${action.text} 完成！`)
     
     
     

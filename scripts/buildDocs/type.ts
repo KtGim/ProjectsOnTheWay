@@ -31,3 +31,8 @@ export type Actions = {
 export type cacheFiles = {
   [key in string]?: string;
 }
+
+export type componentProps = {[key in string]: {
+  typeName: string;
+  desc: string;
+}}

@@ -1,3 +1,4 @@
+import { componentProps } from '../type';
 import parseTsFile from './parseTsFile'
 
 const buildTablePropsInfo = (tsxPath: string) => {
@@ -5,19 +6,22 @@ const buildTablePropsInfo = (tsxPath: string) => {
     propAlias,
     typeAlias
   } = parseTsFile(tsxPath);
-
   let propsCellsInfo = '';
-  Object.keys(propAlias).forEach(key => {
+  Object.keys(propAlias as componentProps).forEach(key => {
     // @ts-ignore
-    let propsInfos = propAlias[key];
+    const propsTypeName = propAlias[key].typeName;
+     // @ts-ignore
+    const desc = propAlias[key].desc;
+    let propsInfos = propsTypeName;
     // @ts-ignore
     if (typeAlias.get(propAlias[key])) {
       // @ts-ignore
       propsInfos = typeAlias.get(propAlias[key])
       // @ts-ignore
-      propsCellsInfo += `| ${key} | - | ${propAlias[key]} (取值为: ${propsInfos.replace(/\|/g, ',')}) | - |\n`;
+      propsCellsInfo += `| ${key} | ${desc} | ${propsTypeName} (取值为: ${propsInfos.replace(/\|/g, ',')}) | - |\n`;
     } else {
-      propsCellsInfo += `| ${key} | - | ${propsInfos} | - |\n`;
+      // @ts-ignore
+      propsCellsInfo += `| ${key} | ${desc} | ${propsTypeName} | - |\n`;
     }
   })
   return `## 组件属性

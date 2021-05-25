@@ -9,16 +9,20 @@ var buildTablePropsInfo = function (tsxPath) {
     var propsCellsInfo = '';
     Object.keys(propAlias).forEach(function (key) {
         // @ts-ignore
-        var propsInfos = propAlias[key];
+        var propsTypeName = propAlias[key].typeName;
+        // @ts-ignore
+        var desc = propAlias[key].desc;
+        var propsInfos = propsTypeName;
         // @ts-ignore
         if (typeAlias.get(propAlias[key])) {
             // @ts-ignore
             propsInfos = typeAlias.get(propAlias[key]);
             // @ts-ignore
-            propsCellsInfo += "| " + key + " | - | " + propAlias[key] + " (\u53D6\u503C\u4E3A: " + propsInfos.replace(/\|/g, ',') + ") | - |\n";
+            propsCellsInfo += "| " + key + " | " + desc + " | " + propsTypeName + " (\u53D6\u503C\u4E3A: " + propsInfos.replace(/\|/g, ',') + ") | - |\n";
         }
         else {
-            propsCellsInfo += "| " + key + " | - | " + propsInfos + " | - |\n";
+            // @ts-ignore
+            propsCellsInfo += "| " + key + " | " + desc + " | " + propsTypeName + " | - |\n";
         }
     });
     return "## \u7EC4\u4EF6\u5C5E\u6027\n\n|\u540D\u79F0  | \u63CF\u8FF0 | \u7C7B\u578B |default|\n|--|--|--|--|\n" + propsCellsInfo;

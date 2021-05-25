@@ -1,4 +1,5 @@
 import ts from "typescript";
+import { componentProps } from "../type";
 
 export default function (pathname: string) {
   // console.log(pathname)
@@ -36,16 +37,21 @@ export default function (pathname: string) {
 
   // 用于将 { a: number } 类型的字符串 准换成对象
   function initObjectAlias (objectStr: string) {
-    let props: {[key in string]: string} = {};
+    let props: componentProps = {};
     if (objectStr) {
       const containerStr: string[] = (objectStr.match(/{(.*?)}/msg) || [])[0].replace(/;/g, '').split('\n').slice(1, -1).map(propStr => propStr.trim());
       containerStr.forEach(prop => {
         if (prop) {
           const propsAndType = prop.split(':');
-          props[propsAndType[0].trim()] = propsAndType[1].trim();
+          const [propsType, propsComment] = propsAndType[1] ? propsAndType[1].trim().split('//') : []
+          props[propsAndType[0].trim()] = {
+            typeName: propsType,
+            desc: propsComment
+          };
         }
       })
     }
+    // console.log(props);
     return props
   }
 
@@ -62,7 +68,7 @@ export default function (pathname: string) {
       let symbol = checker.getSymbolAtLocation(node.name);
       if (symbol) {
         // output.push(serializeClass(symbol));
-        console.log(serializeClass(symbol).documentation);
+        // console.log(serializeClass(symbol).documentation);
       }
       // No need to walk any further, class expressions/inner declarations
       // cannot be exported
@@ -76,9 +82,8 @@ export default function (pathname: string) {
       // }
       const propsStr = printer.printNode(ts.EmitHint.Unspecified, node, sourceNodeFile!);
       
-      let props: string | {
-        [x: string]: string
-      } = '';
+      let props: string | componentProps = '';
+      console.log(ts.getSyntheticLeadingComments(node));
 
       if (!propsStr.match(/{(.*?)}/msg)) {
         // 匹配 type A = '1' | '2' | '3'
@@ -103,7 +108,7 @@ export default function (pathname: string) {
     let symbol = checker.getSymbolAtLocation(node.name);
     if (symbol) {
       // output.push(serializeClass(symbol));
-      console.log(serializeClass(symbol).documentation);
+      // console.log(node.name.escapedText, serializeClass(symbol).documentation);
     }
   }
 

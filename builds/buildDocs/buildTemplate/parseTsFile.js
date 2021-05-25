@@ -57,10 +57,15 @@ function default_1(pathname) {
             containerStr.forEach(function (prop) {
                 if (prop) {
                     var propsAndType = prop.split(':');
-                    props[propsAndType[0].trim()] = propsAndType[1].trim();
+                    var _a = propsAndType[1] ? propsAndType[1].trim().split('//') : [], propsType = _a[0], propsComment = _a[1];
+                    props[propsAndType[0].trim()] = {
+                        typeName: propsType,
+                        desc: propsComment
+                    };
                 }
             });
         }
+        // console.log(props);
         return props;
     }
     /** visit nodes finding exported classes */
@@ -74,7 +79,7 @@ function default_1(pathname) {
             var symbol_1 = checker.getSymbolAtLocation(node.name);
             if (symbol_1) {
                 // output.push(serializeClass(symbol));
-                console.log(serializeClass(symbol_1).documentation);
+                // console.log(serializeClass(symbol).documentation);
             }
             // No need to walk any further, class expressions/inner declarations
             // cannot be exported
@@ -90,6 +95,7 @@ function default_1(pathname) {
             // }
             var propsStr = printer.printNode(typescript_1["default"].EmitHint.Unspecified, node, sourceNodeFile);
             var props = '';
+            console.log(typescript_1["default"].getSyntheticLeadingComments(node));
             if (!propsStr.match(/{(.*?)}/msg)) {
                 // 匹配 type A = '1' | '2' | '3'
                 props = propsStr.split("=")[1].replace(/;/g, '').trim();
@@ -110,7 +116,7 @@ function default_1(pathname) {
         var symbol = checker.getSymbolAtLocation(node.name);
         if (symbol) {
             // output.push(serializeClass(symbol));
-            console.log(serializeClass(symbol).documentation);
+            // console.log(node.name.escapedText, serializeClass(symbol).documentation);
         }
     }
     /** Serialize a symbol into a json object */

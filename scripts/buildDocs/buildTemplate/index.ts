@@ -31,8 +31,7 @@ ${buildTablePropsInfo(tsxPath)}`;
       const newFile = fs.readFileSync(tsxPath, 'utf-8');
       const oldDocsFile = fs.readFileSync(docsPath, 'utf-8');
 
-      const template = `${oldDocsFile.split('## 组件属性')[0]}
-${buildTablePropsInfo(tsxPath)}`;
+      const template = `${oldDocsFile.split('## 组件属性')[0]}${buildTablePropsInfo(tsxPath)}`;
       fs.writeFileSync(docsPath, template, 'utf-8');
 
       // @ts-ignore

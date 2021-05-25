@@ -85,7 +85,7 @@ var BuildDocs = /** @class */ (function () {
             this.collectDocsFiles(componentName, docsPath);
         }
         var action = actionsInfo_1.modifyActions[this.type];
-        action.log("componentName\u76F8\u5173\u6587\u6863 " + action.text + " \u5B8C\u6210\uFF01");
+        action.log(componentName + "\u76F8\u5173\u6587\u6863 " + action.text + " \u5B8C\u6210\uFF01");
         // let newFile = null;
         // const isMdExist = fs.existsSync(resolve(docsRoot, `${componentName}/index.md`));
         // const isTsxExist = fs.existsSync(resolve(docsRoot, `${componentName}/index.md`));
