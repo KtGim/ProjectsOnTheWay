@@ -50,6 +50,7 @@ watcher
     }
   })
   .on('raw', (event, path, {type}) => { // internal
+    console.log(event, path, type)
     let dir = path.split('/').pop();
     if(type === 'directory') {
       // console.log(leadingInNames, 'in', event);
@@ -65,9 +66,10 @@ watcher
 
       buildIndex(dir, leadingInNames, event as originType);
       // components/index.ts 变动时不触发
-      if (dir !== 'components') {
-        buildDocs.processDocs(dir, event as originType);
-      }
+      // if (dir !== 'components') {
+      //   buildDocs.processDocs(dir, event as originType);
+      // }
+      buildDocs.processDocs(dir, event as originType);
       buildRoutes(buildRoutesTemplate(leadingInNames), 'modified')
     } else {
       // components/index.ts 变动时不触发

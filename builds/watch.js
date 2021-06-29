@@ -47,6 +47,7 @@ watcher
 })
     .on('raw', function (event, path, _a) {
     var type = _a.type;
+    console.log(event, path, type);
     var dir = path.split('/').pop();
     if (type === 'directory') {
         // console.log(leadingInNames, 'in', event);
@@ -60,9 +61,10 @@ watcher
         }
         buildIndex_1["default"](dir, leadingInNames, event);
         // components/index.ts 变动时不触发
-        if (dir !== 'components') {
-            buildDocs.processDocs(dir, event);
-        }
+        // if (dir !== 'components') {
+        //   buildDocs.processDocs(dir, event as originType);
+        // }
+        buildDocs.processDocs(dir, event);
         buildRoutes_1["default"](buildRoutesTemplate_1["default"](leadingInNames), 'modified');
     }
     else {

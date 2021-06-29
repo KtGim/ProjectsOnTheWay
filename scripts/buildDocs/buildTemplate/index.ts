@@ -19,12 +19,13 @@ const buildMdTemplate: (options: {
     tsxFiles,
     type
   }) => {
-
+    
     if (type === 'CREATED') {
       const template = `${buildContent('Demo')}
 
-${buildTablePropsInfo(tsxPath)}`;
-      fs.writeFileSync(docsPath, template, 'utf-8');
+        ${buildTablePropsInfo(tsxPath)}`;
+              fs.writeFileSync(docsPath, template, 'utf-8');
+     
     } else if (type === 'MODIFIED') {
      
       

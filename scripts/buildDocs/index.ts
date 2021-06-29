@@ -60,7 +60,12 @@ class BuildDocs {
   }
 
   collectDocsFiles(componentName: string, path: string) {
-    this.docsFiles[componentName] = fs.readFileSync(path, 'utf-8');
+    try {
+      this.docsFiles[componentName] = fs.readFileSync(path, 'utf-8');
+    } catch(e) {
+      this.docsFiles[componentName] = '';
+      fs.mkdirSync(resolve(path, '..'));
+    }
   }
 
   processDocs(componentName: string, type: keyof typeof transformModifyType) {

@@ -46,7 +46,13 @@ var BuildDocs = /** @class */ (function () {
         this.tsxFiles[componentName] = fs_1["default"].readFileSync(path, 'utf-8');
     };
     BuildDocs.prototype.collectDocsFiles = function (componentName, path) {
-        this.docsFiles[componentName] = fs_1["default"].readFileSync(path, 'utf-8');
+        try {
+            this.docsFiles[componentName] = fs_1["default"].readFileSync(path, 'utf-8');
+        }
+        catch (e) {
+            this.docsFiles[componentName] = '';
+            fs_1["default"].mkdirSync(path_1.resolve(path, '..'));
+        }
     };
     BuildDocs.prototype.processDocs = function (componentName, type) {
         var components = this.components;

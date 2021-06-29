@@ -10,7 +10,7 @@ var buildTablePropsInfo_1 = __importDefault(require("./buildTablePropsInfo"));
 var buildMdTemplate = function (_a) {
     var componentName = _a.componentName, tsxPath = _a.tsxPath, docsPath = _a.docsPath, docsFiles = _a.docsFiles, tsxFiles = _a.tsxFiles, type = _a.type;
     if (type === 'CREATED') {
-        var template = buildContent_1["default"]('Demo') + "\n\n" + buildTablePropsInfo_1["default"](tsxPath);
+        var template = buildContent_1["default"]('Demo') + "\n\n        " + buildTablePropsInfo_1["default"](tsxPath);
         fs.writeFileSync(docsPath, template, 'utf-8');
     }
     else if (type === 'MODIFIED') {
