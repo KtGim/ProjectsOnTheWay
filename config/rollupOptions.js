@@ -6,6 +6,9 @@ const vue = require('rollup-plugin-vue')
 const { babel } = require('@rollup/plugin-babel')
 const less = require('rollup-plugin-less')
 const jsx = require("acorn-jsx")
+// const autoprefixer = require('autoprefixer')
+const postcss = require('rollup-plugin-postcss')
+// const pxToRem = require('postcss-plugin-px2rem');
 
 const packageJSON = require('../package.json')
 const external = ['vue'];
@@ -44,10 +47,23 @@ const commonConf = (input, output, inputCss) => {
         css: true,
         compileTemplate: true
       }),
-      less({
-        rootpath: inputCss,
-        output: output || false,
-        insert: !output, // 自动 添加到 header 标签内
+      // less({
+      //   rootpath: inputCss,
+      //   output: output || false,
+      //   insert: !output, // 自动 添加到 header 标签内
+      // }),
+      postcss({
+        plugins: [
+          require('autoprefixer')({overrideBrowserslist: ['> 0.15% in CN']})
+        ],
+        config: {
+            path: '../postcss.components.config.js'
+        },
+        use: {               
+            less: { javascriptEnabled: true }
+        },
+        extensions: ['.less'], // Looks like this still processes CSS despite this line.
+        extract: false         
       }),
       tsPlugin,
       babel({
