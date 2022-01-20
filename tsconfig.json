@@ -104,7 +104,8 @@
     "./site/**/*.tsx",
     "./components/**/*.tsx",
     "./components/**/*.ts",
-    "./typings/*.d.ts"
+    "./typings/*.d.ts",
+    "helper/rollup-plugin-md-parser/.virtualFile/B.tsx"
   ],
   "exclude": [
     "./node_modules/**/*",

@@ -8,3 +8,15 @@
     var a = 1;
     console.log(a);
 ```
+
+```tsx
+    import BApp from './B';
+
+    const Com = () => {
+      return (
+        <BApp />
+      );
+    }
+
+    export default Com;
+```
