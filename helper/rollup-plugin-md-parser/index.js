@@ -7,15 +7,18 @@ const virtualFilePath = './helper/rollup-plugin-md-parser/.virtualFile';
 const fileInputPath = '../helper/rollup-plugin-md-parser/.virtualFile/';
 
 const langs = ['ts', 'tsx', 'js', 'javascript', 'jsx'];
+
 export default function myExample () {
   return {
     name: 'md-parser', // this name will show up in warnings and errors
-    // resolveId (source, importer, options) {
-    // },
-    // load (id) {
-    //   }
-    // },
+    resolveId (source, importer, options) {
+      console.log(4, source, importer)
+    },
+    load (id) {
+      console.log(3)
+    },
     transform ( code, id ) {
+      console.log(0)
       // console.log(path.basename(id));
       // console.log(path.dirname(id));
       // console.log(path.extname(id));
@@ -24,7 +27,7 @@ export default function myExample () {
         const tokens = marked.lexer(code);
         // console.log(tokens);
         
-        tokens.forEach(token => {
+        tokens.forEach((token) => {
           const {
             type,
             lang,
@@ -101,7 +104,8 @@ export default function myExample () {
         }
       }
     },
-    // moduleParsed(moduleInfo) {
-    // }
+    moduleParsed(moduleInfo) {
+      console.log(1)
+    }
   };
 }
