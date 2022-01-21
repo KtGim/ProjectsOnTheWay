@@ -10,11 +10,11 @@
 ```
 
 ```tsx
-    import BApp from './B';
+    import { B } from 'components';
 
     const Com = () => {
       return (
-        <BApp />
+        <B />
       );
     }
 

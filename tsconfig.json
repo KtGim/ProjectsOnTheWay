@@ -32,7 +32,8 @@
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. 将多个文件夹下面的编译文件打包到统一等级的目录中*/
     // "typeRoots": [],                                  /* Specify multiple folders that act like `./node_modules/@types`. */
     "types": [
-      "marked"
+      "marked",
+      "node"
     ],                                      /* Specify type package names to be included without being referenced in a source file. */
     // "allowUmdGlobalAccess": true,                     /* Allow accessing UMD globals from modules. */
     // "resolveJsonModule": true,                        /* Enable importing .json files */
@@ -100,14 +101,18 @@
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
   "include": [
-    "./site/**/*.ts",
-    "./site/**/*.js",
-    "./site/**/*.jsx",
-    "./site/**/*.tsx",
-    "./components/**/*.tsx",
-    "./components/**/*.ts",
-    "./typings/*.d.ts",
-    "helper/rollup-plugin-md-parser/.virtualFile/B.tsx"
+    "site/**/*.ts",
+    "site/**/*.js",
+    "site/**/*.jsx",
+    "site/**/*.tsx",
+    "utils/**/*.ts",
+    "utils/*.ts",
+    "utils/**/*.tsx",
+    "utils/*.tsx",
+    "components/*.ts",
+    "components/**/*.tsx",
+    "components/**/*.ts",
+    "typings/*.d.ts"
   ],
   "exclude": [
     "./node_modules/**/*",
