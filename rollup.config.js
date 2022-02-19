@@ -8,9 +8,10 @@ import image from '@rollup/plugin-image';
 import postcss from 'rollup-plugin-postcss';
 import ts from 'rollup-plugin-typescript2';
 import jsx from 'acorn-jsx';
-import mdParser from './helper/rollup-plugin-md-parser/index';
+import json from '@rollup/plugin-json';
+import { string } from 'rollup-plugin-string';
 
-const fileExtensions = ['.js', '.jsx', '.tsx'];
+const fileExtensions = ['.js', '.jsx', '.tsx', '.md'];
 const cssExtensions = ['.css', '.less'];
 
 const tsPlugin = ts({
@@ -27,6 +28,10 @@ export default {
     sourcemap: true,
   },
   plugins: [
+    string({
+      include: ['**/*.md'],
+    }),
+    json(),
     image(),
     postcss({
       extensions: cssExtensions
@@ -38,7 +43,7 @@ export default {
       'process.env.NODE_ENV': JSON.stringify( 'development' ),
       preventAssignment: true
     }),
-    mdParser(),
+    // mdParser(),
     tsPlugin,
     babel({
       presets: ["@babel/preset-react"],

@@ -1,15 +1,16 @@
 import React from 'react';
+import 'highlight.js/styles/a11y-light.css'
 import './app.less';
 
-import { AppProps } from './index';
+import { AppProps } from './type';
 
-import Amd from './a.md';
+import BDemo from 'components/BDemo';
 
 function App(props: AppProps){
   return (
     <div className="app">
-      Hello World From React-Rollup {props.name} <br/>
-      <Amd />
+      Hello World From React-Rollup {props.name}
+      <BDemo />
     </div>
   );
 }
