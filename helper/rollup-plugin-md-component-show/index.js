@@ -34,7 +34,7 @@ export default function returnNewMd () {
             const TempModule = () => {
                 return (
                     <CodeProvider
-                        markdown={${JSON.stringify(code)}}
+                        markdown={${JSON.stringify(code.replace(new RegExp('``` demo','g'), '').replace(new RegExp('```  ','g'), ''))}}
                         components={{
                             ${components.join(',')}
                         }}
@@ -44,8 +44,6 @@ export default function returnNewMd () {
 
             export default TempModule;
         `;
-
-        console.log(tempModule);
         
         const {code: cde, map} = transformSync(tempModule, {
             ast: false,

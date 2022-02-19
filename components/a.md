@@ -5,9 +5,9 @@
     console.log(a);
 ```
 
-```demo
+``` demo
 <A />
-```
+```  
 
 ```tsx
   import React from 'react';
@@ -23,9 +23,9 @@
   export default A;
 ```
 
-```demo
+``` demo
 <B />
-```
+```  
 
 ```tsx
     import React from 'react';
