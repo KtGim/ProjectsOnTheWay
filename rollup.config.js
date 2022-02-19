@@ -9,7 +9,7 @@ import postcss from 'rollup-plugin-postcss';
 import ts from 'rollup-plugin-typescript2';
 import jsx from 'acorn-jsx';
 import json from '@rollup/plugin-json';
-import { string } from 'rollup-plugin-string';
+import returnNewMd from "./helper/rollup-plugin-md-component-show/index";
 
 const fileExtensions = ['.js', '.jsx', '.tsx', '.md'];
 const cssExtensions = ['.css', '.less'];
@@ -28,9 +28,7 @@ export default {
     sourcemap: true,
   },
   plugins: [
-    string({
-      include: ['**/*.md'],
-    }),
+    returnNewMd(),
     json(),
     image(),
     postcss({
@@ -59,7 +57,7 @@ export default {
       host: "localhost",
       port: 3000,
     }),
-    livereload({ watch: "dist" }),
+    livereload({ watch: ["dist", "helper/rollup-plugin-md-component-show/index.js"] }),
   ],
   acornInjectPlugins: [jsx()]
 };

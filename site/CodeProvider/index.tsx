@@ -7,6 +7,7 @@ const CodeProvider  = ({
     markdown,
     components
 }: CodeProviderProps) => {
+    console.log(components, 'components');
     return (
         <MarkdownView
             markdown={markdown}
