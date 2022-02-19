@@ -5,7 +5,9 @@
     console.log(a);
 ```
 
+```demo
 <A />
+```
 
 ```tsx
   import React from 'react';
@@ -21,7 +23,9 @@
   export default A;
 ```
 
+```demo
 <B />
+```
 
 ```tsx
     import React from 'react';
