@@ -1,8 +1,14 @@
-import {lazy} from 'react';
-import { componentsPath, ComponentsProps } from './common';
 
-const components: ComponentsProps = {
-    A: lazy(() => import((`${componentsPath}/business/A/index.tsx`)))
-};
+    import {lazy} from 'react';
+    import { ComponentsProps } from './common';
 
-export default components;
+    const components: ComponentsProps = {
+        
+    A: lazy(() => import(('../../docs/business/A/Demo.md')))
+    ,
+    B: lazy(() => import(('../../docs/business/B/Demo.md')))
+    
+    };
+
+    export default components;
+    

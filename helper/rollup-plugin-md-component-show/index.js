@@ -34,7 +34,7 @@ export default function returnNewMd () {
 
             const importStrings = [];
             components.forEach((id) => {
-                importStrings.push(`import ${id} from './${id}'`);
+                importStrings.push(`import ${id} from '${providerRelativePath}/components/index.tsx'`);
             });
 
             /**

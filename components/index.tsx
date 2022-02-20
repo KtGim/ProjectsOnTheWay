@@ -1,3 +1,4 @@
-import B from './business/B';
+import A from './business/A';
 
-export { B };
+
+export { A };

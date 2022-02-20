@@ -2,11 +2,6 @@
 
 ## 简介
 
-```javascript
-    var a = 1;
-    console.log(a);
-```
-
 ### 例子
 
 ``` demo
