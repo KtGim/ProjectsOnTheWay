@@ -27,24 +27,6 @@
   export default A;
 ```
 
-``` demo
-<B />
-```  
-
-```tsx
-    import React from 'react';
-
-    const B = () => {
-        return (
-            <div>
-                BBBB
-            </div>
-        )
-    };
-
-    export default B;
-```
-
 ### API
 
 | 成员 | 说明 | 类型 | 默认值 | 版本 |
