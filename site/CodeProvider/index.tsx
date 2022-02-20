@@ -12,6 +12,10 @@ const CodeProvider  = ({
         <MarkdownView
             markdown={markdown}
             components={components}
+            options={{
+                tables: true,
+                emoji: true
+            }}
             extensions={showdownHighlight({pre: true})}
         />
     )

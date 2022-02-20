@@ -1,3 +1,3 @@
-import B from './B';
+import B from './business/B';
 
 export { B };
