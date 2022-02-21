@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    BrowserRouter as Router,
+    HashRouter as Router,
     Routes,
     Route
 } from 'react-router-dom';
@@ -29,10 +29,8 @@ const Routers = () => {
                         Comp =  components['404'];
                     }
                     return (
-                        <Route key={key} path={path}>
-                            <Comp />
-                        </Route>
-                    );
+                        <Route key={key} path={path} element={<Comp />} />
+                    )
                 })
             }
             <Route path="/404">

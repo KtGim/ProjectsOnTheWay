@@ -4,14 +4,20 @@ import path from 'path';
 
 const DEMO_FLAG = 'demo';
 const COMPONENTS_MODULE_NAME = `components${path.sep}`;
+const DOCS_MODULE_NAME = `docs${path.sep}`;
 
 const firstToUpper = (str) => {
     return str.trim().toLowerCase().replace(str[0], str[0].toUpperCase());
 }
 
 const getProviderPath = (pa) => {
-    const paths = (pa.split(COMPONENTS_MODULE_NAME)[1]).split(path.sep);
-    return Array.from({length: paths.length}).fill('..').join('/');
+    const docsPath = pa.split(DOCS_MODULE_NAME)[1];
+    const paths = (docsPath).split(path.sep);
+    const prePath = path.dirname(docsPath);
+    return {
+        preFix: Array.from({length: paths.length}).fill('..').join('/'),
+        prePath: prePath.replace(path.sep, '/')
+    };
 }
 
 export default function returnNewMd () {
@@ -21,7 +27,11 @@ export default function returnNewMd () {
     transform ( code, id ) {
         if(path.extname(id) == '.md') {
             const pa = path.normalize(id);
-            const providerRelativePath = `${getProviderPath(pa)}/`;
+            const {
+                preFix,
+                prePath
+            } = getProviderPath(pa);
+            const providerRelativePath = `${preFix}/`;
             const mdFileName = firstToUpper(path.basename(id).replace('.md', '')); //获取当前文件名
             const components = [];
             const tokens = marked.lexer(code);
@@ -34,7 +44,7 @@ export default function returnNewMd () {
 
             const importStrings = [];
             components.forEach((id) => {
-                importStrings.push(`import ${id} from '${providerRelativePath}/components/index.tsx'`);
+                importStrings.push(`import ${id} from '${providerRelativePath}components/${prePath}/index';`);
             });
 
             /**
@@ -48,30 +58,37 @@ export default function returnNewMd () {
              * 结尾的 ``` 后面需要加上两个空格
              * 目的主要是为了 方便进行字符串替换
              */
-
+            const fileName = `TempModule${firstToUpper(mdFileName)}`;
             const tempModule = `
                 import React from 'react';
                 import CodeProvider from '${providerRelativePath}site/CodeProvider';
-                ${importStrings.join(';\n')}
+                ${importStrings.join('\n')}
 
-                const TempModule${mdFileName} = () => {
+                const ${fileName} = () => {
                     return (
                         <CodeProvider
                             markdown={${JSON.stringify(code.replace(new RegExp('``` demo','g'), '').replace(new RegExp('```  ','g'), ''))}}
-                            components={{
-                                ${components.join(',')}
-                            }}
+                            ${
+                                components.length ?
+`
+components={{
+    ${components.join(',')}
+}}
+` : undefined
+                            }
                         />
                     )
                 }
 
-                export default TempModule${mdFileName};
+                export default ${fileName};
             `;
+
+            // console.log(tempModule);
 
             const {code: cde, map} = transformSync(tempModule, {
                 ast: false,
                 code: true,
-                filename: `TempModule${mdFileName}.tsx`,
+                filename: `${fileName}.tsx`,
                 configFile: path.resolve('./babelrc.json')
             });
             return {

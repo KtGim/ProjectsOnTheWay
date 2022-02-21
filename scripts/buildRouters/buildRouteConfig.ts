@@ -11,7 +11,7 @@ const buildRouteConfig = (moduleNames: RouteProps[]) => {
     `
         {
             name: '${name}',
-            path: '${path}',
+            path: '/${path}',
             key: '${name}'
         }
     `)

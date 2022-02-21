@@ -1,8 +1,9 @@
-const fs = require('fs');
-const {resolve, join} = require('path');
+import fs from 'fs';
+import {resolve, join} from 'path';
 import buildRouteConfig from './buildRouteConfig';
-import buildLazyComponents from './buildLazyComponents';
+import { buildComponents } from './buildLazyComponents';
 import { RouteProps, ComponentsKey } from "./type";
+import { FilterModules } from './helpers';
 
 const componentsRoot = resolve(__dirname, '../../components');
 const routerRoot = resolve(__dirname, '../../site/.routerConfig');
@@ -10,9 +11,10 @@ const routerRoot = resolve(__dirname, '../../site/.routerConfig');
 const getModuleComponentName: (path: string) => ComponentsKey[] = (path: string) => {
     return fs.readdirSync(path)
     .filter((f: any) =>
-      (fs.statSync(join(path, f)).isDirectory()) && (f !== 'style')
-    )
+        FilterModules.indexOf(f) == -1 && (fs.statSync(join(path, f)).isDirectory())
+    ) as ComponentsKey[]
 }
+
 const leadingInNames: ComponentsKey[] = getModuleComponentName(componentsRoot);
 
 const routerConfigArr: RouteProps[] = [];
@@ -31,7 +33,7 @@ leadingInNames.forEach((mName: ComponentsKey) => {
 });
 
 const routerConfigTemplate = buildRouteConfig(routerConfigArr);
-const routerComponentsTemplate = buildLazyComponents(routerConfigArr);
+const routerComponentsTemplate = buildComponents(routerConfigArr);
 
 fs.writeFileSync(`${routerRoot}/config.ts`, routerConfigTemplate, 'utf-8');
 fs.writeFileSync(`${routerRoot}/lazyComponents.tsx`, routerComponentsTemplate, 'utf-8');

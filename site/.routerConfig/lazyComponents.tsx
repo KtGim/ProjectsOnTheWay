@@ -1,12 +1,13 @@
 
-    import {lazy} from 'react';
     import { ComponentsProps } from './common';
+    import A from '../../docs/business/A/Demo.md';
+import B from '../../docs/business/B/Demo.md';
 
     const components: ComponentsProps = {
         
-    A: lazy(() => import(('../../docs/business/A/Demo.md')))
+    A: A
     ,
-    B: lazy(() => import(('../../docs/business/B/Demo.md')))
+    B: B
     
     };
 

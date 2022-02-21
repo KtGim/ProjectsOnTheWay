@@ -5,7 +5,9 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "test",
-    "site": "rollup -c rollup.config.js -w"
+    "site": "rollup -c rollup.config.js -w",
+    "build-route": "ts-node ./scripts/buildRouters/index.ts",
+    "dev": "ts-node ./scripts/buildRouters/index.ts & rollup -c rollup.config.js"
   },
   "keywords": [
     "common"
@@ -21,6 +23,7 @@
     "@types/react-dom": "^17.0.11",
     "deepmerge": "^4.2.2",
     "rollup": "^2.64.0",
+    "ts-node": "^10.5.0",
     "typescript": "^4.7.0-dev.20220220"
   },
   "dependencies": {

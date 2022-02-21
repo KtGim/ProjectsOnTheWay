@@ -5,13 +5,13 @@
         
         {
             name: 'A',
-            path: 'business/A',
+            path: '/business/A',
             key: 'A'
         }
     ,
         {
             name: 'B',
-            path: 'business/B',
+            path: '/business/B',
             key: 'B'
         }
     
