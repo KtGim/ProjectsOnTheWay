@@ -13,9 +13,20 @@ const CodeProvider  = ({
             components={components}
             options={{
                 tables: true,
-                emoji: true
+                emoji: true,
+                omitExtraWLInCodeBlocks: true,
+                headerLevelStart: 1,
+                parseImgDimensions: true,
+                simplifiedAutoLink: true,
+                tablesHeaderId: true,
+                tasklists: true,
+                smoothLivePreview: true,
+                smartIndentationFix: true,
+                openLinksInNewWindow: true,
+                splitAdjacentBlockquotes: true
             }}
             extensions={showdownHighlight({pre: true})}
+            className="demo-display-area"
         />
     )
 }
