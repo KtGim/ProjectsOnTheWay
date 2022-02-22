@@ -8,7 +8,7 @@ interface Props extends AP {
 
 type AType = "A";
 
-const A = (props: Props) => {
+const A = () => {
     const [a, setA] = useState(0);
     const aa: AType = 'A';
 
