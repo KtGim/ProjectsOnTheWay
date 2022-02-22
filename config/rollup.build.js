@@ -8,7 +8,8 @@ export default [{
         sourcemap: true,
         globals: {
             react: 'React',
-            antd: 'antd'
+            antd: 'antd',
+            'react-dom': 'react-dom'
         }
     }
 }, {
@@ -19,7 +20,8 @@ export default [{
         sourcemap: true,
         globals: {
             react: 'React',
-            antd: 'antd'
+            antd: 'antd',
+            'react-dom': 'react-dom'
         }
     }
 }, {
@@ -31,7 +33,8 @@ export default [{
         sourcemap: true,
         globals: {
             react: 'React',
-            antd: 'antd'
+            antd: 'antd',
+            'react-dom': 'react-dom'
         }
     }
 }];

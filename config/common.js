@@ -18,7 +18,7 @@ const tsPlugin = ts({
 
 export default {
     input: './components/index.tsx',
-    external: ['react', 'antd'],
+    external: ['react', 'antd', 'react-dom'],
     plugins: [
         json(),
         image(),
