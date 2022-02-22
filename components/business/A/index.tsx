@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
+import { AP } from './type';
+interface Props extends AP {
+    name?: string;
+    age: number;
+}
 
-const A = () => {
+type AType = "A";
+
+const A = (props: Props) => {
     const [a, setA] = useState(0);
+    const aa: AType = 'A';
+
     return (
         <div>
             {a}
