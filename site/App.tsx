@@ -5,8 +5,14 @@ import './app.less';
 import 'antd/dist/antd.css';
 
 import Routers from './.routerConfig/index';
+import {A} from '../lib/esm/index'
 
 function App(){
-  return <Routers />;
+  return (
+    <div>
+      <A />
+      <Routers />
+    </div>
+  );
 }
 export default App;

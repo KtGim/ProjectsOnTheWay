@@ -13,7 +13,7 @@ const A = (props: Props) => {
     const aa: AType = 'A';
 
     return (
-        <div>
+        <div className="a-component">
             {a}
             <Button onClick={() => {
                 setA(a + 1);
