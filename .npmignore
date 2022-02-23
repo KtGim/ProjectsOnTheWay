@@ -4,3 +4,17 @@ config
 docs
 site
 dist
+changeLogs
+components
+helper
+scripts
+typings
+utils
+.gitignore
+babelrc
+bugs.md
+package-lock.json
+package.json
+README.md
+rollup.config.js
+tsconfig.json
