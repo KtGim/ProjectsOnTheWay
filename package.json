@@ -1,6 +1,6 @@
 {
   "name": "busi-ui",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "gwms and wms common business components",
   "main": "lib/esm/index.js",
   "scripts": {
