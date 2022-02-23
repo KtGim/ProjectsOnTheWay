@@ -23,17 +23,24 @@ export default {
         json(),
         image(),
         postcss({
-        extensions: cssExtensions
+            extract: true,
+            // Use named exports alongside default export.
+            namedExports: true,
+            // Minimize CSS, boolean or options for cssnano.
+            minimize: true,
+            // Enable sourceMap.
+            sourceMap: true,
+            extensions: cssExtensions
         }),
         nodeResolve({
-        extensions: fileExtensions
+            extensions: fileExtensions
         }),
         tsPlugin,
         babel({
-        presets: ["@babel/preset-react"],
-        babelHelpers: "bundled",
-        extensions: fileExtensions,
-        exclude: 'node_modules/**'
+            presets: ["@babel/preset-react"],
+            babelHelpers: "bundled",
+            extensions: fileExtensions,
+            exclude: 'node_modules/**'
         }),
         commonjs()
     ],
