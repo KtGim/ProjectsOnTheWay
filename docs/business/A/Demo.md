@@ -1,25 +1,21 @@
-# heading
-
-## 简介
-
-### 例子
+```
+ 你愁啥
+```
+### 简单的例子
 
 ``` demo
 <A />
 ```  
 
 ```tsx
-  import React from 'react';
+    import React from 'react';
+    import { A } from 'busi-ui';
 
-  const A = () => {
-      return (
-          <div>
-              AAAA
-          </div>
-      )
-  };
+    const Demo =() => {
+        return <A />
+    }
 
-  export default A;
+    export default Demo;
 ```
 
 ``` demo

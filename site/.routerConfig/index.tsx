@@ -14,7 +14,7 @@ import NotFound from 'site/layout/NotFound';
 import Layout from 'site/layout';
 import ComponentsLayout from 'site/layout/components';
 
-const initRoutesConfig = () => {
+const initRoutesConfig: () => RoutersMapProps = () => {
     const routersMap: RoutersMapProps = {};
 
     routers && routers.forEach((route: RouteProps) => {
@@ -26,7 +26,7 @@ const initRoutesConfig = () => {
             if(!routersMap[moduleName]) {
                 routersMap[moduleName] = [];
             }
-            routersMap[moduleName].push(route);
+            routersMap[moduleName]!.push(route);
         }
     })
 

@@ -20,4 +20,13 @@
     ];
     
     export default routerConfig;
+
+
+    type moduleNameType = 'business';
+    type componentNameType = 'A' | 'B';
+
+    export {
+        moduleNameType,
+        componentNameType
+    };
     

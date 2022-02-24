@@ -2,27 +2,28 @@ import fs from 'fs';
 import {resolve, join} from 'path';
 import buildRouteConfig from './buildRouteConfig';
 import { buildComponents } from './buildLazyComponents';
-import { RouteProps, ComponentsKey } from "./type";
+import { RouteProps } from "./type";
 import { FilterModules } from './helpers';
+import { componentNameType, moduleNameType } from '../../site/.routerConfig/config';
 
 const componentsRoot = resolve(__dirname, '../../components');
 const routerRoot = resolve(__dirname, '../../site/.routerConfig');
 
-const getModuleComponentName: (path: string) => ComponentsKey[] = (path: string) => {
+// @ts-ignore  主要是 泛型无法转换成指定的 string 类型
+const getModuleComponentName: <T>(path: string) => T[] = (path: string) => {
     return fs.readdirSync(path)
-    .filter((f: any) =>
+    .filter((f: string) =>
         FilterModules.indexOf(f) == -1 && (fs.statSync(join(path, f)).isDirectory())
-    ) as ComponentsKey[]
+    );
 }
 
-const leadingInNames: ComponentsKey[] = getModuleComponentName(componentsRoot);
-
+const leadingInNames: moduleNameType[] = getModuleComponentName<moduleNameType>(componentsRoot);
 const routerConfigArr: RouteProps[] = [];
 
-leadingInNames.forEach((mName: ComponentsKey) => {
+leadingInNames.forEach((mName: moduleNameType) => {
     const componentsPathPre = `${componentsRoot}/${mName}/`;
-    const componentsInModule = getModuleComponentName(componentsPathPre);
-    componentsInModule.forEach((comName: string) => {
+    const componentsInModule = getModuleComponentName<componentNameType>(componentsPathPre);
+    componentsInModule.forEach((comName) => {
         routerConfigArr.push({
             name: comName,
             path: `${mName}/${comName}`,

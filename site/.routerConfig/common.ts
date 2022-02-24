@@ -1,24 +1,24 @@
 import { ReactNode } from "react";
-type ComponentsKey = 'business' | 'common';
+import { moduleNameType, componentNameType } from './config';
+
 interface RouteProps {
-    name: string;
+    name: componentNameType;
     key: string;
     component?: ReactNode;
     path: string;
-    moduleName?: ComponentsKey
+    moduleName?: moduleNameType
 }
 
-interface ComponentsProps {
-    [key: string]: React.LazyExoticComponent<React.ComponentType<any>>
+type ComponentsProps = {
+    [key in componentNameType]: React.LazyExoticComponent<React.ComponentType<any>>
 }
 
-interface RoutersMapProps {
-    [key: string]: RouteProps[]
+type RoutersMapProps = {
+    [key in moduleNameType | string]?: RouteProps[]
 }
 
 export {
     RouteProps,
     ComponentsProps,
-    ComponentsKey,
     RoutersMapProps
 }
