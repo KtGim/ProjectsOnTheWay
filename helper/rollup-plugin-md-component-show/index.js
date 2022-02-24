@@ -33,19 +33,19 @@ export default function returnNewMd () {
             } = getProviderPath(pa);
             const providerRelativePath = `${preFix}/`;
             const mdFileName = firstToUpper(path.basename(id).replace('.md', '')); //获取当前文件名
-            const components = [];
+            const components = new Set();
             const tokens = marked.lexer(code);
             tokens.forEach(t => {
                 if(t.lang && t.lang == DEMO_FLAG) {
                     const componentName = t.text.replace('<', '').replace(' />', '');
-                    components.push(componentName);
+                    !components.has(componentName) && components.add(componentName);
                 }
             });
 
-            const importStrings = [];
-            components.forEach((id) => {
-                importStrings.push(`import ${id} from '${providerRelativePath}components/index';`);
-            });
+            // const importStrings = [];
+            // components.forEach((id) => {
+            //     importStrings.push(`import {${id}} from '${providerRelativePath}components/index';`);
+            // });
 
             /**
              * markdown 的内容需要展示出实际的组件
@@ -62,17 +62,17 @@ export default function returnNewMd () {
             const tempModule = `
                 import React from 'react';
                 import CodeProvider from '${providerRelativePath}site/CodeProvider';
-                ${importStrings.join('\n')}
+                ${components.size ? `import {${[...components].join(',')}} from '${providerRelativePath}components/index.tsx'` : undefined}
 
                 const ${fileName} = () => {
                     return (
                         <CodeProvider
                             markdown={${JSON.stringify(code.replace(new RegExp('``` demo','g'), '').replace(new RegExp('```  ','g'), ''))}}
                             ${
-                                components.length ?
+                                components.size?
 `
 components={{
-    ${components.join(',')}
+    ${[...components].join(',')}
 }}
 ` : undefined
                             }
