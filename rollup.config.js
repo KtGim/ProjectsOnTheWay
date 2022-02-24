@@ -57,7 +57,7 @@ export default {
       host: "localhost",
       port: 3000,
     }),
-    livereload({ watch: ["dist", "helper/rollup-plugin-md-component-show/index.js"] }),
+    livereload({ watch: ["dist", "site"] }),
   ],
   acornInjectPlugins: [jsx()]
 };

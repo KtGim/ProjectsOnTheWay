@@ -6,13 +6,14 @@ const buildRouteConfig = (moduleNames: RouteProps[]) => {
 
     const routerConfig: RouteProps[] = [
         ${
-            moduleNames.map(({name, path}) => {
+            moduleNames.map(({name, path, moduleName}) => {
                 return (
     `
         {
             name: '${name}',
-            path: '/${path}',
-            key: '${name}'
+            path: '${path}',
+            key: '${name}',
+            moduleName: '${moduleName}'
         }
     `)
             })

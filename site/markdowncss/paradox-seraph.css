@@ -201,7 +201,6 @@ h6 code {
 table {
   margin-top: 1rem;
   width: calc(100% - 40px);
-  margin: 0 20px 10px 20px;
 }
 
 table tr:nth-child(2n),

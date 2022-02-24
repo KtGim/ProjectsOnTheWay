@@ -12,8 +12,13 @@ interface ComponentsProps {
     [key: string]: React.LazyExoticComponent<React.ComponentType<any>>
 }
 
+interface RoutersMapProps {
+    [key: string]: RouteProps[]
+}
+
 export {
     RouteProps,
     ComponentsProps,
-    ComponentsKey
+    ComponentsKey,
+    RoutersMapProps
 }

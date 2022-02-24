@@ -5,14 +5,16 @@
         
         {
             name: 'A',
-            path: '/business/A',
-            key: 'A'
+            path: 'business/A',
+            key: 'A',
+            moduleName: 'business'
         }
     ,
         {
             name: 'B',
-            path: '/business/B',
-            key: 'B'
+            path: 'business/B',
+            key: 'B',
+            moduleName: 'business'
         }
     
     ];
