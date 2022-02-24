@@ -2,8 +2,7 @@ import React from 'react';
 import {
     HashRouter as Router,
     Routes,
-    Route,
-    Navigate
+    Route
 } from 'react-router-dom';
 
 import components from './lazyComponents';
@@ -13,6 +12,7 @@ import routers from './config';
 import NotFound from 'site/layout/NotFound';
 import Layout from 'site/layout';
 import ComponentsLayout from 'site/layout/components';
+import Log from '../../docs/changeLogs/log.md';
 
 const initRoutesConfig: () => RoutersMapProps = () => {
     const routersMap: RoutersMapProps = {};
@@ -40,6 +40,7 @@ const Routers = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<Layout />}>
+                    <Route path="/logs" element={<Log />} />
                     <Route path="/component" element={<ComponentsLayout />}>
                         {
                             routers.map((route: RouteProps) => {
