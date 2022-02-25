@@ -1,0 +1,73 @@
+.dark {
+    .main {
+        height: 100vh;
+        .nav {
+            height: 40px;
+            border: 1px solid #000;
+            line-height: 2;
+            font-size: 18px;
+            text-align: right;
+
+            a {
+                margin: 0 5px;
+            }
+        }
+    
+        .content {
+            height: calc(100% - 40px);
+            .components-layout {
+                height: 100%;
+                .left {
+                    height: 100%;
+                    float: left;
+                    width: 200px;
+                    background: #000;
+    
+                    .menu-list {
+                        p {
+                            text-align: left;
+                            font-size: 18px;
+                            color: #fff;
+                            padding: 10px;
+                            border: 0;
+                        }
+                        .title {
+                            text-align: left;
+                            font-size: 18px;
+                            color: #fff;
+                            padding: 10px;
+                            margin: 0;
+                        }
+    
+                        .sub-menu {
+                            .title {
+                                padding: 5px 10px;
+                                background: green;
+                            }
+                            .link {
+                                display: block;
+                                color: #fff;
+                                font-size: 16px;
+                                box-sizing: border-box;
+                                padding-left: 10px;
+                            }
+                            .active {
+                                background: #000;
+                                color: #fff;
+                                border: 1px solid #fff;
+                                border-right: 0;
+                            }
+                        }
+                    }
+                }
+    
+                .content {
+                    padding: 20px;
+                    height: 100%;
+                    float: right;
+                    width: calc(100% - 200px);
+                }
+            }
+        }
+    }
+}

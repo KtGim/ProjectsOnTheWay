@@ -6,27 +6,13 @@ import 'antd/dist/antd.css';
 
 import Routers from './.routerConfig/index';
 
-type ThemeType = 'light' | 'dark';
-type Setting = {
-  theme: ThemeType;
-}
-type ActionType = 'CHANGE_THEME';
+import { Setting, ActionType, ContextProps, Action  } from './type';
 
 const defaultSetting: Setting = {
   theme: 'light'
 };
 
 const CHANGE_THEME: ActionType = 'CHANGE_THEME';
-
-type Action = {
-  type: ActionType,
-  payload: Setting
-}
-
-interface ContextProps {
-  state: Setting,
-  dispatch?: React.Dispatch<Action>
-}
 
 const ProviderContext = createContext<ContextProps>({state: defaultSetting});
 
@@ -45,11 +31,16 @@ const outboundPreContainerReducer:(state: Setting, action: Action) => Setting  =
 function App(){
 
   const [state, dispatch] = useReducer(outboundPreContainerReducer, defaultSetting);
-
   return (
     <ProviderContext.Provider value={{ state, dispatch }}>
-      <Routers />
+      <div className={state.theme}>
+        <Routers />
+      </div>
     </ProviderContext.Provider>
   );
 }
 export default App;
+
+export {
+  ProviderContext
+}
