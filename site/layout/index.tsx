@@ -5,7 +5,7 @@ import Nav from './nav';
 const Layout = () => {
     return (
         <div className="main">
-            <nav><Nav /></nav>
+            <Nav />
             <div className="content">
                 <Outlet />
             </div>
