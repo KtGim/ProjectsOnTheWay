@@ -32,6 +32,7 @@ export default {
             // Enable sourceMap.
             sourceMap: true,
             extensions: cssExtensions,
+            extract: true,
             use: [
                 ['less', {
                   javascriptEnabled: true

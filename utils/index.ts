@@ -8,6 +8,12 @@ const getClassPrefix:<T>(theme: T, content: string[]) => (desc: string) => strin
     }
 }
 
+const capitalize: (s: string) => string = s => {
+    if (typeof s !== "string") return "";
+    return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
 export  {
-    getClassPrefix
+    getClassPrefix,
+    capitalize
 }

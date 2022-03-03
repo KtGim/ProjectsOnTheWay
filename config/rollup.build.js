@@ -1,4 +1,21 @@
+import { resolve } from 'path'; 
 import baseConfig from './common';
+import { commonConf, getModuleComponentName, capitalize } from './splits';
+
+const componentsRoot = resolve(__dirname, '../components');
+const componentsOutput = resolve(__dirname, '../lib');
+
+const leadingInNames = getModuleComponentName(componentsRoot);
+
+const buildComponents = [];
+leadingInNames.forEach((mName) => {
+    const componentsPathPre = `${componentsRoot}/${mName}/`;
+    const componentsInModule = getModuleComponentName(componentsPathPre);
+    componentsInModule.forEach((comName) => {
+        const upName = capitalize(comName);
+        upName && buildComponents.push(commonConf(`${componentsPathPre}${upName}/index.tsx`, upName, `${componentsOutput}/${upName}/index.js`));
+    })
+});
 
 export default [{
     ...baseConfig,
@@ -37,4 +54,6 @@ export default [{
             'react-dom': 'react-dom'
         }
     }
-}];
+},
+    ...buildComponents
+];
