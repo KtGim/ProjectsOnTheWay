@@ -32,7 +32,12 @@ export default {
     json(),
     image(),
     postcss({
-      extensions: cssExtensions
+      extensions: cssExtensions,
+      use: [
+        ['less', {
+          javascriptEnabled: true
+        }]
+      ],
     }),
     nodeResolve({
       extensions: fileExtensions
@@ -47,7 +52,17 @@ export default {
       presets: ["@babel/preset-react"],
       babelHelpers: "bundled",
       extensions: fileExtensions,
-      exclude: 'node_modules/**'
+      exclude: 'node_modules/**',
+      plugins: [
+        [
+            "import",
+            {
+                "libraryName": "antd",
+                "libraryDirectory": "es",
+                "style": true
+            }
+        ]
+      ]
     }),
     commonjs(),
     serve({

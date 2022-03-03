@@ -2,7 +2,6 @@ import React, { createContext, useReducer } from 'react';
 
 import 'highlight.js/styles/a11y-light.css'
 import './app.less';
-import 'antd/dist/antd.css';
 
 import Routers from './.routerConfig/index';
 
