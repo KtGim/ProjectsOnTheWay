@@ -31,7 +31,7 @@ const initCommonConfig = (options = {}) => {
                 // Minimize CSS, boolean or options for cssnano.
                 minimize: true,
                 // Enable sourceMap.
-                sourceMap: true,
+                // sourceMap: true,
                 extensions: cssExtensions,
                 // extract: true,
                 use: [
