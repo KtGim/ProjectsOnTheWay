@@ -13,6 +13,7 @@ import NotFound from 'site/layout/NotFound';
 import Layout from 'site/layout';
 import ComponentsLayout from 'site/layout/components';
 import Log from '../../docs/changeLogs/log.md';
+import StartMd from '../../docs/common/start.md';
 
 const initRoutesConfig: () => RoutersMapProps = () => {
     const routersMap: RoutersMapProps = {};
@@ -42,6 +43,7 @@ const Routers = () => {
                 <Route path="/" element={<Layout />}>
                     <Route path="/logs" element={<Log />} />
                     <Route path="/component" element={<ComponentsLayout />}>
+                        <Route path="/component/" element={<StartMd />} />
                         {
                             routers.map((route: RouteProps) => {
                                 let {
