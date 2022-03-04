@@ -13,7 +13,10 @@ const capitalize: (s: string) => string = s => {
     return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
+const upperCaseName = (name: string) => name.split('.').join('').toUpperCase();
+
 export  {
     getClassPrefix,
-    capitalize
+    capitalize,
+    upperCaseName
 }

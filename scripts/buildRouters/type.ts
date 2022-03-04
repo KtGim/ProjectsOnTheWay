@@ -1,5 +1,6 @@
-import { RouteProps } from '../../site/.routerConfig/common'
+import { RouteProps, LogRouteProps } from '../../site/.routerConfig/common'
 
 export {
-    RouteProps
+    RouteProps,
+    LogRouteProps
 }

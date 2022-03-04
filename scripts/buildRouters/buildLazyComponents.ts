@@ -1,5 +1,6 @@
-import { RouteProps } from "./type";
+import { LogRouteProps, RouteProps } from "./type";
 import { docsPath } from './helpers';
+import { upperCaseName } from '../../utils'
 // lazy component 引用时会报错
 const buildLazyComponents = (moduleNames: RouteProps[]) => {
     return `
@@ -48,7 +49,35 @@ const buildComponents = (moduleNames: RouteProps[]) => {
     `;
 }
 
+const buildLogComponents = (moduleNames: LogRouteProps[]) => {
+    const importStrings: string[] = [];
+
+    moduleNames.forEach(({name}) => {
+        importStrings.push(`import ${upperCaseName(name)} from '${docsPath}/changeLogs/${name}';`);
+    });
+    return `
+    import { LogComponentsProps } from './common';
+    ${importStrings.join('\n')}
+
+    const components: LogComponentsProps = {
+        ${
+            moduleNames.map(({name}) => {
+                const cName = upperCaseName(name);
+                return (
+    `
+    ${cName}: ${cName}
+    ` 
+                )
+            })
+        }
+    };
+
+    export default components;
+    `;
+}
+
 export {
     buildLazyComponents,
-    buildComponents
+    buildComponents,
+    buildLogComponents
 };

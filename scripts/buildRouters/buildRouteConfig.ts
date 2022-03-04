@@ -1,17 +1,16 @@
-import { RouteProps } from "./type";
-
 const getArrString = (set: Set<string>) => {
     return [...set].map((s, index) => index == set.size - 1 ? `'${s}'` : `'${s}' | `).join('')
 };
 
-const buildRouteConfig = (moduleNames: RouteProps[]) => {
+const buildRouteConfig:<T>(moduleNames: T[], routerType: 'RouteProps' | 'LogRouteProps') => string = (moduleNames, routerType) => {
     const modules: Set<string> = new Set();
     const componentsName: Set<string> = new Set();
     return `
-    import { RouteProps } from './common';
+    import { ${routerType} } from './common';
 
-    const routerConfig: RouteProps[] = [
+    const routerConfig: ${routerType}[] = [
         ${
+            //@ts-ignore 
             moduleNames.map(({name, path, moduleName}) => {
                 moduleName && modules.add(moduleName);
                 name && componentsName.add(name);

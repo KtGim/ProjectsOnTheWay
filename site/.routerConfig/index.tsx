@@ -6,19 +6,21 @@ import {
 } from 'react-router-dom';
 
 import components from './lazyComponents';
-import { RouteProps, RoutersMapProps } from './common';
+import logComponents from './logComponents';
+import { RouteProps, RoutersMapProps, LogRouteProps } from './common';
 
 import routers from './config';
+import logRoutes from './logConfig';
 import NotFound from 'site/layout/NotFound';
 import Layout from 'site/layout';
 import ComponentsLayout from 'site/layout/components';
-import Log from '../../docs/changeLogs/log.md';
 import StartMd from '../../docs/common/start.md';
+import { upperCaseName } from 'utils';
 
-const initRoutesConfig: () => RoutersMapProps = () => {
+const initRoutesConfig: (routes: (RouteProps | LogRouteProps)[]) => RoutersMapProps = (routes) => {
     const routersMap: RoutersMapProps = {};
 
-    routers && routers.forEach((route: RouteProps) => {
+    routes && routes.forEach((route: RouteProps | LogRouteProps) => {
         const {
             moduleName
         } = route;
@@ -34,15 +36,39 @@ const initRoutesConfig: () => RoutersMapProps = () => {
     return routersMap;
 };
 
-const routerConfigs = initRoutesConfig();
+const routerConfigs = initRoutesConfig(routers);
+const logConfigs = initRoutesConfig(logRoutes);
 
 const Routers = () => {
     return (
         <Router>
             <Routes>
                 <Route path="/" element={<Layout />}>
-                    <Route path="/logs" element={<Log />} />
-                    <Route path="/component" element={<ComponentsLayout />}>
+                    <Route path="/logs" element={<ComponentsLayout prePath="logs" routerConfig={logConfigs} />}>
+                        <Route path="/logs/" element={<StartMd />} />
+                        {
+                            logRoutes.map((route: LogRouteProps) => {
+                                let {
+                                    name,
+                                    path,
+                                    key
+                                } = route;
+                                let Comp = null;
+                                const lName = upperCaseName(name);
+                                if(logComponents[lName]) {
+                                    Comp = logComponents[lName];
+                                } else {
+                                    console.error(`名称为 ${lName} 的组件不存在，请先创建组件！`)
+                                    path = '/404';
+                                    Comp =  NotFound;
+                                }
+                                return (
+                                    <Route key={key} path={path} element={<Comp />} />
+                                )
+                            })
+                        }
+                    </Route>
+                    <Route path="/component" element={<ComponentsLayout prePath="component" routerConfig={routerConfigs} />}>
                         <Route path="/component/" element={<StartMd />} />
                         {
                             routers.map((route: RouteProps) => {
@@ -71,10 +97,6 @@ const Routers = () => {
             </Routes>
         </Router>
     );
-}
-
-export {
-    routerConfigs
 }
 
 export default Routers;
