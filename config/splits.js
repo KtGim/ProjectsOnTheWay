@@ -20,9 +20,9 @@ const commonConf = (input, name, output) => {
     if(!input) return;
     return {
         ...initCommonConfig({
-            postcss: {
-                extract: resolve(`${output}/style/index.css`)
-            }
+            // postcss: {
+            //     extract: resolve(`${output}/style/index.css`)
+            // }
         }),
         input,
         output: {
