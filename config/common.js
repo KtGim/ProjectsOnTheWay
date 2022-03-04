@@ -17,49 +17,101 @@ const tsPlugin = ts({
     tsconfigOverride: { compilerOptions : { module: "es2015" } }
 });
 
-export default {
-    input: './components/index.tsx',
-    external: ['react', 'antd', 'react-dom'],
-    plugins: [
-        clear({
-            targets: ['lib/']
-        }),
-        json(),
-        image(),
-        postcss({
-            // Minimize CSS, boolean or options for cssnano.
-            minimize: true,
-            // Enable sourceMap.
-            sourceMap: true,
-            extensions: cssExtensions,
-            // extract: true,
-            use: [
-                ['less', {
-                  javascriptEnabled: true
-                }]
-            ],
-        }),
-        nodeResolve({
-            extensions: fileExtensions
-        }),
-        tsPlugin,
-        babel({
-            presets: ["@babel/preset-react"],
-            babelHelpers: "bundled",
-            extensions: fileExtensions,
-            exclude: 'node_modules/**',
-            plugins: [
-                [
-                    "import",
-                    {
-                        "libraryName": "antd",
-                        "libraryDirectory": "es",
-                        "style": true
-                    }
+const initCommonConfig = (options = {}) => {
+    return {
+        input: './components/index.tsx',
+        external: ['react', 'antd', 'react-dom'],
+        plugins: [
+            clear({
+                targets: ['lib/']
+            }),
+            json(),
+            image(),
+            postcss({
+                // Minimize CSS, boolean or options for cssnano.
+                minimize: true,
+                // Enable sourceMap.
+                sourceMap: true,
+                extensions: cssExtensions,
+                // extract: true,
+                use: [
+                    ['less', {
+                    javascriptEnabled: true
+                    }]
+                ],
+                ...options.postcss
+            }),
+            nodeResolve({
+                extensions: fileExtensions
+            }),
+            tsPlugin,
+            babel({
+                presets: ["@babel/preset-react"],
+                babelHelpers: "bundled",
+                extensions: fileExtensions,
+                exclude: 'node_modules/**',
+                plugins: [
+                    [
+                        "import",
+                        {
+                            "libraryName": "antd",
+                            "libraryDirectory": "es",
+                            "style": true
+                        }
+                    ]
                 ]
-            ]
-        }),
-        commonjs()
-    ],
-    acornInjectPlugins: [jsx()],
-}
+            }),
+            commonjs()
+        ],
+        acornInjectPlugins: [jsx()],
+    }
+};
+
+export default initCommonConfig;
+
+// export default {
+//     input: './components/index.tsx',
+//     external: ['react', 'antd', 'react-dom'],
+//     plugins: [
+//         clear({
+//             targets: ['lib/']
+//         }),
+//         json(),
+//         image(),
+//         postcss({
+//             // Minimize CSS, boolean or options for cssnano.
+//             minimize: true,
+//             // Enable sourceMap.
+//             sourceMap: true,
+//             extensions: cssExtensions,
+//             // extract: true,
+//             use: [
+//                 ['less', {
+//                   javascriptEnabled: true
+//                 }]
+//             ],
+//         }),
+//         nodeResolve({
+//             extensions: fileExtensions
+//         }),
+//         tsPlugin,
+//         babel({
+//             presets: ["@babel/preset-react"],
+//             babelHelpers: "bundled",
+//             extensions: fileExtensions,
+//             exclude: 'node_modules/**',
+//             plugins: [
+//                 [
+//                     "import",
+//                     {
+//                         "libraryName": "antd",
+//                         "libraryDirectory": "es",
+//                         "style": true
+//                     }
+//                 ]
+//             ]
+//         }),
+//         commonjs()
+//     ],
+//     acornInjectPlugins: [jsx()],
+// }

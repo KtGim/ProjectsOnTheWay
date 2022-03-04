@@ -1,6 +1,6 @@
 import fs from 'fs';
-import { join } from 'path';
-import baseConfig from './common';
+import { join, resolve } from 'path';
+import initCommonConfig from './common';
 const FilterModules = ['docs', 'style'];
 
 const getModuleComponentName = (path) => {
@@ -19,12 +19,16 @@ const capitalize = s => {
 const commonConf = (input, name, output) => {
     if(!input) return;
     return {
-        ...baseConfig,
+        ...initCommonConfig({
+            postcss: {
+                extract: resolve(`${output}/style/index.css`)
+            }
+        }),
         input,
         output: {
             format: "umd",
             name,
-            file: output,
+            file: `${output}/index.js`,
             exports: "default",
             globals: {
                 react: 'React',

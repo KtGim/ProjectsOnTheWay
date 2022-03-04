@@ -1,5 +1,5 @@
 import { resolve } from 'path'; 
-import baseConfig from './common';
+import initCommonConfig from './common';
 import { commonConf, getModuleComponentName, capitalize } from './splits';
 
 const componentsRoot = resolve(__dirname, '../components');
@@ -13,9 +13,11 @@ leadingInNames.forEach((mName) => {
     const componentsInModule = getModuleComponentName(componentsPathPre);
     componentsInModule.forEach((comName) => {
         const upName = capitalize(comName);
-        upName && buildComponents.push(commonConf(`${componentsPathPre}${upName}/index.tsx`, upName, `${componentsOutput}/${upName}/index.js`));
+        upName && buildComponents.push(commonConf(`${componentsPathPre}${upName}/index.tsx`, upName, `${componentsOutput}/${upName}`));
     })
 });
+
+const baseConfig = initCommonConfig();
 
 export default [{
     ...baseConfig,
