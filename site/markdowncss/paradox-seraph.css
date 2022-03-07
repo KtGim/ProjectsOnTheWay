@@ -86,7 +86,7 @@ body {
  */
 
 /* yaml */
-pre.md-meta-block {
+.content pre.md-meta-block {
   background-color: var(--background-color);
   padding-bottom: .5rem;
   color: var(--accent-color);
@@ -96,13 +96,13 @@ pre.md-meta-block {
 
 /* headings */
 /* <> */
-h1, h2, h3, h4, h5, h6 {
+.content h1, h2, h3, h4, h5, h6 {
   font-family: var(--heading-font);
   color: var(--header-color);
 }
 
 /* <> */
-h1 {
+.content h1 {
   /* padding: 5% 4% 4% 4%; */
   text-align: center;
   margin-top: 3rem;
@@ -111,18 +111,18 @@ h1 {
   border: 4px solid var(--primary-colour);
 }
 
-h1:not(:first-child) {
+.content h1:not(:first-child) {
   margin-top: 3rem;
 }
 
 /* <> */
-h2 {
+.content h2 {
   content: '';
   text-align: center;
   font-size: var(--h2-fontsize);
   margin: 1.5rem 10%;
 }
-h2:after {
+.content h2:after {
   content: '';
 	/* height: 1px; */
 	width: 70%;
@@ -132,39 +132,39 @@ h2:after {
 }
 
 /* <> */
-h3 {
+.content h3 {
   margin-top: 1.5rem;
   margin-bottom: 0.5em;
   font-size: var(--h3-fontsize);
 }
 /* <> */
-h3 span{
+.content h3 span{
   padding: 0 1em;
   border-left: 2px solid var(--primary-colour);
   border-right: 2px solid var(--primary-colour);
 }
 
-h4{
+.content h4{
   color: var(--header-color);
   margin-top: 1rem;
   margin-bottom: 0.4em;
   font-size: var(--h4-fontsize );
 }
 /* <> */
-h4 span{
+.content h4 span{
   padding: 1px 0 0.1em 0;
   border-bottom: 2px dashed var(--primary-colour);
 }
 
 
-h5{
+.content h5{
   color: var(--header-color);  
   margin-top: 1rem;
   margin-bottom: 0.2em;
   font-size: var(--h5-fontsize);
 }
 
-h6{
+.content h6{
   font-style: oblique;
   color: var(--header-color);  
   margin-top: 1rem;
@@ -172,51 +172,51 @@ h6{
   font-size: var(--h6-fontsize);
 }
 
-h1 tt,
-h1 code {
+.content h1 tt,
+.content h1 code {
     font-size: inherit;
 }
-h2 tt,
-h2 code {
+.content h2 tt,
+.content h2 code {
     font-size: inherit;
 }
-h3 tt,
-h3 code {
+.content h3 tt,
+.content h3 code {
     font-size: inherit;
 }
-h4 tt,
-h4 code {
+.content h4 tt,
+.content h4 code {
     font-size: inherit;
 }
-h5 tt,
-h5 code {
+.content h5 tt,
+.content h5 code {
     font-size: inherit;
 }
-h6 tt,
-h6 code {
+.content h6 tt,
+.content h6 code {
     font-size: inherit;
 }
 
 /* table */
-table {
+.content table {
   margin-top: 1rem;
   width: calc(100% - 40px);
 }
 
-table tr:nth-child(2n),
-thead {
+.content table tr:nth-child(2n),
+.content thead {
     background-color: var(--side-bar-bg-color);
 }
 
-td,
-th {
+.content td,
+.content th {
   border-style: solid;
   border-color: var(--border-color);
   border-width: 1px;
   padding: .35rem .7rem
 }
 
-li p {
+.content li p {
   margin: 0;
   border: none;
   padding: 0;
@@ -235,8 +235,8 @@ li p {
 
 /* Task list Checkbox styling from https://github.com/h16nning/typora-gitbook-theme/blob/main/src/gitbook-teal.css */
 
-.md-task-list-item > input:before,
-input[type="checkbox"]:before {
+.content .md-task-list-item > input:before,
+.content input[type="checkbox"]:before {
   border-radius: 0.2rem;
   margin-top: -0.08rem;
   margin-left: -0.1rem;
@@ -250,26 +250,26 @@ input[type="checkbox"]:before {
   transition-property: background-color;
 }
 
-.md-task-list-item:hover > input:before,
-input[type="checkbox"]:hover:before {
+.content .md-task-list-item:hover > input:before,
+.content input[type="checkbox"]:hover:before {
   background-color: var(--primary-colour);
 }
 
-.md-task-list-item > input:checked:before,
-.md-task-list-item > input[checked]:before,
-input[type="checkbox"]:checked:before {
+.content .md-task-list-item > input:checked:before,
+.content .md-task-list-item > input[checked]:before,
+.content input[type="checkbox"]:checked:before {
   background-color: var(--primary-colour);
 }
 
-.md-task-list-item:hover > input:checked:before,
-.md-task-list-item:hover > input[checked]:before,
-input[type="checkbox"]:hover:checked:before {
+.content .md-task-list-item:hover > input:checked:before,
+.content .md-task-list-item:hover > input[checked]:before,
+.content input[type="checkbox"]:hover:checked:before {
   background-color: var(--primary-colour);
 }
 
-.md-task-list-item > input:after,
-.md-task-list-item > input:after,
-input[type="checkbox"]:after {
+.content .md-task-list-item > input:after,
+.content .md-task-list-item > input:after,
+.content input[type="checkbox"]:after {
   transform: rotate(-45deg);
   position: absolute;
   border: 2px solid white;
@@ -285,15 +285,15 @@ input[type="checkbox"]:after {
   transition-property: opacity;
 }
 
-.md-task-list-item > input:checked:after,
-.md-task-list-item > input[checked]:after,
-input[type="checkbox"]:checked:after {
+.content .md-task-list-item > input:checked:after,
+.content .md-task-list-item > input[checked]:after,
+.content input[type="checkbox"]:checked:after {
   opacity: 1;
 }
 
 
 
-blockquote {
+.content blockquote {
   font-style: italic; /* <> */
   margin: 1rem 0;
   padding-left: 2ch;
@@ -305,7 +305,7 @@ blockquote {
 }
 
 /* horizontal line */
-hr {
+.content hr {
   border: none;
   border-bottom: 2px solid var(--hr-color);
   margin-top: 1.4rem;
@@ -313,12 +313,12 @@ hr {
 }
 
 /* list markers */
-ol > li::marker, ul > li::marker {
+.content ol > li::marker, ul > li::marker {
 	color: var(--primary-colour);
 	font-weight: bold;
 }
 
-p {
+.content p {
   margin: 0.1em 0;
 }
 
@@ -327,11 +327,11 @@ p {
  * see http:/*support.typora.io/Code-Block-Styles
  */
 
-.cm-s-inner .CodeMirror-gutters {
+.content .cm-s-inner .CodeMirror-gutters {
    background: var(--code-bg-color);
 }
 
-.code-tooltip {
+.content .code-tooltip {
   box-shadow: none;
   border-radius: var(--border-radius);
   background-color: var(--code-bg-color);
@@ -340,24 +340,24 @@ p {
   border-width: 1px;
 }
 
-.code-tooltip input {
+.content .code-tooltip input {
   outline: none;
   width: 20ch;
 }
 
-.md-fences .code-tooltip {
+.content .md-fences .code-tooltip {
   bottom: -1.8rem;
   padding: none;
 }
 
-.md-fences.md-focus .cm-s-inner {
+.content .md-fences.md-focus .cm-s-inner {
   /* Remove bottom right border radius when tooltip is shown */
   border-bottom-right-radius: 0;
 }
 
 /* code tooltip autocomplete list */
 
-.autoComplt-hint {
+.content .autoComplt-hint {
   background-color: transparent !important;
   margin: 0 !important;
   padding: 0.125rem 0.375rem !important;
@@ -366,16 +366,16 @@ p {
   height: 1.4rem !important;
 }
 
-.autoComplt-hint-selected {
+.content .autoComplt-hint-selected {
   background-color: var(--link-color) !important;
   color: var(--background-color) !important;
 }
 
 /* basic styles */
 
-.md-fences,
-code,
-tt {
+.content .md-fences,
+.content code,
+.content tt {
   border: 1px solid var(--border-color);
   background-color: var(--code-bg-color);
   font-family: var(--monospace-font);
@@ -385,7 +385,7 @@ tt {
   line-height: var(--monospace-line-height);
 }
 
-.md-fences {
+.content .md-fences {
   margin-bottom: 18px;
   margin-top: 15px;
   padding: 0.2em 1em;
@@ -393,7 +393,7 @@ tt {
   padding-bottom: 6px;
 }
 
-a {
+.content a {
   color:  var(--link-color);
 }
 
@@ -402,17 +402,17 @@ a {
  * Control UI (optional)
  */
 
-.outline-item:hover {
+ .content .outline-item:hover {
   color: var(--header-color);
 }
 
-#write div.md-toc-tooltip {
+.content #write div.md-toc-tooltip {
 	background-color: var(--background-color);
 }
 
 /* CodeMirror Theme: a modified version of ir_black - https://github.com/FarhadG/code-mirror-themes/blob/master/themes/ir_black.css */
 
-.cm-s-inner {
+.content .cm-s-inner {
 	font-size: 1em;
 	line-height: 1.5em;
 	font-family: var(--monospace-font);
@@ -421,48 +421,48 @@ a {
 	background: var(--code-bg-color) !important;
 	color: var(--codemirror-color);
 }
-.cm-s-inner .CodeMirror-lines {
+.content .cm-s-inner .CodeMirror-lines {
 	padding: 0px 0;
 }
-.cm-s-inner .CodeMirror-gutters {
+.content .cm-s-inner .CodeMirror-gutters {
 	background-color: var(--code-bg-color) !important;
 	border: none;
 }
-.cm-s-inner div.CodeMirror-cursor {	border-left: 3px solid var(--codemirror-color) !important;}
-.cm-s-inner .CodeMirror-selected {	background: #afafaf !important;}
-.cm-s-inner .cm-comment {	color: #575757 !important;}
-.cm-s-inner .cm-keyword {	color: #1675ce !important;}
-.cm-s-inner .cm-string {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-number {	color: #5b1d68 !important;}
-.cm-s-inner .cm-property {	color: #5b1d68 !important;}
-.cm-s-inner .cm-atom {	color: #5b1d68 !important;}
-.cm-s-inner .cm-operator {	color: #173d61 !important;}
-.cm-s-inner .CodeMirror-linenumber {	color: #7C7C7C !important;}
+.content .cm-s-inner div.CodeMirror-cursor {	border-left: 3px solid var(--codemirror-color) !important;}
+.content .cm-s-inner .CodeMirror-selected {	background: #afafaf !important;}
+.content .cm-s-inner .cm-comment {	color: #575757 !important;}
+.content .cm-s-inner .cm-keyword {	color: #1675ce !important;}
+.content .cm-s-inner .cm-string {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-number {	color: #5b1d68 !important;}
+.content .cm-s-inner .cm-property {	color: #5b1d68 !important;}
+.content .cm-s-inner .cm-atom {	color: #5b1d68 !important;}
+.content .cm-s-inner .cm-operator {	color: #173d61 !important;}
+.content .cm-s-inner .CodeMirror-linenumber {	color: #7C7C7C !important;}
 /* Not in original Theme... */
-.cm-s-inner .cm-def {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-punctuation {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-variable {	color: #125d5f !important;}
-.cm-s-inner .cm-variable-2 {	color: #125d5f !important;}
-.cm-s-inner .cm-variable-3 {	color: #125d5f !important;}
-.cm-s-inner .cm-meta {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-string-2 {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-qualifier {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-builtin {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-quote {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-bracket {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-tag {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-attribute {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-hr {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-link {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-plus {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-minus {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-error {	color: var(--codemirror-color) !important;}
-.cm-s-inner .cm-invalidchar {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-def {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-punctuation {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-variable {	color: #125d5f !important;}
+.content .cm-s-inner .cm-variable-2 {	color: #125d5f !important;}
+.content .cm-s-inner .cm-variable-3 {	color: #125d5f !important;}
+.content .cm-s-inner .cm-meta {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-string-2 {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-qualifier {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-builtin {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-quote {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-bracket {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-tag {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-attribute {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-hr {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-link {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-plus {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-minus {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-error {	color: var(--codemirror-color) !important;}
+.content .cm-s-inner .cm-invalidchar {	color: var(--codemirror-color) !important;}
 
 /* End CodeMirror Theme */
 
 /* markdown 文档样式 这一部分主要描绘 展示 组件的box*/
-p {
+.content p {
   border: 4px solid rgb(191,173,111);
   padding: 10px;
   border-radius: 3px;
