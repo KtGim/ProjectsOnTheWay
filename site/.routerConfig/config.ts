@@ -16,14 +16,21 @@
             key: 'B',
             moduleName: 'business'
         }
+    ,
+        {
+            name: 'Switch',
+            path: 'common/Switch',
+            key: 'Switch',
+            moduleName: 'common'
+        }
     
     ];
     
     export default routerConfig;
 
 
-    type moduleNameType = 'business';
-    type componentNameType = 'A' | 'B';
+    type moduleNameType = 'business' | 'common';
+    type componentNameType = 'A' | 'B' | 'Switch';
 
     export {
         moduleNameType,
