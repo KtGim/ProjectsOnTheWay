@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`A is running 1`] = `
+<div
+  className="a-component"
+>
+  0
+  <button
+    className="ant-btn ant-btn-default"
+    onClick={[Function]}
+    type="button"
+  >
+    <span>
+      Button
+    </span>
+  </button>
+</div>
+`;
+
+exports[`renders correctly 1`] = `
+<div
+  className="a-component"
+>
+  0
+  <button
+    className="ant-btn ant-btn-default"
+    onClick={[Function]}
+    type="button"
+  >
+    <span>
+      Button
+    </span>
+  </button>
+</div>
+`;

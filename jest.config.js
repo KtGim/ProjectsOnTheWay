@@ -3,7 +3,7 @@ module.exports = {
     preset: "ts-jest",
     testEnvironment: "node",
     roots: [
-        "<rootDir>/components"
+        "<rootDir>/components/tests"
     ],
     verbose: true,
     testRegex: '(.+)\\.test\\.(jsx?|tsx?)$',
@@ -16,6 +16,7 @@ module.exports = {
         "!**/node_modules/**",
         "!**/vendor/**"
     ],
+    collectCoverage: true,
     coverageDirectory: './coverage',
     coveragePathIgnorePatterns: [
         "/node_modules/"
