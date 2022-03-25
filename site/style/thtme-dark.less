@@ -1,24 +1,42 @@
 .dark {
+    line-height: 1;
     .main {
         height: 100vh;
         .nav {
-            height: 40px;
-            border: 1px solid #000;
-            line-height: 2;
-            font-size: 18px;
-            // text-align: right;
-
+            box-shadow: 0px 6px 10px #eee;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #000;
+            line-height: 36px;
             a {
                 margin: 0 5px;
+                font-size: 18px;
+                color: #fff;
             }
 
-            .switcher {
-                top: 8px;
+            .active {
+                color: #a3b3a3
+            }
+
+            .logo {
+                background-image: url(../G.png);
+                display: inline-block;
+                vertical-align: top;
+                height: 30px;
+                width: 30px;
+                background-position: top;
+                background-repeat: no-repeat;
+                background-size: contain;
+                margin: 4px;
             }
         }
     
         .content {
             height: calc(100% - 40px);
+            position: relative;
+            top: 38px;
             .components-layout {
                 height: 100%;
                 .left {
@@ -26,7 +44,9 @@
                     float: left;
                     width: 200px;
                     background: #000;
-    
+                    transition: all .5s ease;
+                    overflow-y: scroll;
+                    overflow-x: hidden;
                     .menu-list {
                         p {
                             text-align: left;
@@ -41,12 +61,20 @@
                             color: #fff;
                             padding: 10px;
                             margin: 0;
+                            position: relative;
+
+                            .switcher {
+                                position: absolute;
+                                right: 48px;
+                                top: 1px;
+                            }
                         }
     
                         .sub-menu {
                             .title {
                                 padding: 5px 10px;
-                                background: green;
+                                background: #a3b3a3;
+                                border-radius: 0;
                             }
                             .link {
                                 display: block;
@@ -56,10 +84,8 @@
                                 padding-left: 10px;
                             }
                             .active {
-                                background: #000;
-                                color: #fff;
-                                border: 1px solid #fff;
-                                border-right: 0;
+                                background: #fff;
+                                color: #000;
                             }
                         }
                     }
@@ -70,6 +96,13 @@
                     height: 100%;
                     float: right;
                     width: calc(100% - 200px);
+                    overflow-y: scroll;
+                    overflow-x: hidden;
+                    top: 0;
+
+                    .demo-display-area {
+                        line-height: 1.5;
+                    }
                 }
             }
         }

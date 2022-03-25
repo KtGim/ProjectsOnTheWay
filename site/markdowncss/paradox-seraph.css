@@ -60,18 +60,6 @@
   }
 }
 
-html {
-  font-size: var(--font-size);
-  background-color: var(--background-color);
-}
-
-html,
-body {
-  color: var(--font-color);
-  font-family: var(--body-font);
-  line-height: var(--line-height);
-}
-
 #write {
 	/* size of writing area: */
   padding-left: var(--document-padding-x);
@@ -103,16 +91,12 @@ body {
 
 /* <> */
 .content h1 {
-  /* padding: 5% 4% 4% 4%; */
   text-align: center;
-  margin-top: 3rem;
-  margin-bottom: 1.5rem;
   font-size: var(--h1-fontsize);
-  border: 4px solid var(--primary-colour);
 }
 
 .content h1:not(:first-child) {
-  margin-top: 3rem;
+  margin-top: 1rem;
 }
 
 /* <> */
@@ -320,6 +304,7 @@ body {
 
 .content p {
   margin: 0.1em 0;
+  position: relative;
 }
 
 /**

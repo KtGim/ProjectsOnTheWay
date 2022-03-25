@@ -15,6 +15,7 @@ import NotFound from 'site/layout/NotFound';
 import Layout from 'site/layout';
 import ComponentsLayout from 'site/layout/components';
 import StartMd from '../../docs/common/start.md';
+import IntroductionMd from '../../docs/common/introduction.md';
 import { upperCaseName } from 'utils';
 
 const initRoutesConfig: (routes: (RouteProps | LogRouteProps)[]) => RoutersMapProps = (routes) => {
@@ -44,6 +45,7 @@ const Routers = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<Layout />}>
+                    <Route path="" element={<IntroductionMd />}></Route>
                     <Route path="/logs" element={<ComponentsLayout prePath="logs" routerConfig={logConfigs} />}>
                         <Route path="/logs/" element={<StartMd />} />
                         {

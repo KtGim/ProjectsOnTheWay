@@ -28,8 +28,7 @@ export default function returnNewMd () {
         if(path.extname(id) == '.md') {
             const pa = path.normalize(id);
             const {
-                preFix,
-                prePath
+                preFix
             } = getProviderPath(pa);
             const providerRelativePath = `${preFix}/`;
             const mdFileName = firstToUpper(path.basename(id).replace('.md', '')); //获取当前文件名
