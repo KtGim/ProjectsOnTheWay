@@ -21,7 +21,7 @@
             }
 
             .logo {
-                background-image: url(../G.png);
+                background-image: url(../asserts/images/G.png);
                 display: inline-block;
                 vertical-align: top;
                 height: 30px;
@@ -89,6 +89,8 @@
                             }
                         }
                     }
+
+                    box-shadow: 2px 2px 210px #000;
                 }
     
                 .content {
@@ -103,6 +105,30 @@
                     .demo-display-area {
                         line-height: 1.5;
                     }
+                }
+
+                .left::-webkit-scrollbar {
+                    width: 1px;
+                    height: 8px;
+                }
+                .left::-webkit-scrollbar-track {
+                    background-color: #fff;
+                }
+
+                .left::-webkit-scrollbar-thumb {
+                    background: #000;
+                }
+
+                .content::-webkit-scrollbar {
+                    width: 2px;
+                    height: 8px;
+                }
+                .content::-webkit-scrollbar-track {
+                    background-color: #fff;
+                }
+
+                .content::-webkit-scrollbar-thumb {
+                    background: #000;
                 }
             }
         }

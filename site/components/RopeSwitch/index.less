@@ -1,0 +1,53 @@
+.rope__switch {
+    position: fixed;
+    width: 1px;
+    top: 0;
+    left: 220px;
+    background-color: #dfcdad;
+    z-index: 999;
+    animation: roll_down 1s ease-out forwards;
+
+    .bulb {
+        background-image: url('../../asserts/images/bulb.png');
+        width: 20px;
+        height: 20px;
+        background-repeat: no-repeat;
+        background-position: top;
+        background-size: contain;
+        transform: rotateX(180deg);
+        bottom: -18px;
+        position: absolute;
+        left: -9px;
+        cursor: pointer;
+        z-index: 1;
+    }
+
+    .bulb::after {
+        content: url(../../asserts/images/guang.png);
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        animation: on 1s ease infinite alternate;
+        bottom: 18px;
+        transform: scale(0.1);
+        left: -17px;
+    }
+
+    @keyframes on {
+        from{
+            opacity: 0;
+        }
+        to{
+            opacity: 1;
+        }
+    }
+
+    @keyframes roll_down {
+        from{
+            height: 0;
+        }
+        to{
+            height: 30%;
+        }
+    }
+}

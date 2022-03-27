@@ -1,5 +1,0 @@
-### Switch
-
-``` demo
-<Switch />
-```  
