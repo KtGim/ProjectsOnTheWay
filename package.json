@@ -7,10 +7,11 @@
     "test": "jest --color",
     "site": "rollup -c rollup.config.js",
     "build-route": "ts-node ./scripts/buildRouters/index.ts",
-    "dev": "ts-node ./scripts/buildRouters/index.ts & rollup -c rollup.config.js -w",
+    "watch": "rollup -c rollup.config.js -w",
+    "dev": "npm-run-all build-route watch build-dir",
     "build-comps": "rollup -c ./config/rollup.build.js",
     "build": "rollup -c rollup.config.dist.js",
-    "build-doc": "ts-node ./scripts/buildDocs/index.ts"
+    "build-dir": "ts-node ./scripts/buildDir/index.ts"
   },
   "keywords": [
     "common"
@@ -30,6 +31,7 @@
     "babel-jest": "^27.5.1",
     "deepmerge": "^4.2.2",
     "jest": "^27.5.1",
+    "npm-run-all": "^4.1.5",
     "react-test-renderer": "^17.0.2",
     "rollup": "^2.64.0",
     "rollup-plugin-terser": "^7.0.2",

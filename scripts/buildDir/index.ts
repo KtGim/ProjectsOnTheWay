@@ -53,3 +53,4 @@ watcher
     // .on('raw', (event, path, details) => { // internal
     //     console.log(event, path, details, 'raw');
     // });
+console.log('======= listening for dir changes =======');
