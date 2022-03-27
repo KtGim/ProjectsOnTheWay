@@ -1,5 +1,5 @@
 import { LogRouteProps, RouteProps } from "./type";
-import { docsPath } from './helpers';
+import { docsPath } from '../helpers';
 import { upperCaseName } from '../../utils'
 // lazy component 引用时会报错
 const buildLazyComponents = (moduleNames: RouteProps[]) => {

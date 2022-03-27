@@ -3,7 +3,7 @@ import {resolve, join} from 'path';
 import buildRouteConfig from './buildRouteConfig';
 import { buildComponents, buildLogComponents } from './buildLazyComponents';
 import { RouteProps, LogRouteProps } from "./type";
-import { FilterModules } from './helpers';
+import { FilterModules } from '../helpers';
 import { componentNameType, moduleNameType } from '../../site/.routerConfig/config';
 
 const componentsRoot = resolve(__dirname, '../../components');
