@@ -8,7 +8,7 @@
     "site": "rollup -c rollup.config.js",
     "build-route": "ts-node ./scripts/buildRouters/index.ts",
     "watch": "rollup -c rollup.config.js -w",
-    "dev": "npm-run-all build-route watch build-dir",
+    "dev": "npm-run-all --parallel build-route watch build-dir",
     "build-comps": "rollup -c ./config/rollup.build.js",
     "build": "rollup -c rollup.config.dist.js",
     "build-dir": "ts-node ./scripts/buildDir/index.ts"
