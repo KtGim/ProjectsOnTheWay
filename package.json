@@ -8,7 +8,8 @@
     "site": "rollup -c rollup.config.js",
     "build-route": "ts-node ./scripts/buildRouters/index.ts",
     "dev": "ts-node ./scripts/buildRouters/index.ts & rollup -c rollup.config.js -w",
-    "build-comps": "rollup -c ./config/rollup.build.js"
+    "build-comps": "rollup -c ./config/rollup.build.js",
+    "build": "rollup -c rollup.config.dist.js"
   },
   "keywords": [
     "common"
