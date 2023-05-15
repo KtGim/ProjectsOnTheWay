@@ -1,0 +1,77 @@
+@import url('./components/less/index.less');
+
+.yl-main {
+  .bg01 {
+    position: fixed;
+    z-index: @z1;
+    left: 0;
+    top: -0.25rem /* 10/20 */;
+    height: 328px;
+    width: 100%;
+    background-image: url('./images/background/top.png');
+    background-position: top;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+
+  .logo {
+    right: 1.13rem /* 22.58/20 */;
+    top: 0;
+    width: 4.57rem /* 91.41/20 */;
+    height: 3.32rem /* 66.48/20 */;
+    position: absolute;
+    z-index: @z10;
+    background-image: url('./images/background/logo.png');
+    background-position: top;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+
+  .selector {
+    height: 1rem /* 20/20 */;
+    // position: absolute;
+    padding: .25rem /* 10/20 */;
+    z-index: @z100;
+    background-color: transparent;
+
+    .adm-dropdown-item .adm-dropdown-item-title-arrow {
+      color: #000;
+    }
+
+    .adm-dropdown-item {
+      justify-content: flex-start;
+    }
+  }
+
+  .container {
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    background-color: transparent;
+    position: absolute;
+    z-index: @z100;
+
+    .taro_page {
+      background-color: transparent;
+    }
+  }
+
+  .template_container {
+    border-radius: 1rem 1rem 0 0;
+    background-color: #fff;
+    position: absolute;
+    z-index: 1000;
+    height: calc(100% - 2.5rem);
+    width: 100%;
+    top: 2.5rem /* 50/20 */;
+    left: 0;
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
+
+  .title1 {
+    font-size: .8rem /* 16/20 */;
+    font-weight: 500;
+  }
+}
