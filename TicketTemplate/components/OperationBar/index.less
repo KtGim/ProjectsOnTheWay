@@ -1,0 +1,110 @@
+.operation-bar {
+    .commonStyle() {
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0 1px;
+        cursor: pointer;
+    }
+
+    .font-size-selector {
+        .commonStyle();
+        span {
+            font-weight: bold;
+            padding-right: 5px;
+        }
+
+        select {
+            background-color: #efefef;
+            color: #000;
+            border: 0;
+
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+
+    .text-decoration {
+        .commonStyle();
+        margin: 2px;
+        padding: 0 5px;
+    }
+
+    .border-editor, .custom {
+        .commonStyle();
+        padding: 0 5px;
+        position: relative;
+
+        .tips {
+            position: absolute;
+            left: -2px;
+            top: -2px;
+            z-index: 5;
+            background: #693fad;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            width: 120px;
+
+            .input-change {
+                width: 134px;
+            }
+
+            .tips_footer {
+                div {
+                    display: inline-block;
+                    width: calc(50% - 4px);
+                    margin: 2px;
+                    margin-top: 8px;
+                    border-radius: 2px;
+                    text-align: center;
+
+                    &:hover{
+                        background: #e6e6e6;
+                        color: rgba(38, 0, 255, 0.726);
+                    }
+                }
+                .ok {
+                    background: green;
+                }
+                .cancel {
+                    background: red;
+                }
+            }
+        }
+    }
+
+    .input-change {
+        .commonStyle();
+        width: 12%;
+        min-width: 80px;
+        span {
+            font-weight: bold;
+            padding-right: 5px;
+        }
+        input {
+            min-width: 35px;
+            width: 50%;
+            border: 0;
+            outline: none;
+            color: rgb(15, 207, 15);
+        }
+    }
+
+    .delete {
+        display: inline-block;
+        vertical-align: middle;
+        padding: 5px;
+        border-radius: 5px;
+
+        &:hover {
+            background-color: #e6e6e6;
+        }
+    }
+
+    .active {
+        font-weight: bold;
+        background: #e6e6e6;
+        border-radius: 3px;
+    }
+}
