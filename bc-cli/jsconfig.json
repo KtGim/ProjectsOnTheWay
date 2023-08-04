@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "module": "ES2020",
+        "baseUrl": ".",
+        "paths": {
+          "questions/*": ["./questions/*"],
+          "helper/*": ["./helper/*"],
+          "commands/*": ["./commands/*"],
+          "scripts/*": ["./scripts/*"],
+        }
+    }
+}

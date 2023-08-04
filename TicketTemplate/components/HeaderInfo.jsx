@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react';
 import OperationBar from './OperationBar/index';
 import { ELEMENTS } from '../const';
-import { SHOW_ELEMENTS } from '../componentConfig';
 import { DISPLAY_ITEMS } from './OperationBar/const';
+import { ComponentsDisplay } from '../IndexElements/index';
+import { SHOW_ELEMENTS } from '../componentConfig';
 
 
 class HeaderInfo extends PureComponent {
@@ -20,7 +21,9 @@ class HeaderInfo extends PureComponent {
             activeElementInfo,
             txtInfo,
             onChange,
-            renderComponentsDisplay
+            propertyInfo,
+            dragEnd,
+            onDragStart
         } = this.props;
         const elementInfo = activeElementInfo || {
             id: ELEMENTS.MAIN,
@@ -46,10 +49,13 @@ class HeaderInfo extends PureComponent {
                         }
                     }
                 }}
-                // showDelete
-                // onDelete={onDelete}
             />
-            {renderComponentsDisplay('', SHOW_ELEMENTS)}
+            <ComponentsDisplay
+                txtInfo={txtInfo}
+                templatePropertiesSetting={propertyInfo}
+                dragEnd={dragEnd}
+                onDragStart={onDragStart}
+            />
         </div>;
     }
 }

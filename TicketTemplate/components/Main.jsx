@@ -69,31 +69,6 @@ class Main extends Component {
 
     componentDidMount() {
         this.computedCurrentMainArea(true);
-        const { mode } = this.props;
-        if(MODES.SHOW !== mode) {
-            this.ref.addEventListener('dblclick', this.showDragClick);
-        }
-    }
-
-    componentWillUnmount() {
-        if(MODES.SHOW !== this.props.mode) {
-            this.ref.removeEventListener('dblclick', this.showDragClick);
-        }
-    }
-
-    showDragClick = () => {
-        if(MODES.SHOW == this.props.mode) {
-           return;
-        }
-        const showDrag = !this.state.showDrag;
-        if(!showDrag) { // 直接赋值不触发更新，不仅如此生命周期
-            this.state.activeIndex = -1;
-        } else {
-            this.props.saveTemplateInfo();
-        }
-        this.setState({
-            showDrag
-        });
     }
 
     componentDidUpdate(nextProps, nextState) {
@@ -192,7 +167,7 @@ class Main extends Component {
             right,
             bottom
         };
-        this.setAera(baseWidth, baseHeight);
+        this.setArea(baseWidth, baseHeight);
     }
 
     // 区域元素拖拽
@@ -201,24 +176,19 @@ class Main extends Component {
             activeIndex
         } = this.state;
         let actIndex = activeIndex;
-        if(MODES.SHOW == this.props.mode) {
-            if(actIndex == -1) {
-                actIndex = index; 
-            } else {
-                actIndex = -1;
-                this.props.saveTemplateInfo();
-            }
-        } else {
+        if(actIndex == -1) {
             actIndex = index;
+        } else {
+            // 拖拽结束时调用，保存步骤
+            actIndex = -1;
+            this.props.saveTemplateInfo();
         }
-
-        // 可以触发 页面更新
         this.setState({
             activeIndex: actIndex
         });
     }
 
-    setAera = (widthTemp, heightTemp, baseInfoInit = {}) => {
+    setArea = (widthTemp, heightTemp, baseInfoInit = {}) => {
         const styleList = calculatePosition(widthTemp, heightTemp);
         this.setState({
             styleList,
@@ -264,12 +234,13 @@ class Main extends Component {
         }
     }
 
+    // 若拽按钮元素拖拽
     handleMouseMove = ({clientY, clientX}) => {
         const {
             showDrag,
             activeIndex
         } = this.state;
-        if(!showDrag || activeIndex < 0) return
+        if(!showDrag || activeIndex < 0) return;
         const {
             layoutInfo,
             baseInfo
@@ -325,7 +296,7 @@ class Main extends Component {
             widthTemp = maxLeft - clientX;
             baseInfoInit = { left: clientX, top: clientY };
         }
-        this.setAera(widthTemp, heightTemp, baseInfoInit);
+        this.setArea(widthTemp, heightTemp, baseInfoInit);
     }
 
     dragEnd = (element, e) => {
@@ -496,17 +467,8 @@ class Main extends Component {
     render() {
         const { showDrag, activeIndex, layoutInfo } = this.state;
         const {
-            txtInfo,
-            baseInfo,
-            activeElementInfo,
-            layoutInfo: layoutInfoProps,
-            replaceActiveElementsInfo,
-            renderComponentsDisplay,
-            handleActions,
-            isEdit,
-            action,
-            className,
-            actionItems
+            txtInfo, baseInfo, activeElementInfo, layoutInfo: layoutInfoProps, replaceActiveElementsInfo,
+            handleActions, isEdit, action, className, actionItems, propertyInfo, dragStart, dragEnd
         } = this.props;
         if(!baseInfo) {
             console.error('baseInfo is required');
@@ -542,9 +504,11 @@ class Main extends Component {
                 layoutInfo={layoutInfo}
                 activeElementInfo={activeElementInfo}
                 txtInfo={txtInfo}
-                renderComponentsDisplay={renderComponentsDisplay}
                 ref={(ins) => { this.headerRef = ins; }}
+                propertyInfo={propertyInfo}
                 onChange={replaceActiveElementsInfo}
+                dragEnd={dragEnd}
+                onDragStart={dragStart}
             />}
             <div
                 ref={(ins) => { this.mainRef = ins; }}

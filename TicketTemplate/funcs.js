@@ -1,7 +1,8 @@
 import { COMMON_ELEMENTS, DEFAULT_STYLE, ICON_SCRIPT_ID, SHOW_ELEMENTS, icon_src } from './componentConfig';
 import View from './components/View';
-import { BASE_DISTANCE, LAYOUT_INDEX, LINE_POSITION, SOURCE_BTN_TYPE, TEMPLATE_SOURCE_ID, UNIT, VIEW_PRINT_TEMPLATE_ID } from './const';
-import TicketTemplate from './index';
+import { BASE_DISTANCE, ELEMENTS, LAYOUT_INDEX, LINE_POSITION, PRE_FIX_KEY, SOURCE_BTN_TYPE, SPLITOR, TEMPLATE_SOURCE_ID, UNIT, VIEW_PRINT_TEMPLATE_ID } from './const';
+import html2canvas from 'html2canvas';
+import { px2in } from './size';
 
 const isHttp = (url) => {
     return /^http(s)?:\/\//.test(url);
@@ -377,7 +378,7 @@ const printTickets = ({
         isHide,  // 隐藏打印面单
         handleActions,
         print: () => {
-            TicketTemplate.toImage(ticketTemplateInfo.baseInfo, socket, printer).then(() => {
+            toImage(ticketTemplateInfo.baseInfo, socket, printer).then(() => {
                 printTickets({
                     ticketTemplateInfo,
                     list,
@@ -391,6 +392,53 @@ const printTickets = ({
                 });
             });
         }
+    });
+};
+
+/**
+ * 生成 pdf 并且打印
+ * @returns
+ */
+const toImage = ({width, height}, socket, printer = 'KM-202 LABEL') => {
+    if(!socket) {
+        console.error('ws does not connect!!');
+        return;
+    }
+    return new Promise(resolve => {
+        const templateViewRoot = document.querySelector(`#${VIEW_PRINT_TEMPLATE_ID}`);
+        if(!templateViewRoot) {
+            console.error('渲染模板不存在!!');
+            return;
+        }
+        const canvas = document.createElement('canvas');
+        //为了使图像不模糊，先将canvas画布放大若干倍，放在较小的容器内
+        canvas.width = width * 2;
+        canvas.height = height * 2;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        //按照需求设置偏移量
+        //  context.translate(0,0);
+        const context = canvas.getContext('2d');
+        context.scale(2, 2);
+        html2canvas(
+            templateViewRoot.querySelector('.ticket-main--content'),
+            {
+                canvas: canvas
+            }
+        ).then(function (canvas) {
+            const printData = {
+                method:'PrintExpress',
+                printer,
+                templateStream: canvas.toDataURL().replace('data:image/png;base64,', ''),
+                documentName:'Commercial',
+                fileType: 'PNG',
+                labelFormat: 'PNG',
+                imageWidth: px2in(width),
+                imageHeight: px2in(height)
+            };
+            socket.send(JSON.stringify(printData));
+            resolve();
+        });
     });
 };
 
@@ -494,13 +542,95 @@ const sourceModalEdit = (templateId, templateRenderedProperties, templateInfo) =
     });
     return sourceModal;
 };
-
 /** 实时编辑数据源 相关方法结束 */
+
+/**
+ * 拖拽画布元素时，计算元素的位置
+ * @param {object} state this.state
+ * @param {object} state.layoutInfo 画布的信息
+ * @param {object} state.baseInfo 面单的信息
+ * @param {object} state.currentDragItemPosition 当前拖拽元素的位置信息
+ * @returns {object} baseInfoTemp 新的面单位置信息
+ */
+const getMainByDrop = (state) => {
+    const { layoutInfo, baseInfo, currentDragItemPosition } = state;
+    const { startClientX, startClientY, clientX, clientY } = currentDragItemPosition;
+    const { left, top, width, height } = baseInfo;
+    // 起始拖拽位置 距离画布最左侧的位置， 拖拽最后到达 layout 的距离不能比这个小，否则就去临界值
+    const leftDistance = startClientX - left;
+    const topDistance = startClientY - top;
+    const rightDistance = (left + width) - startClientX;
+    const bottomDistance = top + height - startClientY;  // 不使用 baseInfo.bottom 是因为在计算过程中有些步骤 bottom 不会重新赋值
+    // 正常移动位置
+    const baseInfoTemp = {
+        ...baseInfo,
+        left: clientX - leftDistance,
+        right: clientX - leftDistance + width,
+        top: clientY - topDistance,
+        bottom: clientY - topDistance + height
+    };
+    // 临界值处理 左 右 上 下
+    if((clientX - layoutInfo.left) < leftDistance) {
+        baseInfoTemp.left = layoutInfo.left;
+        baseInfoTemp.right = layoutInfo.left + width;
+    }
+    if((layoutInfo.right - clientX) < rightDistance) {
+        baseInfoTemp.left = layoutInfo.right - width;
+        baseInfoTemp.right = layoutInfo.right;
+    }
+    if((clientY - layoutInfo.top) < topDistance) {
+        baseInfoTemp.top = layoutInfo.top;
+        baseInfoTemp.bottom = layoutInfo.top + height;
+    }
+    if((layoutInfo.bottom - clientY) < bottomDistance) {
+        baseInfoTemp.top = layoutInfo.bottom - height;
+        baseInfoTemp.bottom = layoutInfo.bottom;
+    }
+    return baseInfoTemp;
+};
+
+/**
+ * 获取拖拽中的元素大小
+ * @param {object} draggingElementProperty 拖拽中的元素信息
+ * @param {object} activeElementInfo 拖拽中元素的初始信息
+ * @param {boolean} dragBar 是否是拖拽右下角
+ * @returns {object}
+ */
+const getDraggingElement = (draggingElementProperty, activeElementInfo, dragBar) => {
+    const { draggingLeft, draggingTop, draggingWidth, draggingHeight } = draggingElementProperty;
+    return {
+        ...activeElementInfo,
+        style: !dragBar ? {
+            ...activeElementInfo.style,
+            left: draggingLeft,
+            top: draggingTop
+        } : {
+            ...activeElementInfo.style,
+            width: draggingWidth,
+            height: draggingHeight
+        }
+    };
+};
+
+/**
+ * 找到带有可识别标记的元素
+ * @param {event} target 当前拖拽的元素
+ * @returns event
+ */
+const findParent = (target) => {
+    if(target.id && target.id.includes(`${ELEMENTS.PROPERTY_IN_DRAW}${SPLITOR}${PRE_FIX_KEY}`)) {
+        return target;
+    } else {
+        return findParent(target.parentNode);
+    }
+};
+
 export {
     isHttp,
     isChinese,
     isNotBindField,
     doNotShowDragBar,
+    toImage,
 
     setUnit,
     setDotsStyle,
@@ -513,6 +643,8 @@ export {
     getFinalWidth,
     getFinalTop,
     getFinalLeft,
+    getMainByDrop,
+    getDraggingElement,
 
     renderInitData,
     injectIcon,
@@ -523,6 +655,7 @@ export {
     printTickets,
 
     filterProps,
+    findParent,
 
     debounce
 };
