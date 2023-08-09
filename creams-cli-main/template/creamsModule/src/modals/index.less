@@ -1,0 +1,76 @@
+.tagName {
+    font-size: 12px;
+    span {
+        color: #848fad;
+        line-height: 18px;
+    }
+    input {
+        margin-top: 4px;
+        font-size: 12px;
+    }
+}
+
+.deleteIcon {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 10000;
+}
+
+.noPaddingModal {
+    :global {
+        .ant-modal-body {
+            padding: 0px;
+        }
+        .ant-modal-footer {
+            justify-content: flex-end;
+        }
+    }
+}
+.rightBox {
+    border-left: 1px solid #848fad;
+    max-height: 600px;
+    overflow: auto;
+    :global {
+        .ant-select-dropdown {
+            z-index: 9999 !important;
+        }
+        .ant-tooltip-open {
+            z-index: 99999 !important;
+        }
+    }
+    // padding: 0px 20px;
+}
+.stopClickBox > span:nth-child(3) {
+    pointer-events: none;
+    cursor: not-allowed;
+}
+.sourceBox {
+    width: 95%;
+    padding: 20px;
+    padding-right: 40px;
+    margin: 0 auto 10px;
+    border: 1px dashed #848fad;
+    position: relative;
+}
+.addVoucherSource {
+    margin-right: 16px;
+    float: right;
+}
+
+.disableCheckbox > span:nth-child(2) {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+    & > span {
+        background-color: #8590ad;
+        opacity: 0.5;
+    }
+}
+.subItem {
+    display: block;
+    margin: 20px 0 10px 0;
+}
+.subRadio {
+    font-size: 12px;
+}

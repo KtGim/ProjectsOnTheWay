@@ -1,0 +1,1 @@
+export { tagModel, categoryModel } from './customModel';

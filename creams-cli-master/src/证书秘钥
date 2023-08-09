@@ -1,0 +1,7 @@
+D323-86C0-D9F3-9389 2AA6-1ACC-4C8C-AC01 854E-C462-386A-7CBB 2C0D-A265-B6A7-E29A
+
+
+
+openssl genrsa -out privkey.pem 1024/2038
+
+openssl req -new -x509 -key privkey.pem -out server.pem -days 365
