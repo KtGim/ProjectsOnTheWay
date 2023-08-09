@@ -1,0 +1,19 @@
+{
+  "name": "@best/zg-monitor-loader",
+  "version": "1.0.5",
+  "description": "自动添加诸葛io 埋点事件",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "http://BG499022@bitbucket.rd.800best.com/scm/wmsweb/zgmonitorloader.git"
+  },
+  "keywords": [
+    "monitor"
+  ],
+  "author": "bg499022",
+  "license": "ISC",
+  "dependencies": {
+    "loader-utils": "^2.0.2",
+    "schema-utils": "^4.0.0"
+  }
+}
