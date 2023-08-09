@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+      "baseUrl": "./",
+      "paths": {
+        "ggs-ui/*": ["components/*"],
+        "ggs-ui/esm/*": ["components/*"],
+        "ggs-ui/lib/*": ["components/*"]
+      },
+      "target": "esnext",
+      "module": "commonjs",
+      "jsx": "react",
+      "strict": true,
+      "declaration": true,
+      "declarationDir": "lib",
+      "moduleResolution": "node",
+      "allowSyntheticDefaultImports": true,
+      "esModuleInterop": false,
+      "resolveJsonModule": true,
+      "skipLibCheck": true,
+  },
+  "exclude": [
+      "node_modules",
+      "components/**/__tests__"
+  ],
+  "include": ["components", "global.d.ts"]
+}

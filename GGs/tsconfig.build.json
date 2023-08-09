@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "emitDeclarationOnly": true }, // 只生成声明文件
+  "exclude": ["**/__tests__/**", "**/demo/**", "node_modules", "lib", "esm"]
+}
