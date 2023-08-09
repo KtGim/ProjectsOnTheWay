@@ -10,6 +10,7 @@ const TicketTemplateKey = '$$ticket$$template$$info$$';
 import './index.less';
 import PrintPet from '../../Tool/Pet/PrinterPet';
 import { PRINTER_TYPES } from '../../Tool/Pet/printerConst';
+import { toImage } from '../Common/TicketTemplate/funcs';
 
 class TicketTemplatePage extends Component {
 
@@ -80,8 +81,8 @@ class TicketTemplatePage extends Component {
         });
     }
 
-    saveTemplateInfo = (info) => {
-        console.info('save info:', info);
+    getCurrentTemplateStep = (info) => {
+        console.info('step info:', info);
     }
 
     hidePage = (props) => {
@@ -100,7 +101,7 @@ class TicketTemplatePage extends Component {
                 SessionStorage.setItem(TicketTemplateKey, props);
                 break;
             case OPERATIONS.PRINT:
-                TicketTemplate.toImage(props, this.state.socket, localStorage.getItem(PRINTER_TYPES.commercialprinter));
+                toImage(props, this.state.socket, localStorage.getItem(PRINTER_TYPES.commercialprinter));
                 break;
         }
         this.setState({
@@ -112,7 +113,7 @@ class TicketTemplatePage extends Component {
         const { pageType } = this.state;
         return <div className="ticket-template_page">
             <TicketTemplate
-                saveTemplateInfo={this.saveTemplateInfo}
+                getCurrentTemplateStep={this.getCurrentTemplateStep}
                 properties={this.sourceProperties}
                 dataInfo={this.dataInfo}
                 lan={getLanguage()}

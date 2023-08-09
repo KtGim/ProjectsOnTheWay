@@ -110,7 +110,6 @@ class View extends React.Component {
             handleActions={this.handleActions}
             actionItems={actionItems}
             action={DATA_ICONS.OPEN_EYES}
-            isEdit={false}
             total={total}
             current={current}
         />;

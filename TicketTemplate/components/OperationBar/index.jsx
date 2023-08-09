@@ -87,7 +87,7 @@ class OperationBar extends PureComponent {
      * @param {string} value 默认展示的数值，如果 iconNameMap 中不存在则展示这个值
      * @param {string} title svg 的 title 属性
      * @param {object} style svg 的样式,只有在 svg 能渲染时才生效
-     * @returns
+     * @returns {React.Component | string}
      */
     static renderSvgIcon = (type, value, title, style) => {
         return iconNameMap[type] ? <svg style={style ? style : undefined} className="icon" aria-hidden="true">

@@ -468,7 +468,7 @@ class Main extends Component {
         const { showDrag, activeIndex, layoutInfo } = this.state;
         const {
             txtInfo, baseInfo, activeElementInfo, layoutInfo: layoutInfoProps, replaceActiveElementsInfo,
-            handleActions, isEdit, action, className, actionItems, propertyInfo, dragStart, dragEnd
+            handleActions, isEdit, action, className, actionItems, propertyInfo, dragStart, dragEnd, onDragOver, draggable = true
         } = this.props;
         if(!baseInfo) {
             console.error('baseInfo is required');
@@ -487,9 +487,11 @@ class Main extends Component {
         };
         const cls = isEdit ? 'draw-container' : 'draw-container ticket-center';
         const props = isEdit ? {
-            draggable: false
-        } : {
-            draggable: true,
+            draggable,
+            onMouseMove: this.handleMouseMove,
+            onDragOver
+         } : {
+            draggable,
             onDragStart: this.dragContainerStart,
             onDragEnd: this.dragContainerEnd,
             onDragOver: this.onMouseMove
@@ -513,9 +515,7 @@ class Main extends Component {
             <div
                 ref={(ins) => { this.mainRef = ins; }}
                 className={isEdit ? 'ticket-main' : 'ticket-main inherit'}
-                onMouseMove={isEdit ? this.handleMouseMove : undefined}
                 style={mainStyle}
-                onDragOver={isEdit ? this.props.onDragOver : undefined}
                 id={ELEMENTS.LAYOUT}
             >
                 {this.renderDragItems(showDrag)}

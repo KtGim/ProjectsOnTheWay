@@ -117,7 +117,7 @@ const DATA_ICONS = {
  * 根据组件类型展示 icon
  */
 const icon_src = 'http://at.alicdn.com/t/c/font_4167045_0fcq9e85lwfj.js';
-const ICON_SCRIPT_ID = 'iconfont-script';
+const ICON_SCRIPT_ID = 'best-icon-font-script';
 
 const iconNameMap = {
     // 编辑器组件

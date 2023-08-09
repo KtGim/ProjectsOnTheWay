@@ -41,11 +41,6 @@ const TEXT_ALIGN_ITEMS = {
 /**
  * templateRenderedProperties 里面的动态属性都可以进行修改
  * 自定义的项目
- *  1. CUSTOM: 自定义
- *  2. DATA_KEY: 动态数据源的 key
- *  TODO:
- *      3. SHOW_DATA: 显示数据
- *      4. FIELD: 组件类型
  */
 const CUSTOMERS = {
     CUSTOM: 'CUSTOM',

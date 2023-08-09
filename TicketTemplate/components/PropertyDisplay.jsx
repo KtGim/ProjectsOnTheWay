@@ -13,7 +13,8 @@ class PropertyDisplay extends Component {
         const {
             properties,
             propertyInfo,
-            title
+            title,
+            dragStart
         } = this.props;
         const {
             primaryKey,
@@ -27,7 +28,7 @@ class PropertyDisplay extends Component {
                         return <div
                             draggable
                             onDragEnd={this.dragEnd.bind(this, property)}
-                            onDragStart={this.props.dragStart}
+                            onDragStart={dragStart}
                             className="property"
                             ref={ins => { this[property[primaryKey]] = ins; }}
                             key={property[primaryKey]}

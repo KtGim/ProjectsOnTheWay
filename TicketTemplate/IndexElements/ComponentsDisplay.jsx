@@ -10,7 +10,7 @@ class ComponentsDisplay extends PureComponent {
             displayElements = SHOW_ELEMENTS,
             templatePropertiesSetting,
             dragEnd,
-            onDragStart
+            dragStart
         } = this.props;
         return <div className="setting-list">
             <PropertyDisplay
@@ -23,7 +23,7 @@ class ComponentsDisplay extends PureComponent {
                 })}
                 propertyInfo={templatePropertiesSetting}
                 dragEnd={dragEnd}
-                dragStart={onDragStart}
+                dragStart={dragStart}
             />
         </div>;
     }

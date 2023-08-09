@@ -97,7 +97,7 @@ class Element extends Component {
         });
     }
 
-    // 右侧拖拽按钮
+    // 右下角拖拽按钮
     renderDrag = () => {
         const {
             onDragStart,

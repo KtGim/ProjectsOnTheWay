@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 
 import Main from './components/Main';
-import { ELEMENTS, LAYOUT_INDEX, MODES, SAVE_STEP_BY_TIMELINE, SPLITOR, PRE_FIX_KEY, LINE_POSITION, BAR_FIX_POSITION, LANGUAGE_KEY, TEMPLATE_PREFIX } from './const';
-import { findParent, getDraggingElement, getFinalHeight, getFinalLeft, getFinalTop, getFinalWidth, getMainByDrop, injectIcon, isNotBindField, setDragBarPosition, sourceModalEdit, toImage } from './funcs';
+import { ELEMENTS, MODES, SPLITOR, LINE_POSITION, LANGUAGE_KEY, TEMPLATE_PREFIX } from './const';
+import { dropProperty, findParent, getComponentId, getDraggingElement, getMainByDrop, getMoveProperty, injectIcon, isNotBindField, sourceModalEdit, toImage } from './funcs';
 import * as language from './language/index';
 import { DATA_ICONS, OPERATIONS, SHOW_ELEMENTS } from './componentConfig';
 import { OPERATION_BAR_ID } from './components/OperationBar/const';
@@ -10,13 +10,7 @@ import View from './components/View';
 import { ComponentsDisplay, Left } from './IndexElements/index';
 
 import './index.less';
-/**
- * 每次停止拖动就会存储历史，目前缓存在本地
- * STPES_INFO：
- *  [key]: 操作时间
- *  [value]: 这个时间段保存的模板班数据
- */
-const STPES_INFO = JSON.parse(localStorage.getItem(SAVE_STEP_BY_TIMELINE) || '[]');
+import { getDateByFormat } from './components/componentCommonFunc';
 
 class TicketTemplate extends Component {
 
@@ -39,8 +33,6 @@ class TicketTemplate extends Component {
                 height: 700,
                 width: '100%'
             },
-
-            limitMaxSteps: 10,
             /**
              * templateRenderedProperties 元素
              * {
@@ -79,30 +71,26 @@ class TicketTemplate extends Component {
         };
 
         /**
-         * 不会实时更新数据
+         * 不会实时更新dom
          * 可以存储变化的值
          */
         this.draggingElementProperty = null; // 拖拽中的元素信息
-
         injectIcon();
     }
 
     static toImage = toImage;
 
     componentDidMount() {
-        const { lan } = this.props;
+        const { lan, txtInfo } = this.props;
         this.setState({
-            txtInfo: language[lan || LANGUAGE_KEY.ZH] || language[LANGUAGE_KEY.ZH]
+            txtInfo: txtInfo || language[lan || LANGUAGE_KEY.ZH] || language[LANGUAGE_KEY.ZH]
         });
 
         /**
          * 窗口或元素变化时需要对位置进行的计算
          * https://best-inc.feishu.cn/wiki/BYrnwo4k2i10iOkuKkVcgKAmn6b
-         * 
          * 1. 监听窗口变化时，更改 画布 的位置信息
-         * 
          * 2. TODO: 当主要 DOM style 变化时需要更改画布的位置信息, 此时需要传入一个回调函数返回重新计算的函数（暂时未实现）
-         * 
          * 3. 监听元素是否被叠加（挡住）
          */
         // 监听窗口变化时，更改 画布 的位置信息
@@ -125,7 +113,6 @@ class TicketTemplate extends Component {
              * 似乎具有迟滞性，
              * 当 isIntersecting （是否折叠） 为 false 时，元素不在在可视区域内： false => 隐藏
              * 当 isIntersecting 为 true 时，元素在可视区域内: true => 展示
-             * 
              * 提供 hideTemplate 方法用于矫正不同情况下的值
              * */
             const { isIntersecting } = entries[0];
@@ -135,7 +122,6 @@ class TicketTemplate extends Component {
                 hidePage && hidePage({...this.saveTemplateInfo(), templateId: this.templateId });
             }
         }, options);
-
         observer.observe(this.ticketRef);
     }
 
@@ -171,10 +157,9 @@ class TicketTemplate extends Component {
 
     saveInfo = () => {
         const {
-            saveTemplateInfo
+            getCurrentTemplateStep
         } = this.props;
         const {
-            limitMaxSteps,
             baseInfo,
             layoutInfo,
             templateRenderedProperties,
@@ -183,13 +168,8 @@ class TicketTemplate extends Component {
             showElementKey,
             dragBar
         } = this.state;
-
-        const date = new Date();
-        if(STPES_INFO.length >= limitMaxSteps) {
-            STPES_INFO.shift();
-        }
-        STPES_INFO.push({
-            time: [`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`],
+        getCurrentTemplateStep && getCurrentTemplateStep({
+            time: getDateByFormat(new Date()),
             props: {
                 baseInfo,
                 layoutInfo,
@@ -199,19 +179,6 @@ class TicketTemplate extends Component {
                 showElementKey,
                 dragBar
             }
-        });
-
-        localStorage.setItem(SAVE_STEP_BY_TIMELINE, JSON.stringify(STPES_INFO));
-
-        saveTemplateInfo && saveTemplateInfo(STPES_INFO);
-    }
-
-    /**
-     * @param {查看历史操作记录} showHistory
-     */
-    showHistory = (showHistory) => {
-        this.setState({
-            showHistory
         });
     }
 
@@ -236,81 +203,11 @@ class TicketTemplate extends Component {
         }
     }
 
-    getComputedStyle = (clientX, clientY) => {
-        const { baseInfo, currentDragItemPosition } = this.state;
-        const { canDragOut = true } = this.props;
-        let { left, top, height, width } = baseInfo;
-        const { startClientX, startClientY } = currentDragItemPosition;
-        const { left:el, top:et, height:eh, width:ew } = this.draggingElementProperty;
-        const elementRight = clientX + ew - (startClientX - el);   // 元素右边
-        const elementBottom = clientY + eh - (startClientY - et);  // 元素底边
-        // 左右不做限制，可以随意拖拽，注释部分不能拖出最右和最下边区域
-        let draggingLeft = 0;
-        let draggingTop = 0;
-        if(canDragOut) {
-            draggingLeft = clientX - left - (startClientX - el);
-            draggingTop = clientY - top - (startClientY - et);
-        } else {
-            draggingLeft = elementRight > (left + width) ? (clientX - ((clientX + ew) - (left + width)) - left): clientX - left - (startClientX - el);
-            draggingTop = elementBottom > (top + height) ? (clientY - ((clientY + eh) - (top + height)) - top): clientY - top - (startClientY - et);
-        }
-        return {
-            draggingLeft,
-            draggingTop
-        };
-    }
-
     onMove = ({clientX, clientY}) => {
-        const { activeElementInfo, dragBar, txtInfo } = this.state;
-        const element = this.mainRef[this.mainRef.getElementKey(activeElementInfo)]; // 当前数据元素
-        const elementRef = this.mainRef.elementRef;
-        const barRef = elementRef.doitsRef[elementRef.getDoitKet(LINE_POSITION.BAR)]; // 拖拽移动元素
-        const drag_linner_left = elementRef.doitsRef[elementRef.getDoitKet(LINE_POSITION.DRAG_LINNER_LEFT)]; // 标齐线竖线
-        const drag_linner_bottom = elementRef.doitsRef[elementRef.getDoitKet(LINE_POSITION.DRAG_LINNER_BOTTOM)]; // 标齐线横线
-        const barInfoRef = elementRef.doitsRef[elementRef.getDoitKet(LINE_POSITION.ACTIVE_INFO)]; // 拖拽时展示信息元素
-        const drag_linner_left_info_Ref = elementRef.doitsRef[elementRef.getDoitKet(LINE_POSITION.ACTIVE_INFO_LEFT)]; // 拖拽时展示信息元素
-        const drag_linner_bottom_info_Ref = elementRef.doitsRef[elementRef.getDoitKet(LINE_POSITION.ACTIVE_INFO_BOTTOM)]; // 拖拽时展示信息元素
-        // const spansRef = this.mainRef.headerRef.spanRefs;
-        if(!this.draggingElementProperty) {
-            this.draggingElementProperty = element.getBoundingClientRect();
-        }
-        const { draggingLeft, draggingTop } = this.getComputedStyle(clientX, clientY);
-        if(dragBar) { // 放大缩小元素时，不能需要移动元素，改变元素宽高
-            const { style, field } = activeElementInfo;
-            const { left, top, height, width } = style;
-            const draggingWidth = draggingLeft - left + width + 1;
-            const draggingHeight = getFinalHeight({field, height: draggingTop - top + height, width: draggingWidth, init: false});
-            element.style.width = `${draggingWidth}px`;
-            element.style.height = `${draggingHeight}px`;
-            const dotStyle = setDragBarPosition({...element.style, height: draggingHeight, width: draggingWidth, fixPosition: BAR_FIX_POSITION}, 'px');
-            barRef.style.left = dotStyle.left;
-            barRef.style.top = dotStyle.top;
-            barInfoRef.innerHTML = `H: ${draggingHeight}<br/> W: ${draggingWidth}`;
-
-            this.draggingElementProperty.draggingWidth = draggingWidth;
-            this.draggingElementProperty.draggingHeight = draggingHeight;
-        } else { // 移动元素时，改变元素位置
-            element.style.left = `${draggingLeft}px`;
-            element.style.top = `${draggingTop}px`;
-            const dotStyle = setDragBarPosition({...element.style, fixPosition: BAR_FIX_POSITION}, 'px');
-            barRef.style.left = dotStyle.left;
-            barRef.style.top = dotStyle.top;
-
-            barInfoRef.innerHTML = `${txtInfo.height}: ${activeElementInfo.style.height}<br/> ${txtInfo.width}: ${activeElementInfo.style.width}`;
-
-            this.draggingElementProperty.draggingTop = draggingTop;
-            this.draggingElementProperty.draggingLeft = draggingLeft;
-        }
-
-        drag_linner_left_info_Ref.innerHTML = `${txtInfo.left}: ${this.draggingElementProperty.draggingLeft || activeElementInfo.style.left}`;
-        drag_linner_bottom_info_Ref.innerHTML = `${txtInfo.top}: ${this.draggingElementProperty.draggingTop || activeElementInfo.style.top}`;
-
-        drag_linner_left.style.left = `${this.draggingElementProperty.draggingLeft}px`;
-        drag_linner_bottom.style.top = `${this.draggingElementProperty.draggingTop}px`;
+        this.draggingElementProperty = getMoveProperty({state: this.state, clientX, clientY, draggingElementProperty: this.draggingElementProperty, mainRef: this.mainRef, canDragOut: this.props.canDragOut});
     }
 
     onDragStart = ({clientX, clientY, target}) => {
-        console.log(target.id, 'onDragStart');
         if(this.mainRef.settingIconRef) {
             this.mainRef.settingIconRef.style.display = 'none';
         }
@@ -318,9 +215,8 @@ class TicketTemplate extends Component {
         let dragBar = false;
         const { templateRenderedProperties } = this.state;
         if(target.id.includes(ELEMENTS.PROPERTY_IN_DRAW)) {
-            activeElementInfo = templateRenderedProperties.find(({id}) => id == target.id.replace(`${ELEMENTS.PROPERTY_IN_DRAW}${SPLITOR}`, ''));
+            activeElementInfo = templateRenderedProperties.find(({id}) => id == getComponentId(target.id, ELEMENTS.PROPERTY_IN_DRAW));
         } else if(target.id == this.mainRef.elementRef.getDoitKet(LINE_POSITION.BAR)) {
-            console.log('drag BAR');
             activeElementInfo = this.state.activeElementInfo;
             dragBar = true;
         }
@@ -353,70 +249,9 @@ class TicketTemplate extends Component {
      * @param {是否改变元素的样式} changeStyle
      */
     dropProperty = (elementInfo, element, changeStyle = true) => {
-        const { currentDragItemPosition, showElementKey, baseInfo, templateRenderedProperties } = this.state;
-        const elementProperty = element.getBoundingClientRect();
-        const { left, top, height, width } = baseInfo;
-        const { clientX, clientY, startClientX, startClientY } = currentDragItemPosition;
-        const { field, style, id } = elementInfo || {};
-        if(elementInfo && left <= clientX && top <= clientY && clientX <= (left + width) && clientY <= (top + height)) {
-            const finalHeight = getFinalHeight({field, height: elementProperty.height, width: elementProperty.width});
-            const elementRight = clientX + elementProperty.width - (startClientX - elementProperty.left);   // 元素右边
-            const elementBottom = clientY + finalHeight - (startClientY - elementProperty.top);  // 元素底边
-            const elementLeft = clientX + elementProperty.width - (startClientX - elementProperty.left) - elementProperty.width;   // 元素左边
-            const elementTop = clientY + finalHeight - (startClientY - elementProperty.top) - finalHeight;  // 元素上边
-
-            const dragLeft = elementRight > (left + width) ? (clientX - ((clientX + elementProperty.width) - (left + width)) - left): clientX - left - (startClientX - elementProperty.left);
-            const dragTop = elementBottom > (top + height) ? (clientY - ((clientY + elementProperty.height) - (top + height)) - top): clientY - top - (startClientY - elementProperty.top);
-            const propertyInfo = changeStyle ? {
-                ...elementInfo,
-                elementRight,
-                elementBottom,
-                elementLeft,
-                elementTop,
-                style: {
-                    position: 'absolute',
-                    zIndex: LAYOUT_INDEX.PROPERTY_IN_DRAW,
-                    height: finalHeight,
-                    width: getFinalWidth({field, height: elementProperty.height, width: elementProperty.width, baseWidth: width, baseHeight: height, init: false}),
-                    /**
-                     * 超过临界值那么取临界值 （鼠标越界直接删除元素）
-                     * 否则
-                     * 鼠标位置 (clientX)  - 初始画布的左上角位置(left) - 拖拽元素时鼠标停留的距离元素的偏移量位置 (startClientX - elementProperty.left)
-                     */
-                    left: getFinalLeft({field, left: dragLeft, baseInfo, init: false}),
-                    top: getFinalTop({field, top: dragTop, baseInfo, init: false})
-                }
-            } : {
-                ...elementInfo,
-                elementRight,
-                elementBottom,
-                elementLeft,
-                elementTop,
-                style: {
-                    ...(style || {}),
-                    // 可以进行宽高的初始设定
-                    width: getFinalWidth({field, height: (style || {}).height, width: (style || {}).width, baseWidth: width, baseHeight: height, init: true}),
-                    height: getFinalHeight({field, height: (style || {}).height, width: (style || {}).width, baseWidth: width, baseHeight: height, init: true})
-                }
-            };
-            if(id) { // 移动
-                const index = (templateRenderedProperties || []).findIndex(({id: fId}) => fId == id);
-                templateRenderedProperties.splice(index, 1, propertyInfo);
-            } else { // 创建
-                propertyInfo.id = `${PRE_FIX_KEY}${SPLITOR}${showElementKey}`;
-                templateRenderedProperties.push(propertyInfo);
-            }
-            this.setState({
-                currentDragItemPosition: {},
-                templateRenderedProperties,
-                showElementKey: id ? showElementKey : showElementKey + 1
-            });
-            this.setState({
-                activeElementInfo: propertyInfo
-            });
-        } else {
-            // 超出范围
-            console.log('超出范围');
+        const returnValue = dropProperty(this.state, elementInfo, element, changeStyle);
+        if(returnValue) {
+            this.setState(returnValue);
         }
     }
 
@@ -426,17 +261,11 @@ class TicketTemplate extends Component {
     dropDataItem = (elementInfo, element) => {
         const { dataInfo } = this.props;
         const { templateRenderedProperties } = this.state;
-        // const elementProperty = element.getBoundingClientRect();
-        const propertyId = (element.id || '').replace(`${ELEMENTS.PROPERTY_IN_DRAW}${SPLITOR}`, '');
+        const propertyId = getComponentId(element.id, ELEMENTS.PROPERTY_IN_DRAW);
         const index = templateRenderedProperties.findIndex(({id}) => id == propertyId);
         const item = templateRenderedProperties[index];
         item.dataKey = elementInfo[dataInfo.fieldKey];  // 将数据项的 key 设置进来
         item.dataKeyLabel = elementInfo[dataInfo.labelKey];  // 将数据项的 key 设置进来
-        // item.style = {
-        //     ...item.style,
-        //     height: elementProperty.height,              // todo 超越边界的时候最好移动一下
-        //     width: elementProperty.width,
-        // }
         templateRenderedProperties.splice(index, 1, item);
         this.setState({
             currentDragItemPosition: {},
@@ -509,18 +338,16 @@ class TicketTemplate extends Component {
                         this.dropDataItemInit(elementInfo, element);
                     }
                 } else if ((dropTargetItemId || '').includes(ELEMENTS.PROPERTY_IN_DRAW)) { // 数据项和属性项的拖拽
+                    const dropTargetId = getComponentId(dropTargetItemId, ELEMENTS.PROPERTY_IN_DRAW);
                     if((startTarget || '').includes(ELEMENTS.DATA)) { // 拖拽完后都会成为组件类型数据
-                        if(dropTargetItemId) {
-                            const field = ((templateRenderedProperties.find(({id}) => id == dropTargetItemId.replace(`${ELEMENTS.PROPERTY_IN_DRAW}${SPLITOR}`, ''))) || {}).field;
-                            // label 不支持动态数据，仅支持手动编写，请使用 text
-                            if(isNotBindField(field)) {
-                                console.error('不支持动态绑定数据项的组件');
-                                return;
-                            }
+                        const field = ((templateRenderedProperties.find(({id}) => id == dropTargetId)) || {}).field;
+                        // label 不支持动态数据，仅支持手动编写，请使用 text
+                        if(isNotBindField(field)) {
+                            console.error('不支持动态绑定数据项的组件');
+                            return;
                         }
                         this.dropDataItem(elementInfo, dropTarget ? element : dropTargetItemInfo);
                     } else if ((startTarget || '').includes(ELEMENTS.PROPERTY)) { // 属性拖到属性上替换原来的属性
-                        const dropTargetId = dropTargetItemId.replace(`${ELEMENTS.PROPERTY_IN_DRAW}${SPLITOR}`, '');
                         const inDrawItem = templateRenderedProperties.find(({id}) => id == dropTargetId);
                         this.dropProperty({...(inDrawItem || {}), ...elementInfo}, element, false);
                     }
@@ -547,8 +374,7 @@ class TicketTemplate extends Component {
     activeElement = (e) => {
         const { activeElementInfo, templateRenderedProperties, pageType } = this.state;
         if(pageType !== OPERATIONS.EDIT) return;
-
-        const targetId = e.target && e.target.id && e.target.id.replace(`${ELEMENTS.PROPERTY_IN_DRAW}${SPLITOR}`, '');
+        const targetId = e.target && e.target.id && getComponentId(e.target.id, ELEMENTS.PROPERTY_IN_DRAW);
         if(targetId == ELEMENTS.MAIN) {
             this.setState({
                 activeElementInfo: null
@@ -594,7 +420,6 @@ class TicketTemplate extends Component {
             });
         }
     }
-
     /**
      * 删除元素操作
      */
@@ -610,15 +435,6 @@ class TicketTemplate extends Component {
         this.setState({
             templateRenderedProperties: templateRenderedProperties.filter(({id}) => id !== activeElementInfo.id),
             activeElementInfo: null
-        });
-    }
-
-    resetTo = (props) => {
-        this.setState({
-            ...this.state,
-            ...props
-        }, () => {
-            this.mainRef.computedCurrentMainArea();
         });
     }
 
@@ -657,11 +473,8 @@ class TicketTemplate extends Component {
             baseInfo,
             templateOriginWidth,
             templateOriginHeight,
-
             templateRenderedProperties,
-
             activeElementInfo,
-
             txtInfo,
             pageType,
             action
@@ -703,8 +516,8 @@ class TicketTemplate extends Component {
                 current={1}
             />
             {/* action == DATA_ICONS.OPEN_EYES 这个条件再渲染, 不然一直触发 */}
-            {action == DATA_ICONS.OPEN_EYES && <View {...this.state} handleActions={this.handleActions} templatePropertiesSetting={this.templatePropertiesSetting}/>}
-            {isEdit && <ComponentsDisplay txtInfo={txtInfo} title={txtInfo.component || componentTitle} templatePropertiesSetting={this.templatePropertiesSetting} dragEnd={this.dragEnd} onDragStart={this.onDragStart}/>}
+            {action == DATA_ICONS.OPEN_EYES && <View {...this.state} handleActions={this.handleActions} templatePropertiesSetting={this.templatePropertiesSetting} draggable={false}/>}
+            {isEdit && <ComponentsDisplay txtInfo={txtInfo} title={txtInfo.component || componentTitle} templatePropertiesSetting={this.templatePropertiesSetting} dragEnd={this.dragEnd} dragStart={this.onDragStart}/>}
         </div>;
     }
 }

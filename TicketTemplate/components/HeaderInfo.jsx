@@ -54,7 +54,7 @@ class HeaderInfo extends PureComponent {
                 txtInfo={txtInfo}
                 templatePropertiesSetting={propertyInfo}
                 dragEnd={dragEnd}
-                onDragStart={onDragStart}
+                dragStart={onDragStart}
             />
         </div>;
     }

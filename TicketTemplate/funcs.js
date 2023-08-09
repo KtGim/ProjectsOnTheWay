@@ -1,6 +1,6 @@
 import { COMMON_ELEMENTS, DEFAULT_STYLE, ICON_SCRIPT_ID, SHOW_ELEMENTS, icon_src } from './componentConfig';
 import View from './components/View';
-import { BASE_DISTANCE, ELEMENTS, LAYOUT_INDEX, LINE_POSITION, PRE_FIX_KEY, SOURCE_BTN_TYPE, SPLITOR, TEMPLATE_SOURCE_ID, UNIT, VIEW_PRINT_TEMPLATE_ID } from './const';
+import { BAR_FIX_POSITION, BASE_DISTANCE, ELEMENTS, LAYOUT_INDEX, LINE_POSITION, PRE_FIX_KEY, SOURCE_BTN_TYPE, SPLITOR, TEMPLATE_SOURCE_ID, UNIT, VIEW_PRINT_TEMPLATE_ID } from './const';
 import html2canvas from 'html2canvas';
 import { px2in } from './size';
 
@@ -168,12 +168,13 @@ const getFinalHeight = ({field, height, width, baseWidth, baseHeight, init = tru
 
 /**
  * 1. 条形码宽度是条形的总和，不能手动修改；
- * @param {string} 组件的类型 field
- * @param {number} 当前拖拽元素 高 height
- * @param {number} 当前拖拽元素 宽 width
- * @param {number} 当前画布的宽 baseWidth
- * @param {number} 当前画布的高 baseHeight
- * @param {boolean} init 是否是初始化
+ * @param {object} info
+ * @param {string} info.field 组件的类型 field
+ * @param {number} info.height 当前拖拽元素 高 height
+ * @param {number} info.width 当前拖拽元素 宽 width
+ * @param {number} info.baseWidth 当前画布的宽 baseWidth
+ * @param {number} info.baseHeight 当前画布的高 baseHeight
+ * @param {boolean} info.init 是否是初始化
  * @returns {number}
  */
 // eslint-disable-next-line no-unused-vars
@@ -625,6 +626,163 @@ const findParent = (target) => {
     }
 };
 
+/**
+ * 拖拽后的元素操作
+ */
+const dropProperty = (state, elementInfo, element, changeStyle = true, errorFunc) => {
+    const { currentDragItemPosition, showElementKey, baseInfo, templateRenderedProperties } = state;
+    const elementProperty = element.getBoundingClientRect();
+    const { left, top, height, width } = baseInfo;
+    const { clientX, clientY, startClientX, startClientY } = currentDragItemPosition;
+    const { field, style, id } = elementInfo || {};
+    if(elementInfo && left <= clientX && top <= clientY && clientX <= (left + width) && clientY <= (top + height)) {
+        const finalHeight = getFinalHeight({field, height: elementProperty.height, width: elementProperty.width});
+        const elementRight = clientX + elementProperty.width - (startClientX - elementProperty.left);   // 元素右边
+        const elementBottom = clientY + finalHeight - (startClientY - elementProperty.top);  // 元素底边
+        const elementLeft = clientX + elementProperty.width - (startClientX - elementProperty.left) - elementProperty.width;   // 元素左边
+        const elementTop = clientY + finalHeight - (startClientY - elementProperty.top) - finalHeight;  // 元素上边
+
+        const dragLeft = elementRight > (left + width) ? (clientX - ((clientX + elementProperty.width) - (left + width)) - left): clientX - left - (startClientX - elementProperty.left);
+        const dragTop = elementBottom > (top + height) ? (clientY - ((clientY + elementProperty.height) - (top + height)) - top): clientY - top - (startClientY - elementProperty.top);
+        const propertyInfo = changeStyle ? {
+            ...elementInfo,
+            elementRight,
+            elementBottom,
+            elementLeft,
+            elementTop,
+            style: {
+                position: 'absolute',
+                zIndex: LAYOUT_INDEX.PROPERTY_IN_DRAW,
+                height: finalHeight,
+                width: getFinalWidth({field, height: elementProperty.height, width: elementProperty.width, baseWidth: width, baseHeight: height, init: false}),
+                /**
+                 * 超过临界值那么取临界值 （鼠标越界直接删除元素）
+                 * 否则
+                 * 鼠标位置 (clientX)  - 初始画布的左上角位置(left) - 拖拽元素时鼠标停留的距离元素的偏移量位置 (startClientX - elementProperty.left)
+                 */
+                left: getFinalLeft({field, left: dragLeft, baseInfo, init: false}),
+                top: getFinalTop({field, top: dragTop, baseInfo, init: false})
+            }
+        } : {
+            ...elementInfo,
+            elementRight,
+            elementBottom,
+            elementLeft,
+            elementTop,
+            style: {
+                ...(style || {}),
+                // 可以进行宽高的初始设定
+                width: getFinalWidth({field, height: (style || {}).height, width: (style || {}).width, baseWidth: width, baseHeight: height, init: true}),
+                height: getFinalHeight({field, height: (style || {}).height, width: (style || {}).width, baseWidth: width, baseHeight: height, init: true})
+            }
+        };
+        if(id) { // 移动
+            const index = (templateRenderedProperties || []).findIndex(({id: fId}) => fId == id);
+            templateRenderedProperties.splice(index, 1, propertyInfo);
+        } else { // 创建
+            propertyInfo.id = `${PRE_FIX_KEY}${SPLITOR}${showElementKey}`;
+            templateRenderedProperties.push(propertyInfo);
+        }
+        return {
+            currentDragItemPosition: {},
+            templateRenderedProperties,
+            showElementKey: id ? showElementKey : showElementKey + 1,
+            activeElementInfo: propertyInfo
+        };
+    } else {
+        // 超出范围
+        (errorFunc || console.error)('超出范围');
+        return  false;
+    }
+};
+
+/**
+ * 获取元素的 id
+ */
+const getComponentId = (idString='', prefix = '', splitor= SPLITOR) => {
+    return idString.replace(`${prefix}${splitor}`, '');
+};
+
+/**
+ * 移动过程中的属性转变， 返回当前拖拽元素的属性
+ * @param {object} props 需要传入的属性
+ * @param {object} props.state this.state
+ * @param {object} props.mainRef this.mainRef
+ * @param {object} props.draggingElementProperty this.draggingElementProperty 拖拽中的元素信息
+ * @param {object} props.canDragOut 是否可以拖拽出画布
+ * @param {number} props.clientX 鼠标的位置
+ * @param {number} props.clientY 鼠标的位置
+ * @returns {object} draggingElementProperty
+ */
+const getMoveProperty = ({
+    state,
+    mainRef,
+    clientX,
+    clientY,
+    draggingElementProperty,
+    canDragOut = true
+}) => {
+    const { activeElementInfo, dragBar, txtInfo, baseInfo, currentDragItemPosition } = state;
+    const element = mainRef[mainRef.getElementKey(activeElementInfo)]; // 当前数据元素
+    const elementRef = mainRef.elementRef;
+    const barRef = elementRef.doitsRef[elementRef.getDoitKet(LINE_POSITION.BAR)]; // 拖拽移动元素
+    const drag_linner_left = elementRef.doitsRef[elementRef.getDoitKet(LINE_POSITION.DRAG_LINNER_LEFT)]; // 标齐线竖线
+    const drag_linner_bottom = elementRef.doitsRef[elementRef.getDoitKet(LINE_POSITION.DRAG_LINNER_BOTTOM)]; // 标齐线横线
+    const barInfoRef = elementRef.doitsRef[elementRef.getDoitKet(LINE_POSITION.ACTIVE_INFO)]; // 拖拽时展示信息元素
+    const drag_linner_left_info_Ref = elementRef.doitsRef[elementRef.getDoitKet(LINE_POSITION.ACTIVE_INFO_LEFT)]; // 拖拽时展示信息元素
+    const drag_linner_bottom_info_Ref = elementRef.doitsRef[elementRef.getDoitKet(LINE_POSITION.ACTIVE_INFO_BOTTOM)]; // 拖拽时展示信息元素
+    if(!draggingElementProperty) {
+        draggingElementProperty = element.getBoundingClientRect();
+    }
+    /**
+     * 计算拖拽中元素的具体位置
+     */
+    let { left, top, height, width } = baseInfo;
+    const { startClientX, startClientY } = currentDragItemPosition;
+    const { left:el, top:et, height:eh, width:ew } = draggingElementProperty;
+    const elementRight = clientX + ew - (startClientX - el);   // 元素右边
+    const elementBottom = clientY + eh - (startClientY - et);  // 元素底边
+    // 左右不做限制，可以随意拖拽，注释部分不能拖出最右和最下边区域
+    let draggingLeft = 0;
+    let draggingTop = 0;
+    if(canDragOut) {
+        draggingLeft = clientX - left - (startClientX - el);
+        draggingTop = clientY - top - (startClientY - et);
+    } else {
+        draggingLeft = elementRight > (left + width) ? (clientX - ((clientX + ew) - (left + width)) - left): clientX - left - (startClientX - el);
+        draggingTop = elementBottom > (top + height) ? (clientY - ((clientY + eh) - (top + height)) - top): clientY - top - (startClientY - et);
+    }
+    if(dragBar) { // 放大缩小元素时，不能需要移动元素，改变元素宽高
+        const { style, field } = activeElementInfo;
+        const { left, top, height, width } = style;
+        const draggingWidth = draggingLeft - left + width + 1;
+        const draggingHeight = getFinalHeight({field, height: draggingTop - top + height, width: draggingWidth, init: false});
+        element.style.width = `${draggingWidth}px`;
+        element.style.height = `${draggingHeight}px`;
+        const dotStyle = setDragBarPosition({...element.style, height: draggingHeight, width: draggingWidth, fixPosition: BAR_FIX_POSITION}, 'px');
+        barRef.style.left = dotStyle.left;
+        barRef.style.top = dotStyle.top;
+        barInfoRef.innerHTML = `H: ${draggingHeight}<br/> W: ${draggingWidth}`;
+
+        draggingElementProperty.draggingWidth = draggingWidth;
+        draggingElementProperty.draggingHeight = draggingHeight;
+    } else { // 移动元素时，改变元素位置
+        element.style.left = `${draggingLeft}px`;
+        element.style.top = `${draggingTop}px`;
+        const dotStyle = setDragBarPosition({...element.style, fixPosition: BAR_FIX_POSITION}, 'px');
+        barRef.style.left = dotStyle.left;
+        barRef.style.top = dotStyle.top;
+        barInfoRef.innerHTML = `${txtInfo.height}: ${activeElementInfo.style.height}<br/> ${txtInfo.width}: ${activeElementInfo.style.width}`;
+        draggingElementProperty.draggingTop = draggingTop;
+        draggingElementProperty.draggingLeft = draggingLeft;
+    }
+    drag_linner_left_info_Ref.innerHTML = `${txtInfo.left}: ${draggingElementProperty.draggingLeft || activeElementInfo.style.left}`;
+    drag_linner_bottom_info_Ref.innerHTML = `${txtInfo.top}: ${draggingElementProperty.draggingTop || activeElementInfo.style.top}`;
+    drag_linner_left.style.left = `${draggingElementProperty.draggingLeft}px`;
+    drag_linner_bottom.style.top = `${draggingElementProperty.draggingTop}px`;
+    return draggingElementProperty;
+};
+
 export {
     isHttp,
     isChinese,
@@ -645,6 +803,9 @@ export {
     getFinalLeft,
     getMainByDrop,
     getDraggingElement,
+    dropProperty,
+    getMoveProperty,
+    getComponentId,
 
     renderInitData,
     injectIcon,
