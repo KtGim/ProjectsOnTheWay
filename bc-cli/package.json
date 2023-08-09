@@ -1,0 +1,44 @@
+{
+  "name": "@best/bc-cli",
+  "version": "1.0.2",
+  "description": "cli for bc",
+  "main": "src/index.js",
+  "dependencies": {
+    "autoprefixer": "7.2.4",
+    "babel-cli": "6.26.0",
+    "babel-loader": "7.1.5",
+    "chalk": "4.1.2",
+    "commander": "9.3.0",
+    "css-loader": "0.23.1",
+    "enquirer": "2.3.6",
+    "file-loader": "3.0.1",
+    "ini": "3.0.0",
+    "less": "3.9.0",
+    "less-loader": "4.1.0",
+    "ora": "5.4.1",
+    "shelljs": "0.8.5",
+    "style-loader": "0.23.1",
+    "thread-loader": "3.0.4",
+    "url-loader": "0.5.7",
+    "util": "0.12.4",
+    "webpack": "4.46.0",
+    "webpack-cli": "3.3.12",
+    "webpack-dev-server": "4.9.2",
+    "webpack-merge": "5.8.0"
+  },
+  "bin": {
+    "bc": "./src/index.js"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "http://BG499022@bitbucket.rd.800best.com/scm/wmsweb/bc-cli.git"
+  },
+  "keywords": [
+    "cli",
+    "quick",
+    "intergration"
+  ],
+  "author": "best",
+  "license": "ISC"
+}
