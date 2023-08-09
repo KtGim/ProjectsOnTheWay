@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>移动端组件库</title>
+  </head>
+  <body>
+    
+    <div id="app"></div>
+    <!-- <input id="input" type="file"> -->
+    <script type="module" src="/src/main.ts"></script>
+    <script>
+      // const arr = [{"children":[{"label":"教育体制改革","value":"edu11"},{"label":"教育统筹管理","value":"edu12"},{"label":"教育资源配置","value":"edu13"},{"label":"异地升学","value":"edu14"}],"label":"教育体制","value":"edu1"},{"children":[{"label":"招生录取","value":"edu21"},{"label":"考场考纪","value":"edu22"}],"label":"考试招生","value":"edu2"},{"children":[{"label":"教学管理","value":"edu31"},{"label":"教育经费管理","value":"edu32"},{"label":"语言文学规范","value":"edu33"},{"label":"学历学位学籍管理","value":"edu34"},{"label":"学生负担","value":"edu35"},{"label":"民办学校","value":"edu36"},{"label":"校园安全","value":"edu37"},{"label":"学前教育","value":"edu38"},{"label":"职业教育","value":"edu39"},{"label":"校外培训","value":"edu310"},{"label":"其他","value":"edu311"}],"label":"教育行政管理","value":"edu3"},{"children":[{"label":"培养培训","value":"edu41"},{"label":"招聘与管理","value":"edu42"},{"label":"师德师风","value":"edu43"},{"label":"教师待遇","value":"edu44"},{"label":"职称评定","value":"edu45"},{"label":"企业教师","value":"edu46"},{"label":"原民办代课教师","value":"edu47"}],"label":"教师队伍和待遇","value":"edu4"},{"children":[{"label":"教育救助","value":"edu51"},{"label":"控辍保学","value":"edu52"}],"label":"失学辍学","value":"edu5"},{"children":[{"label":"收费标准","value":"edu61"},{"label":"乱收费","value":"edu62"}],"label":"教育经费","value":"edu6"},{"children":[{"label":"其他","value":"edu71"}],"label":"其他","value":"edu7"}]
+      // const formatValue = {};
+      // function format(arr, prefix) {
+      //   arr && arr.forEach(node => {
+      //     if (node.children) {
+      //       format(node.children, `${prefix}-${node.label}`)
+      //     }
+      //     formatValue[`${prefix}-${node.label}`] = node.value
+      //   })
+      // }
+      // format(arr, '教育');
+      // console.log(formatValue);
+    </script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/mammoth@1.4.8/mammoth.browser.min.js"></script>
+    <script>
+      const input = document.querySelector('input[type=file]')
+
+      // input.addEventListener('change', ()=>{
+      //   const reader = new FileReader()
+      //   reader.readAsArrayBuffer(input.files[0],'utf8') // input.files[0]为第一个文件
+      //   reader.onload = ()=>{
+      //     console.log(ab2str(reader.result))
+      //   }
+      // }, false)
+
+      input.addEventListener('change', ()=>{
+        parseWordDocxFile(input);
+      }, false)
+
+      // function ab2str(buf) {
+      //   return String.fromCharCode.apply(null, new Uint16Array(buf));
+      // }
+
+      function parseWordDocxFile(inputElement) {
+        var files = inputElement.files || [];
+        if (!files.length) return;
+        var file = files[0];
+
+        console.log(file);
+
+        console.time();
+        var reader = new FileReader();
+        reader.onloadend = function(event) {
+          var arrayBuffer = reader.result;
+          mammoth.convertToHtml({arrayBuffer: arrayBuffer}, {
+            responseType: 'arraybuffer'
+          }).then(function (resultObject) {
+            console.log(resultObject.value)
+          })
+          console.timeEnd();
+          // mammoth.extractRawText({arrayBuffer: arrayBuffer}).then(function (resultObject) {
+          //   console.log(resultObject.value)
+          // })
+          // mammoth.convertToMarkdown({arrayBuffer: arrayBuffer}).then(function (resultObject) {
+          //   console.log(resultObject.value)
+          // })
+        };
+        reader.readAsArrayBuffer(file);
+      }
+    </script> -->
+  </body>
+</html>
