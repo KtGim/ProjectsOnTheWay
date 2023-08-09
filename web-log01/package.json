@@ -1,0 +1,22 @@
+{
+  "name": "@best/web-log-loader",
+  "version": "4.0.11",
+  "description": "Recording Front-end Logs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://BG499793@bitbucket.rd.800best.com/scm/wmsweb/web-log.git"
+  },
+  "keywords": [
+    "web-log"
+  ],
+  "author": "Jiang Ning",
+  "license": "ISC",
+  "dependencies": {
+    "loader-utils": "^2.0.2",
+    "schema-utils": "^4.0.0"
+  }
+}
