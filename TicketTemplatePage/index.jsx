@@ -111,16 +111,34 @@ class TicketTemplatePage extends Component {
 
     render() {
         const { pageType } = this.state;
+        const {
+            templateId,
+            sourceProperties,
+            dataInfo,
+            templateRenderedProperties,
+            templateOriginHeight,
+            templateOriginWidth,
+            showElementKey,
+            baseInfo,
+            layoutInfo
+        } = this.props;
         return <div className="ticket-template_page">
             <TicketTemplate
                 getCurrentTemplateStep={this.getCurrentTemplateStep}
-                properties={this.sourceProperties}
-                dataInfo={this.dataInfo}
                 lan={getLanguage()}
-                currentPageNo={0}
                 pageType={pageType}
                 hidePage={this.hidePage}
                 handleActions={this.handleActions}
+                // 页面渲染相关
+                templateId={templateId}
+                templateOriginHeight={templateOriginHeight}
+                templateOriginWidth={templateOriginWidth}
+                templateRenderedProperties={templateRenderedProperties}
+                showElementKey={showElementKey}
+                baseInfo={baseInfo}
+                layoutInfo={layoutInfo}
+                properties={sourceProperties || this.sourceProperties}
+                dataInfo={dataInfo || this.dataInfo}
             />
         </div>;
     }

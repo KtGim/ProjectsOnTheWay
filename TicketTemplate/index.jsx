@@ -16,18 +16,21 @@ class TicketTemplate extends Component {
 
     constructor(props) {
         super(props);
+        const { templateOriginHeight, templateOriginWidth, templateId, templateRenderedProperties, showElementKey, baseInfo, layoutInfo } = props;
+        // 新建时使用创建时间作为 id，编辑时使用传入的 templateId
+        this.sourceId = templateId || new Date().getTime();
         // 初始化时生成当前元素的 id
-        this.templateId = `${TEMPLATE_PREFIX}${SPLITOR}${new Date().getTime()}`;
+        this.templateId = `${TEMPLATE_PREFIX}${SPLITOR}${this.sourceId}`;
         this.state = {
-            templateOriginWidth: 400,
-            templateOriginHeight: 550,
-            baseInfo: { // 当前编辑区域在页面中的位置和大小信息
+            templateOriginWidth: templateOriginHeight || 400,
+            templateOriginHeight: templateOriginWidth || 550,
+            baseInfo: baseInfo || { // 当前编辑区域在页面中的位置和大小信息
                 left: 0,
                 top: 0,
                 height: 0,
                 width: 0
             },
-            layoutInfo: { // 模板固定大小
+            layoutInfo: layoutInfo || { // 模板固定大小
                 left: 0,
                 top: 0,
                 height: 700,
@@ -52,19 +55,19 @@ class TicketTemplate extends Component {
                     dataKeyLabel    // 数据项的名称, 模板编辑时使用
                 };
              */
-            templateRenderedProperties: [],
+            templateRenderedProperties: templateRenderedProperties || [],
             pageType: OPERATIONS.EDIT,  // 页面类型，编辑或者预览
             action: OPERATIONS.EDIT,    // 当前操作类型，编辑或者预览
 
             currentDragItemPosition: {},   // 当前拖拽的对象的位置信息
-            showElementKey: 1,               // 元素属性的 唯一属性,递增,前端控制
+            showElementKey: showElementKey || 1,               // 元素属性的 唯一属性,递增,前端控制
 
             activeElementInfo: null   // 当前鼠标激活对象
         };
 
         this.ticketRef = null;
         this.mainRef = null;
-        this.templatePropertiesSetting= {
+        this.templatePropertiesSetting = {
             labelKey: 'name',
             primaryKey: 'field',
             fieldKey: 'field'
