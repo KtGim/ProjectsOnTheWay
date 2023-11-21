@@ -5,7 +5,6 @@
 
 import React, { PureComponent } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-
 class QrCode extends PureComponent {
     render() {
         const {
@@ -15,6 +14,7 @@ class QrCode extends PureComponent {
             // 组件差异化交互或者样式属性封装
             elementProps: {
                 id,
+                // dataKeyLabel,
                 style: {
                     width = 128
                 }

@@ -1,4 +1,4 @@
-import { COMMON_ELEMENTS, DEFAULT_STYLE, ICON_SCRIPT_ID, SHOW_ELEMENTS, icon_src } from './componentConfig';
+import { COMMON_ELEMENTS, DEFAULT_STYLE, ICON_SCRIPT_ID, OPERATIONS, SHOW_ELEMENTS, icon_src } from './componentConfig';
 import View from './components/View';
 import { BAR_FIX_POSITION, BASE_DISTANCE, ELEMENTS, LAYOUT_INDEX, LINE_POSITION, PRE_FIX_KEY, SOURCE_BTN_TYPE, SPLITOR, TEMPLATE_SOURCE_ID, UNIT, VIEW_PRINT_TEMPLATE_ID } from './const';
 import html2canvas from 'html2canvas';
@@ -272,15 +272,21 @@ const filterProps = (obj = {}, props = [], exclude = true) => {
  * @param {string} labelKey 数据源绑定的字段，可根据接口数据动态展示文本信息
  * @param {number} total 分页的总页数,组件渲染时传入
  * @param {number} current 当前页数，组件渲染时传入
+ * @param {string} pageType 页面类型，组件渲染时传入
  * @returns {{field: string, info: string, componentProps: object}}}
  * 这里的方法的功能，可以在各自组件的内部实现
  * 这里只是做一下简单数据的封装或者拼接，复杂逻辑还是回归到各自的组件内部实现
  * 可以查看  components/common/DateInfo.jsx 的备注
  */
-const renderInitData = (elementInfo, labelKey = 'name', total = 1, current = 1) => {
-    const { showData, dataKeyLabel, field, componentProps = {} } = elementInfo;
+const renderInitData = (elementInfo, labelKey = 'name', total = 1, current = 1, pageType = OPERATIONS.EDIT) => {
+    const { showData, dataKeyLabel, field, componentProps = {}, isRealData = false } = elementInfo;
     // 首先展示 showData，如果没有展示 dataKeyLabel (组件的名称)，如果没有展示 elementInfo[labelKey]
+    const dataComponents = [SHOW_ELEMENTS.BARCODE, SHOW_ELEMENTS.QRCode, SHOW_ELEMENTS.TEXT];
     let info = showData || dataKeyLabel || elementInfo[labelKey];
+    if(!isRealData && pageType == OPERATIONS.VIEW && dataComponents.includes(field)) { // 预览模式下数据类型组件全部替换成 XXXX
+        info = 'XXXXX';
+        // Array.from({length: Math.random() * 10}).fill('X').join('');
+    }
     // 每个组件都会保存这个两个属性，用于分页
     // TODO: 根据当前页数来决定组件是否展示，只在首页展示的功能 showPageNumber
     switch (field) {
@@ -325,46 +331,36 @@ const createViewRoot = (id = VIEW_PRINT_TEMPLATE_ID, containerTag = 'body') => {
  * @param {Object}      param0
  * @param {Object}      param0.ticketTemplateInfo   模板信息
  * @param {Array}       param0.list                 打印数据
- * @param {Object}      param0.socket               打印机
+ * @param {function}    param0.printCb              打印一张后的回调
  * @param {string}      param0.printer              打印机类型
  * @param {boolean}     param0.isHide               是否隐藏打印面单 默认隐藏 true
  * @param {Array}       param0.actionItems          操作按钮图标（ACTIONS_TYPE） 默认不展示
  * @param {Function}    [param0.handleActions]      操作按钮的事件 可选
- * @param {Function}    [param0.successFunc]        打印完成的回调 可选
  * @param {number}      [param0.index=0]            当前打印的索引 默认 0
+ * @param {string}      [param0.paper='']           打印纸张类型 默认 '' printer 不存在是，这个字段可以结合 pet 的默认打印机进行起作用
  * @returns
  */
 const printTickets = ({
     ticketTemplateInfo,
     list,
-    socket,
     printer,
     isHide = true,
     actionItems = [],
     handleActions,
-    successFunc,
-    index = 0
+    index = 0,
+    printCb,
+    paper = ''
 }) => {
     if(!ticketTemplateInfo) {
         console.error('未传入模板信息');
         return;
     }
-    if(!socket) {
-        console.error('未传入打印机');
-        return;
-    }
-    if(!printer) {
-        console.error('未传入打印机类型');
-        return;
-    }
     const props = list[index];
     if(!props) {
         if(index > 0) {
-            console.log('打印完成');
             if(isHide) { // 未展示的时候，打印完成后直接关闭掉，移除dom
                 View.closeView();
             }
-            successFunc && successFunc();
         } else {
             console.error('未传入打印数据');
         }
@@ -379,18 +375,22 @@ const printTickets = ({
         isHide,  // 隐藏打印面单
         handleActions,
         print: () => {
-            toImage(ticketTemplateInfo.baseInfo, socket, printer).then(() => {
-                printTickets({
-                    ticketTemplateInfo,
-                    list,
-                    socket,
-                    printer,
-                    isHide,
-                    actionItems,
-                    handleActions,
-                    successFunc,
-                    index: index + 1
-                });
+            toImage(ticketTemplateInfo.baseInfo, printer, paper || props.paper).then((data) => {
+                View.closeView();
+                // 递归调用自己
+                printCb && printCb(data, () => {
+                    printTickets({
+                        ticketTemplateInfo,
+                        list,
+                        printer,
+                        isHide,
+                        actionItems,
+                        handleActions,
+                        index: index + 1,
+                        printCb,
+                        paper
+                    });
+                }, index + 1 == list.length);
             });
         }
     });
@@ -398,47 +398,46 @@ const printTickets = ({
 
 /**
  * 生成 pdf 并且打印
- * @returns
+ * @param {Object}      param0
+ * @param {number}      param0.width    模板宽度
+ * @param {number}      param0.height   模板高度
+ * @param {string}      printer         打印机类型
+ * @param {function}    cb              回调函数
  */
-const toImage = ({width, height}, socket, printer = 'KM-202 LABEL') => {
-    if(!socket) {
-        console.error('ws does not connect!!');
-        return;
+const toImage = ({width, height}, printer = '', paper = '') => {
+    if(!printer && !paper) {
+        console.error('TicketTemplate 未传入打印机类型');
+        return Promise.reject('TicketTemplate 未传入打印机类型!!');
     }
     return new Promise(resolve => {
         const templateViewRoot = document.querySelector(`#${VIEW_PRINT_TEMPLATE_ID}`);
         if(!templateViewRoot) {
             console.error('渲染模板不存在!!');
-            return;
+            return Promise.reject('渲染模板不存在!!');
         }
-        const canvas = document.createElement('canvas');
         //为了使图像不模糊，先将canvas画布放大若干倍，放在较小的容器内
-        canvas.width = width * 2;
-        canvas.height = height * 2;
-        canvas.style.width = width + 'px';
-        canvas.style.height = height + 'px';
-        //按照需求设置偏移量
-        //  context.translate(0,0);
-        const context = canvas.getContext('2d');
-        context.scale(2, 2);
+        // 热敏打印机对图片像素要求高，增大一些倍数使打印更清晰
+        // 不要太大，因为 pet 会报出内存不足
         html2canvas(
             templateViewRoot.querySelector('.ticket-main--content'),
             {
-                canvas: canvas
+                width,
+                height,
+                scale: 1
             }
         ).then(function (canvas) {
             const printData = {
-                method:'PrintExpress',
+                method:'PrintReport',
+                orderType: 'WEB_IMAGE',
                 printer,
-                templateStream: canvas.toDataURL().replace('data:image/png;base64,', ''),
-                documentName:'Commercial',
-                fileType: 'PNG',
-                labelFormat: 'PNG',
+                paper,
+                imageStream: canvas.toDataURL().replace('data:image/png;base64,', ''),
+                documentName:`ONLINE_PAPER_${new Date().getTime()}`,
+                // 注意传进来的 尺寸如果不一致，也会导致渲染失败
                 imageWidth: px2in(width),
                 imageHeight: px2in(height)
             };
-            socket.send(JSON.stringify(printData));
-            resolve();
+            resolve(JSON.stringify(printData));
         });
     });
 };
@@ -517,7 +516,7 @@ const getSourceByInputs = (inputs) => {
     return source;
 };
 
-const sourceModalEdit = (templateId, templateRenderedProperties, templateInfo) => {
+const sourceModalEdit = (templateId, templateRenderedProperties, templateInfo, handleActions) => {
     const sourceModal = createSourceModal(templateId, templateRenderedProperties);
     sourceModal.addEventListener('click', (e) => {
         const targetId = e.target && e.target.id;
@@ -533,7 +532,8 @@ const sourceModalEdit = (templateId, templateRenderedProperties, templateInfo) =
                     if(dataSource) {
                         View.openView({
                             ...templateInfo,
-                            actionItems: [],
+                            actionItems: [OPERATIONS.PRINT],
+                            handleActions,
                             dataSource: getSourceByInputs(inputs)
                         });
                     }
@@ -598,9 +598,10 @@ const getMainByDrop = (state) => {
  * @returns {object}
  */
 const getDraggingElement = (draggingElementProperty, activeElementInfo, dragBar) => {
-    const { draggingLeft, draggingTop, draggingWidth, draggingHeight } = draggingElementProperty;
+    const { draggingLeft, draggingTop, draggingWidth, draggingHeight, isOutOfBase } = draggingElementProperty;
     return {
         ...activeElementInfo,
+        isOutOfBase,
         style: !dragBar ? {
             ...activeElementInfo.style,
             left: draggingLeft,
@@ -629,8 +630,8 @@ const findParent = (target) => {
 /**
  * 拖拽后的元素操作
  */
-const dropProperty = (state, elementInfo, element, changeStyle = true, errorFunc) => {
-    const { currentDragItemPosition, showElementKey, baseInfo, templateRenderedProperties } = state;
+const dropProperty = (mainElement, state, elementInfo, element, changeStyle = true, errorFunc) => {
+    const { currentDragItemPosition, baseInfo, templateRenderedProperties } = state;
     const elementProperty = element.getBoundingClientRect();
     const { left, top, height, width } = baseInfo;
     const { clientX, clientY, startClientX, startClientY } = currentDragItemPosition;
@@ -660,8 +661,8 @@ const dropProperty = (state, elementInfo, element, changeStyle = true, errorFunc
                  * 否则
                  * 鼠标位置 (clientX)  - 初始画布的左上角位置(left) - 拖拽元素时鼠标停留的距离元素的偏移量位置 (startClientX - elementProperty.left)
                  */
-                left: getFinalLeft({field, left: dragLeft, baseInfo, init: false}),
-                top: getFinalTop({field, top: dragTop, baseInfo, init: false})
+                left: getFinalLeft({field, left: dragLeft, baseInfo, init: false}) + mainElement.scrollLeft,
+                top: getFinalTop({field, top: dragTop, baseInfo, init: false}) + mainElement.scrollTop
             }
         } : {
             ...elementInfo,
@@ -680,13 +681,12 @@ const dropProperty = (state, elementInfo, element, changeStyle = true, errorFunc
             const index = (templateRenderedProperties || []).findIndex(({id: fId}) => fId == id);
             templateRenderedProperties.splice(index, 1, propertyInfo);
         } else { // 创建
-            propertyInfo.id = `${PRE_FIX_KEY}${SPLITOR}${showElementKey}`;
+            propertyInfo.id = `${PRE_FIX_KEY}${SPLITOR}${new Date().getMilliseconds()}`;
             templateRenderedProperties.push(propertyInfo);
         }
         return {
             currentDragItemPosition: {},
             templateRenderedProperties,
-            showElementKey: id ? showElementKey : showElementKey + 1,
             activeElementInfo: propertyInfo
         };
     } else {
@@ -712,6 +712,7 @@ const getComponentId = (idString='', prefix = '', splitor= SPLITOR) => {
  * @param {object} props.canDragOut 是否可以拖拽出画布
  * @param {number} props.clientX 鼠标的位置
  * @param {number} props.clientY 鼠标的位置
+ * @param {function} props.exceedFunc 超出范围的回调函数
  * @returns {object} draggingElementProperty
  */
 const getMoveProperty = ({
@@ -720,9 +721,11 @@ const getMoveProperty = ({
     clientX,
     clientY,
     draggingElementProperty,
-    canDragOut = true
+    canDragOut = true,
+    exceedFunc
 }) => {
-    const { activeElementInfo, dragBar, txtInfo, baseInfo, currentDragItemPosition } = state;
+    const { activeElementInfo, dragBar, txtInfo, baseInfo, currentDragItemPosition, activeElements } = state;
+    const inBatchDragging = activeElements.some(({id}) => id == activeElementInfo.id);
     const element = mainRef[mainRef.getElementKey(activeElementInfo)]; // 当前数据元素
     const elementRef = mainRef.elementRef;
     const barRef = elementRef.doitsRef[elementRef.getDoitKet(LINE_POSITION.BAR)]; // 拖拽移动元素
@@ -740,17 +743,21 @@ const getMoveProperty = ({
     let { left, top, height, width } = baseInfo;
     const { startClientX, startClientY } = currentDragItemPosition;
     const { left:el, top:et, height:eh, width:ew } = draggingElementProperty;
-    const elementRight = clientX + ew - (startClientX - el);   // 元素右边
-    const elementBottom = clientY + eh - (startClientY - et);  // 元素底边
+    const absX = startClientX - el;
+    const absY = startClientY - et;
+    const elementRight = clientX + ew - absX;   // 元素右边  相对base 的位置上， startClientX - el 是移动的距离 + 右移， - 左移
+    const elementBottom = clientY + eh - absY;  // 元素底边
     // 左右不做限制，可以随意拖拽，注释部分不能拖出最右和最下边区域
     let draggingLeft = 0;
     let draggingTop = 0;
+    const scrollTop = mainRef.mainRef.scrollTop;
+    const scrollLeft = mainRef.mainRef.scrollLeft;
     if(canDragOut) {
-        draggingLeft = clientX - left - (startClientX - el);
-        draggingTop = clientY - top - (startClientY - et);
+        draggingLeft = clientX - left - absX + scrollLeft;
+        draggingTop = clientY - top - absY + scrollTop;
     } else {
-        draggingLeft = elementRight > (left + width) ? (clientX - ((clientX + ew) - (left + width)) - left): clientX - left - (startClientX - el);
-        draggingTop = elementBottom > (top + height) ? (clientY - ((clientY + eh) - (top + height)) - top): clientY - top - (startClientY - et);
+        draggingLeft = (elementRight > (left + width) ? (clientX - ((clientX + ew) - (left + width)) - left): clientX - left - absX) + scrollLeft;
+        draggingTop = (elementBottom > (top + height) ? (clientY - ((clientY + eh) - (top + height)) - top): clientY - top - absY) + scrollTop;
     }
     if(dragBar) { // 放大缩小元素时，不能需要移动元素，改变元素宽高
         const { style, field } = activeElementInfo;
@@ -762,7 +769,7 @@ const getMoveProperty = ({
         const dotStyle = setDragBarPosition({...element.style, height: draggingHeight, width: draggingWidth, fixPosition: BAR_FIX_POSITION}, 'px');
         barRef.style.left = dotStyle.left;
         barRef.style.top = dotStyle.top;
-        barInfoRef.innerHTML = `H: ${draggingHeight}<br/> W: ${draggingWidth}`;
+        barInfoRef.innerHTML = `${txtInfo.height}: ${draggingHeight.toFixed(1)}<br/> ${txtInfo.width}: ${draggingWidth.toFixed(1)}`;
 
         draggingElementProperty.draggingWidth = draggingWidth;
         draggingElementProperty.draggingHeight = draggingHeight;
@@ -772,15 +779,67 @@ const getMoveProperty = ({
         const dotStyle = setDragBarPosition({...element.style, fixPosition: BAR_FIX_POSITION}, 'px');
         barRef.style.left = dotStyle.left;
         barRef.style.top = dotStyle.top;
-        barInfoRef.innerHTML = `${txtInfo.height}: ${activeElementInfo.style.height}<br/> ${txtInfo.width}: ${activeElementInfo.style.width}`;
+        barInfoRef.innerHTML = `${txtInfo.height}: ${activeElementInfo.style.height.toFixed(1)}<br/> ${txtInfo.width}: ${activeElementInfo.style.width.toFixed(1)}`;
         draggingElementProperty.draggingTop = draggingTop;
         draggingElementProperty.draggingLeft = draggingLeft;
     }
-    drag_linner_left_info_Ref.innerHTML = `${txtInfo.left}: ${draggingElementProperty.draggingLeft || activeElementInfo.style.left}`;
-    drag_linner_bottom_info_Ref.innerHTML = `${txtInfo.top}: ${draggingElementProperty.draggingTop || activeElementInfo.style.top}`;
+    drag_linner_left_info_Ref.innerHTML = `${txtInfo.left}: ${(draggingElementProperty.draggingLeft || activeElementInfo.style.left).toFixed(1)}`;
+    drag_linner_bottom_info_Ref.innerHTML = `${txtInfo.top}: ${(draggingElementProperty.draggingTop || activeElementInfo.style.top).toFixed(1)}`;
     drag_linner_left.style.left = `${draggingElementProperty.draggingLeft}px`;
     drag_linner_bottom.style.top = `${draggingElementProperty.draggingTop}px`;
-    return draggingElementProperty;
+    // 是否是超出 base 画布
+    draggingElementProperty.isOutOfBase = isOutOfBase(activeElementInfo.isOutOfBase, height, width, draggingElementProperty, exceedFunc ? () => {
+        exceedFunc(element);
+    } : undefined);
+    activeElementInfo.isOutOfBase = draggingElementProperty.isOutOfBase;
+    // 元素 上下左右 超出画布的 上下左右
+    let inBatchDraggingDataInfo = null;
+    if(inBatchDragging) {
+        inBatchDraggingDataInfo = {};
+        const resetElements = activeElements.filter(({id}) => id != activeElementInfo.id);
+        const moveX = clientX - startClientX;
+        const moveY = clientY - startClientY;
+        // TODO: 批量拖拽barcode 时，计算的位置会有些许问题
+        resetElements.forEach((item) => {
+            const element = mainRef[mainRef.getElementKey(item)];
+            const movedX = item.style.left + moveX;
+            const movedY = item.style.top + moveY;
+            element.style.left = `${movedX}px`;
+            element.style.top = `${movedY}px`;
+            const isOutOfBaseItem = isOutOfBase(
+                item.isOutOfBase,
+                height,
+                width,
+                {draggingLeft: movedX, draggingTop: movedY, draggingHeight: item.style.height, draggingWidth: item.style.width}
+            );
+            item.isOutOfBase = isOutOfBaseItem;
+            inBatchDraggingDataInfo[item.id] = {
+                left: movedX,
+                top: movedY,
+                isOutOfBase: isOutOfBaseItem
+            };
+            if(isOutOfBaseItem) {
+                exceedFunc && exceedFunc(item);
+            }
+        });
+    }
+    return {
+        draggingElementProperty,
+        inBatchDraggingDataInfo
+    };
+};
+
+// 只要有一条边超出 base 的范围那么就是超出范围
+// draggingElementProperty 里面的值是拖拽中的元素的位置信息，相对baseInfo 的距离
+const isOutOfBase = (preOutOfBase, height, width, draggingElementProperty, exceedFunc) => {
+    const { draggingLeft, draggingTop, draggingHeight, draggingWidth, height:DH, width:DW } = draggingElementProperty;
+    const elementBottom = draggingTop + (draggingHeight || DH);
+    const elementRight = draggingLeft + (draggingWidth || DW);
+    const curOutOfBase = draggingLeft < 0 || draggingTop < 0 || elementBottom > height || elementRight > width;
+    if(!preOutOfBase && curOutOfBase) {
+        exceedFunc && exceedFunc();
+    }
+    return curOutOfBase;
 };
 
 export {

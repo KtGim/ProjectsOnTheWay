@@ -17,21 +17,21 @@ class Actions extends PureComponent {
     if(showItems.includes(OPERATIONS.SAVE)) {
       children.push(
         <p className="print" key="save" onClick={handleClick.bind(this,OPERATIONS.SAVE)}>
-          {OperationBar.renderSvgIcon(OPERATIONS.SAVE, OPERATIONS.SAVE, textInfo[OPERATIONS.PRINT])}
+          {OperationBar.renderSvgIcon(OPERATIONS.SAVE, OPERATIONS.SAVE, true, textInfo[OPERATIONS.PRINT])}
         </p>
       );
     }
     if(showItems.includes(DATA_ICONS.OPEN_EYES)) {
       children.push(
         <p className="print" key="show_in_time_action" onClick={this.clickEye}>
-          {showInTime ? OperationBar.renderSvgIcon(DATA_ICONS.OPEN_EYES, DATA_ICONS.OPEN_EYES) : OperationBar.renderSvgIcon(DATA_ICONS.CLOSE_EYES, DATA_ICONS.CLOSE_EYES)}
+          {showInTime ? OperationBar.renderSvgIcon(DATA_ICONS.OPEN_EYES, DATA_ICONS.OPEN_EYES, true) : OperationBar.renderSvgIcon(DATA_ICONS.CLOSE_EYES, DATA_ICONS.CLOSE_EYES, true)}
         </p>
       );
     }
     if(showItems.includes(OPERATIONS.PRINT)) {
       children.push(
         <p className="print" key="print_action" onClick={handleClick.bind(this,OPERATIONS.PRINT)}>
-          {OperationBar.renderSvgIcon(OPERATIONS.PRINT, OPERATIONS.PRINT, textInfo[OPERATIONS.PRINT])}
+          {OperationBar.renderSvgIcon(OPERATIONS.PRINT, OPERATIONS.PRINT, true, textInfo[OPERATIONS.PRINT])}
         </p>
       );
     }
@@ -42,7 +42,7 @@ class Actions extends PureComponent {
         <div className="ticket-actions--items" key="ticket-actions--items">
           {
             restItems.map(item => {
-              return <p key={item} onClick={handleClick.bind(this,item)}>{OperationBar.renderSvgIcon(item, item, textInfo[item])}</p>;
+              return <p key={item} onClick={handleClick.bind(this,item)}>{OperationBar.renderSvgIcon(item, item, true, textInfo[item])}</p>;
             })
           }
       </div>

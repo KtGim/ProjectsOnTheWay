@@ -10,9 +10,16 @@ class ComponentsDisplay extends PureComponent {
             displayElements = SHOW_ELEMENTS,
             templatePropertiesSetting,
             dragEnd,
-            dragStart
+            dragStart,
+            visible = true,
+            showIcon = false,
+            renderRightConfig
         } = this.props;
-        return <div className="setting-list">
+        const className = ['right-setting-list'];
+        if(!visible) {
+            className.push('dis_visible');
+        }
+        return <div className={className.join(' ')}>
             <PropertyDisplay
                 title={title}
                 properties={Object.keys(displayElements).map(key => {
@@ -24,7 +31,11 @@ class ComponentsDisplay extends PureComponent {
                 propertyInfo={templatePropertiesSetting}
                 dragEnd={dragEnd}
                 dragStart={dragStart}
+                showIcon={showIcon}
             />
+            {
+                renderRightConfig && renderRightConfig()
+            }
         </div>;
     }
 }

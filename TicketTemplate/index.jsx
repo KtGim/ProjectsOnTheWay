@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import Main from './components/Main';
-import { ELEMENTS, MODES, SPLITOR, LINE_POSITION, LANGUAGE_KEY, TEMPLATE_PREFIX } from './const';
+import { ELEMENTS, MODES, SPLITOR, LINE_POSITION, LANGUAGE_KEY, TEMPLATE_PREFIX, LICK_IMAGE_PROP_KEYS, LICK_BAR_CODE_PROP_KEYS } from './const';
 import { dropProperty, findParent, getComponentId, getDraggingElement, getMainByDrop, getMoveProperty, injectIcon, isNotBindField, sourceModalEdit, toImage } from './funcs';
 import * as language from './language/index';
 import { DATA_ICONS, OPERATIONS, SHOW_ELEMENTS } from './componentConfig';
@@ -10,27 +10,31 @@ import View from './components/View';
 import { ComponentsDisplay, Left } from './IndexElements/index';
 
 import './index.less';
-import { getDateByFormat } from './components/componentCommonFunc';
+import { collectKeyDownEvents, mouseEvents, removeKeyDownEvents, removeMouseDownEvent, stepCache } from './events';
 
 class TicketTemplate extends Component {
-
     constructor(props) {
         super(props);
+        const { templateId, templateOriginHeight, templateOriginWidth, pageType, baseInfo, layoutInfo, templateRenderedProperties } = props;
+        // 新建时使用创建时间作为 id，编辑时使用传入的 templateId
+        this.sourceId = templateId || new Date().getTime();
         // 初始化时生成当前元素的 id
-        this.templateId = `${TEMPLATE_PREFIX}${SPLITOR}${new Date().getTime()}`;
+        this.templateId = `${TEMPLATE_PREFIX}${SPLITOR}${this.sourceId}`;
+        const baseOriginWidth = (pageType !== OPERATIONS.VIEW ? templateOriginWidth : (baseInfo || {}).width) || 400;
+        const baseOriginHeight = (pageType !== OPERATIONS.VIEW ? templateOriginHeight : (baseInfo || {}).height) || 550;
         this.state = {
-            templateOriginWidth: 400,
-            templateOriginHeight: 550,
-            baseInfo: { // 当前编辑区域在页面中的位置和大小信息
+            templateOriginWidth: baseOriginWidth,
+            templateOriginHeight: baseOriginHeight,
+            baseInfo: baseInfo || { // 当前编辑区域在页面中的位置和大小信息
                 left: 0,
                 top: 0,
-                height: 0,
-                width: 0
+                height: baseOriginHeight,
+                width: baseOriginWidth
             },
-            layoutInfo: { // 模板固定大小
+            layoutInfo: layoutInfo || { // 模板固定大小
                 left: 0,
                 top: 0,
-                height: 700,
+                height: 'calc(100vh - 150px)',
                 width: '100%'
             },
             /**
@@ -52,19 +56,19 @@ class TicketTemplate extends Component {
                     dataKeyLabel    // 数据项的名称, 模板编辑时使用
                 };
              */
-            templateRenderedProperties: [],
+            templateRenderedProperties: templateRenderedProperties || [],
             pageType: OPERATIONS.EDIT,  // 页面类型，编辑或者预览
             action: OPERATIONS.EDIT,    // 当前操作类型，编辑或者预览
 
             currentDragItemPosition: {},   // 当前拖拽的对象的位置信息
-            showElementKey: 1,               // 元素属性的 唯一属性,递增,前端控制
 
-            activeElementInfo: null   // 当前鼠标激活对象
+            activeElementInfo: null,   // 当前鼠标激活对象
+            activeElements: []       // 批量选中的对象集合
         };
 
         this.ticketRef = null;
         this.mainRef = null;
-        this.templatePropertiesSetting= {
+        this.templatePropertiesSetting = {
             labelKey: 'name',
             primaryKey: 'field',
             fieldKey: 'field'
@@ -75,17 +79,20 @@ class TicketTemplate extends Component {
          * 可以存储变化的值
          */
         this.draggingElementProperty = null; // 拖拽中的元素信息
+        this.inBatchDraggingDataInfo = null;  // 拖拽时产生的批量数据存储在这里
+
+        this.caches = stepCache();
         injectIcon();
     }
 
     static toImage = toImage;
 
     componentDidMount() {
-        const { lan, txtInfo } = this.props;
+        const { lan, txtInfo, renderTicketBase, keyDownCb } = this.props;
         this.setState({
             txtInfo: txtInfo || language[lan || LANGUAGE_KEY.ZH] || language[LANGUAGE_KEY.ZH]
         });
-
+        this.mainRef.computedCurrentMainArea(true);
         /**
          * 窗口或元素变化时需要对位置进行的计算
          * https://best-inc.feishu.cn/wiki/BYrnwo4k2i10iOkuKkVcgKAmn6b
@@ -95,34 +102,61 @@ class TicketTemplate extends Component {
          */
         // 监听窗口变化时，更改 画布 的位置信息
         this.addResizeFunction(true);
-        // 监听元素是否被叠加（挡住）
-        // this.isIntersecting();
+        // 绑定当前的更改模板的信息的方法
+        renderTicketBase(this.renderTicketBaseCb);
+        // 缓存当前的模板信息
+        this.saveInfo();
+        // 快捷键操作
+        collectKeyDownEvents(this.templateId, (params) => {
+            const { operation } = params;
+            switch (operation) {
+                case OPERATIONS.UNDO:
+                    this.setState({...(this.caches.undo().content)});
+                    break;
+                case OPERATIONS.REDO:
+                    this.setState({...(this.caches.redo().content)});
+                    break;
+                case OPERATIONS.DELETE:
+                    this.onBatchDelete();
+                    break;
+                case OPERATIONS.SELECT_ALL:
+                    this.selectAll();
+                    break;
+            }
+            /**
+             * this.templateId 当前模板 Id
+             * params keyDown 事件的参数
+             * this.saveTemplateInfo() 当前模板的信息
+             */
+            keyDownCb && keyDownCb(this.templateId, params, this.saveTemplateInfo());
+        });
+
+        // 鼠标事件, 批量选中
+        mouseEvents(this.templateId, this.getQueryBatch);
     }
 
-    isIntersecting = () => {
-        const root = this.ticketRef.parentNode;
-        if(!root) return;
-        const options = {
-            // 表示重叠面积占被观察者的比例，从 0 - 1 取值，
-            // 1 表示完全被包含
-            threshold: 1.0,
-            root // 必须是目标元素的父级元素
-        };
-        const observer = new IntersectionObserver((entries) => {
-            /**
-             * 似乎具有迟滞性，
-             * 当 isIntersecting （是否折叠） 为 false 时，元素不在在可视区域内： false => 隐藏
-             * 当 isIntersecting 为 true 时，元素在可视区域内: true => 展示
-             * 提供 hideTemplate 方法用于矫正不同情况下的值
-             * */
-            const { isIntersecting } = entries[0];
-            this.isIntersecting = isIntersecting;
-            if(!this.isIntersecting) {
-                const { hidePage } = this.props;
-                hidePage && hidePage({...this.saveTemplateInfo(), templateId: this.templateId });
+    componentWillUnmount() {
+        this.addResizeFunction(false);
+        removeKeyDownEvents(this.templateId);
+        removeMouseDownEvent(this.templateId);
+    }
+
+    getQueryBatch = (_, queryAreaInfo) => {
+        const { templateRenderedProperties, baseInfo } = this.state;
+        const { endX, endY, startX, startY } = queryAreaInfo;
+        const { left, top } = baseInfo;
+        const activeElements = [];
+        templateRenderedProperties.forEach((item) => {
+            const { left: elementLeft, top: elementTop, width, height } = item.style;
+            if(left + elementLeft >= startX && left + elementLeft + width <= endX && top + elementTop >= startY && top + elementTop + height <= endY) {
+                activeElements.push(item);
             }
-        }, options);
-        observer.observe(this.ticketRef);
+        });
+        this.setState({
+            activeElements
+        }, () => {
+            this.saveInfo();
+        });
     }
 
     addResizeFunction = (subscribe) => {
@@ -130,7 +164,7 @@ class TicketTemplate extends Component {
         if(subscribe) {
             window.onresize = () => {
                 // 当前的模板才需要重新计算
-                if(this.ticketRef.id == this.templateId && this.isIntersecting) {
+                if(this.ticketRef.id == this.templateId) {
                     this.mainRef.computedCurrentMainArea();
                 }
             };
@@ -139,8 +173,18 @@ class TicketTemplate extends Component {
         }
     }
 
-    componentWillUnmount() {
-        this.addResizeFunction(false);
+    // 外部更改子组件的 state 状态
+    renderTicketBaseCb = (baseInfoState) => {
+        return new Promise((resolve) => {
+            this.setState({
+                baseInfo: {
+                    ...this.state.baseInfo,
+                    ...baseInfoState
+                }
+            }, () => {
+                resolve();
+            });
+        });
     }
 
     static getDerivedStateFromProps(props) {
@@ -152,42 +196,42 @@ class TicketTemplate extends Component {
     }
 
     getTemplateInfo = (templateInfo) => {
-        this.setState(templateInfo);
+        this.setState(templateInfo, () => {
+            this.saveInfo();
+        });
     }
 
     saveInfo = () => {
-        const {
-            getCurrentTemplateStep
-        } = this.props;
+        const { getCurrentTemplateStep } = this.props;
         const {
             baseInfo,
             layoutInfo,
             templateRenderedProperties,
             templateOriginWidth,
             templateOriginHeight,
-            showElementKey,
-            dragBar
+            dragBar,
+            activeElements
         } = this.state;
-        getCurrentTemplateStep && getCurrentTemplateStep({
-            time: getDateByFormat(new Date()),
-            props: {
-                baseInfo,
-                layoutInfo,
-                templateRenderedProperties,
-                templateOriginWidth,
-                templateOriginHeight,
-                showElementKey,
-                dragBar
-            }
-        });
+        const info = {
+            baseInfo,
+            layoutInfo,
+            templateRenderedProperties,
+            templateOriginWidth,
+            templateOriginHeight,
+            dragBar,
+            activeElements
+        }
+        this.caches.push(info);
+        getCurrentTemplateStep && getCurrentTemplateStep(JSON.parse(JSON.stringify(info)));
     }
 
     /**
      * 拖拽过程中记录一下拖拽的位置和当前的对象
      * @param {e} param0
      */
-    onDragOver = ({clientX, clientY, target}) => {
-        // console.log(target.id);
+    onDragOver = (e) => {
+        e.preventDefault();
+        const {clientX, clientY, target} = e;
         if(this.state.activeElementInfo) { // 在画布中拖拽
             this.onMove({ clientX, clientY });
         } else { // 元素拖入画布中
@@ -204,7 +248,9 @@ class TicketTemplate extends Component {
     }
 
     onMove = ({clientX, clientY}) => {
-        this.draggingElementProperty = getMoveProperty({state: this.state, clientX, clientY, draggingElementProperty: this.draggingElementProperty, mainRef: this.mainRef, canDragOut: this.props.canDragOut});
+        const { draggingElementProperty, inBatchDraggingDataInfo } = getMoveProperty({state: this.state, clientX, clientY, draggingElementProperty: this.draggingElementProperty, mainRef: this.mainRef, canDragOut: this.props.canDragOut, exceedFunc: this.props.exceedFunc});
+        this.draggingElementProperty = draggingElementProperty;
+        this.inBatchDraggingDataInfo = inBatchDraggingDataInfo;
     }
 
     onDragStart = ({clientX, clientY, target}) => {
@@ -249,7 +295,7 @@ class TicketTemplate extends Component {
      * @param {是否改变元素的样式} changeStyle
      */
     dropProperty = (elementInfo, element, changeStyle = true) => {
-        const returnValue = dropProperty(this.state, elementInfo, element, changeStyle);
+        const returnValue = dropProperty(this.mainRef.mainRef, this.state, elementInfo, element, changeStyle);
         if(returnValue) {
             this.setState(returnValue);
         }
@@ -269,7 +315,8 @@ class TicketTemplate extends Component {
         templateRenderedProperties.splice(index, 1, item);
         this.setState({
             currentDragItemPosition: {},
-            templateRenderedProperties
+            templateRenderedProperties,
+            activeElements: []
         });
     }
 
@@ -284,7 +331,15 @@ class TicketTemplate extends Component {
         elementInfoTemp.id = null;
         elementInfoTemp.dataKey = elementInfo[dataInfo.fieldKey];  // 将数据项的 key 设置进来
         elementInfoTemp.dataKeyLabel = elementInfo[dataInfo.labelKey];  // 将数据项的 key 设置进来
-        elementInfoTemp.field = SHOW_ELEMENTS.TEXT;  // 默认展示为联动的数据项
+        // 如果初始拖进来的属性包含 类 图片字段，那么默认类型展示为图片类型组件
+        const lowerKey = elementInfoTemp.dataKey && elementInfoTemp.dataKey.toLowerCase();
+        let defaultField = elementInfoTemp.dataKey;
+        if(LICK_IMAGE_PROP_KEYS.some(propKey => lowerKey.includes(propKey))) { // 类图片
+            defaultField = SHOW_ELEMENTS.IMAGE;
+        } else if(LICK_BAR_CODE_PROP_KEYS.some(propKey => lowerKey.includes(propKey))) { // 类条形码
+            defaultField = SHOW_ELEMENTS.BARCODE;
+        }
+        elementInfoTemp.field = defaultField;  // 默认展示为联动的数据项
         this.dropProperty(elementInfoTemp, element);
     }
 
@@ -304,14 +359,15 @@ class TicketTemplate extends Component {
         }
         // 从画布内拖出来, 超出任意范围，删除元素。（本期不做处理）
         // 判断的位置不要改动，否则会影响交互行为
-        else if (!canDragOut && !dropTarget && (left > clientX || top > clientY || clientY > (height + top) || clientX > (left + width))) { 
+        else if (!canDragOut && !dropTarget && (left > clientX || top > clientY || clientY > (height + top) || clientX > (left + width))) {
             // 拖出的距离没有做精细的计算，鼠标拖出即为拖出
             // 不能拖出去就直接从面板删除
             if(elementInfo) {
                 this.setState({
                     currentDragItemPosition: {},
                     templateRenderedProperties: templateRenderedProperties.filter(({id}) => id !== elementInfo.id),
-                    activeElementInfo: null
+                    activeElementInfo: null,
+                    activeElements: []
                 }, () => {
                     this.draggingElementProperty = null;
                 });
@@ -321,6 +377,24 @@ class TicketTemplate extends Component {
             const activeElementInfoTemp = getDraggingElement(this.draggingElementProperty, activeElementInfo, dragBar);
             templateRenderedProperties.splice(templateRenderedProperties.findIndex(({id}) => id == activeElementInfo.id), 1, activeElementInfoTemp);
             this.replaceActiveElementsInfo(activeElementInfoTemp, () => {
+                if(this.inBatchDraggingDataInfo) {
+                    const { templateRenderedProperties } = this.state;
+                    this.setState({
+                        templateRenderedProperties: templateRenderedProperties.map(item => {
+                            const { isOutOfBase, ...rest } = this.inBatchDraggingDataInfo[item.id];
+                            return {
+                                ...item,
+                                isOutOfBase,
+                                style: {
+                                    ...item.style,
+                                    ...rest
+                                }
+                            };
+                        })
+                    }, () => {
+                        this.inBatchDraggingDataInfo = null;
+                    });
+                }
                 this.draggingElementProperty = null;
             });
         } else { // 拖进或者拖出画布
@@ -357,18 +431,16 @@ class TicketTemplate extends Component {
                     this.setState({
                         currentDragItemPosition: {},
                         templateRenderedProperties: templateRenderedProperties.filter(({id}) => id !== elementInfo.id),
-                        activeElementInfo: null
+                        activeElementInfo: null,
+                        activeElements: []
                     });
-                }
-                if(elementInfo && elementInfo.id) {
-                    // 操作完后进行保存
-                    this.saveInfo();
                 }
             }
         }
         if(this.mainRef.settingIconRef) {
             this.mainRef.settingIconRef.style.display = 'block';
         }
+        this.saveInfo();
     }
 
     activeElement = (e) => {
@@ -377,7 +449,8 @@ class TicketTemplate extends Component {
         const targetId = e.target && e.target.id && getComponentId(e.target.id, ELEMENTS.PROPERTY_IN_DRAW);
         if(targetId == ELEMENTS.MAIN) {
             this.setState({
-                activeElementInfo: null
+                activeElementInfo: null,
+                activeElements: []
             });
         } else if(targetId && targetId !== OPERATION_BAR_ID && (!activeElementInfo || (targetId !== activeElementInfo.id))) {
             // console.log(templateRenderedProperties.find(({id}) => targetId == id), 'activeElement')
@@ -434,28 +507,67 @@ class TicketTemplate extends Component {
         const { templateRenderedProperties } = this.state;
         this.setState({
             templateRenderedProperties: templateRenderedProperties.filter(({id}) => id !== activeElementInfo.id),
-            activeElementInfo: null
+            activeElementInfo: null,
+            activeElements: []
         });
     }
 
-    handleActions = (action) => {
+    selectAll = () => {
+        const { templateRenderedProperties } = this.state;
         this.setState({
-            activeElementInfo: null,
-            action
+            activeElements: templateRenderedProperties
         });
-        if(action == DATA_ICONS.SOURCE) {
-            sourceModalEdit(this.templateId, this.state.templateRenderedProperties, this.saveTemplateInfo());
+    }
+
+    onBatchDelete = () => {
+        const { activeElements, activeElementInfo } = this.state;
+        if(!activeElements.length) {
+            if(activeElementInfo) {
+                this.onDelete();
+            }
+        } else {
+            const { templateRenderedProperties } = this.state;
+            this.setState({
+                templateRenderedProperties: templateRenderedProperties.filter(({id}) => !activeElements.find(({id: activeId}) => activeId == id)),
+                activeElements: []
+            });
         }
+    }
+
+    handleActions = (action) => {
+        const { templateRenderedProperties, pageType, activeElements } = this.state;
         const { handleActions } = this.props;
+        const templateInfo = this.saveTemplateInfo();
+        const pageTypeTemp = [OPERATIONS.EDIT, OPERATIONS.VIEW].includes(action) ? action : pageType;
+        const state = {
+            activeElementInfo: null,
+            activeElements: [],
+            action
+        };
+        switch (action) {
+            case DATA_ICONS.SOURCE:
+                sourceModalEdit(this.templateId, templateRenderedProperties, this.saveTemplateInfo(), (cbAction) => {
+                    handleActions && handleActions({
+                        ...templateInfo,
+                        pageType: pageTypeTemp,
+                        action: cbAction
+                    });
+                });
+            break;
+            case OPERATIONS.DELETE:
+                state.templateRenderedProperties = templateRenderedProperties.filter(({id}) => !activeElements.find(({id: activeId}) => activeId == id));
+            break;
+        }
         handleActions && handleActions({
-            ...this.saveTemplateInfo(),
-            pageType: [OPERATIONS.EDIT, OPERATIONS.VIEW].includes(action) ? action : this.state.pageType,
+            ...templateInfo,
+            pageType: pageTypeTemp,
             action
         });
+        this.setState(state);
     };
 
     saveTemplateInfo = () => {
-        const { layoutInfo, templateOriginHeight, templateOriginWidth, baseInfo, templateRenderedProperties} = this.state;
+        const { layoutInfo, templateOriginHeight, templateOriginWidth, baseInfo, templateRenderedProperties, dragBar} = this.state;
         return JSON.parse(JSON.stringify({
             layoutInfo,
             templateOriginHeight,
@@ -463,7 +575,8 @@ class TicketTemplate extends Component {
             baseInfo,
             templatePropertiesSetting: this.templatePropertiesSetting,
             templateRenderedProperties,
-            templateId: this.templateId
+            templateId: this.sourceId,
+            dragBar
         }));
     }
 
@@ -475,6 +588,7 @@ class TicketTemplate extends Component {
             templateOriginHeight,
             templateRenderedProperties,
             activeElementInfo,
+            activeElements,
             txtInfo,
             pageType,
             action
@@ -484,12 +598,21 @@ class TicketTemplate extends Component {
             properties,
             dataInfo,
             currencyComponent,
-            renderExtraction
+            renderExtraction,
+            renderRightConfig,
+            showQuit,
+            onElement,
+            viewSourceList
         } = this.props;
         const isEdit = pageType == OPERATIONS.EDIT;
-        return <div className="ticket-template" ref={ins => { this.ticketRef = ins; }} id={this.templateId}>
-            {isEdit && <Left dragEnd={this.dragEnd} onDragStart={this.onDragStart} txtInfo={txtInfo} properties={properties} dataInfo={dataInfo} currencyComponent={currencyComponent} templatePropertiesSetting={this.templatePropertiesSetting} />}
+        return <div
+            className="ticket-template"
+            ref={ins => { this.ticketRef = ins; }}
+            id={this.templateId}
+        >
+            {(isEdit) && <Left activeElementInfo={activeElementInfo} dragEnd={this.dragEnd} onDragStart={this.onDragStart} txtInfo={txtInfo} properties={properties} dataInfo={dataInfo} currencyComponent={currencyComponent} templatePropertiesSetting={this.templatePropertiesSetting} />}
             <Main
+                showQuit={showQuit}
                 layoutInfo={layoutInfo}
                 templateOriginHeight={templateOriginHeight}
                 templateOriginWidth={templateOriginWidth}
@@ -498,7 +621,6 @@ class TicketTemplate extends Component {
                 txtInfo={txtInfo}
                 mode={MODES.SHOW}
                 renderExtraction={renderExtraction}
-                saveTemplateInfo={this.saveInfo}
                 onDragOver={this.onDragOver}
                 dragEnd={this.dragEnd}
                 dragStart={this.onDragStart}
@@ -507,17 +629,21 @@ class TicketTemplate extends Component {
                 activeElement={this.activeElement}
                 replaceActiveElementsInfo={this.replaceActiveElementsInfo}
                 activeElementInfo={activeElementInfo}
+                activeElements={activeElements}
                 ref={(ins) => { this.mainRef = ins; }}
                 onDelete={this.onDelete}
                 handleActions={this.handleActions}
                 action={action}
                 isEdit={isEdit}
                 total={1}
+                pageType={pageType}
                 current={1}
+                viewSourceList={viewSourceList}
+                onElement={onElement}
             />
             {/* action == DATA_ICONS.OPEN_EYES 这个条件再渲染, 不然一直触发 */}
-            {action == DATA_ICONS.OPEN_EYES && <View {...this.state} handleActions={this.handleActions} templatePropertiesSetting={this.templatePropertiesSetting} draggable={false}/>}
-            {isEdit && <ComponentsDisplay txtInfo={txtInfo} title={txtInfo.component || componentTitle} templatePropertiesSetting={this.templatePropertiesSetting} dragEnd={this.dragEnd} dragStart={this.onDragStart}/>}
+            {action == DATA_ICONS.OPEN_EYES && <View {...this.state} handleActions={this.handleActions} templatePropertiesSetting={this.templatePropertiesSetting} draggable/>}
+            {isEdit && <ComponentsDisplay txtInfo={txtInfo} title={txtInfo.component || componentTitle} templatePropertiesSetting={this.templatePropertiesSetting} dragEnd={this.dragEnd} dragStart={this.onDragStart} renderRightConfig={renderRightConfig}/>}
         </div>;
     }
 }

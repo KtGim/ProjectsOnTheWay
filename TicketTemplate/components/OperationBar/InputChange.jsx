@@ -5,14 +5,14 @@ import { CSSPROP2DPI, getSizeValue } from '../../size';
 class InputChange extends PureComponent {
 
     handleChange = (e) => {
-        const { type, handleChange, inputType='number', unit = UNIT.MM } = this.props;
+        const { type, handleChange, inputType='number', unit = UNIT.MM, needTrans = true } = this.props;
         if(!handleChange) {
             console.warn('handleChange is not defined');
             return;
         }
         if(inputType === 'number') {
             let returnValue = Number(e.target.value);
-            if(unit === UNIT.MM) {
+            if(needTrans && unit === UNIT.MM) {
                 returnValue = getSizeValue(returnValue, UNIT.PX,  CSSPROP2DPI[type]);
             }
             handleChange(returnValue, type);
@@ -22,9 +22,9 @@ class InputChange extends PureComponent {
     }
 
     render() {
-        const { value, title, type, showUnit = false, unit = UNIT.PX, onAfter = true, inputType='number', step = 1 } = this.props;
+        const { value, title, type, showUnit = false, unit = UNIT.PX, onAfter = true, inputType='number', step = 1, needTrans = true } = this.props;
         let showValue = value;
-        if(unit === UNIT.MM) {
+        if(needTrans && unit === UNIT.MM) {
             showValue = parseInt(getSizeValue(value, UNIT.MM, CSSPROP2DPI[type]), 10);
         }
         return <div className="input-change" key={type}>

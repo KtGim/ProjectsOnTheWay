@@ -19,7 +19,7 @@ class Left extends PureComponent {
             commonComponent,
             noData
         } = txtInfo;
-        return <div className="setting-list">
+        return <div className="left-setting-list">
             {/* 数据源属性 */}
             {
                 properties && properties.map(({sourceCode, sourceName, isDetail, columns}) => {

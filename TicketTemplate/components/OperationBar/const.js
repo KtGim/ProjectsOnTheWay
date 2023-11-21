@@ -60,11 +60,11 @@ const FONT_SIZE_ITEMS = [ 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 ];
 const FONT_COLOR_ITEMS = [ '#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', 'red', 'blue', 'yellow' ];
 
 // 文案修饰样式
-const FONT_DESC_ITEMS = [ FONT_ITEMS.COLOR, FONT_ITEMS.BOLD, ...Object.values(TEXT_DECORATION_ITEMS), ...Object.values(TEXT_ALIGN_ITEMS)];
+const FONT_DESC_ITEMS = [ FONT_ITEMS.BOLD, ...Object.values(TEXT_DECORATION_ITEMS), ...Object.values(TEXT_ALIGN_ITEMS)];
 // 元素位置样式
 const STYLE_DESC_ITEMS = Object.values(STYLE_ITEMS);
 
-const DEFAULT_DISPLAY_ITEMS = [FONT_ITEMS.SIZE, ...FONT_DESC_ITEMS, BORDER_STYLE_ITEMS.BORDER, ...STYLE_DESC_ITEMS];
+const DEFAULT_DISPLAY_ITEMS = [FONT_ITEMS.SIZE, ...FONT_DESC_ITEMS, ...STYLE_DESC_ITEMS];
 
 /**
  * 各个组件的特殊操作

@@ -4,9 +4,19 @@ import OperationBar from './OperationBar/index';
 
 class PropertyDisplay extends Component {
 
+    state = {
+        show: false
+    }
+
     dragEnd = (property, e) => {
         const { dragEnd, propertyInfo } = this.props;
         dragEnd(property, this[property[propertyInfo.primaryKey]], e);
+    }
+
+    onClick = () => {
+        this.setState({
+            show: !this.state.show
+        });
     }
 
     renderProperties = () => {
@@ -14,15 +24,18 @@ class PropertyDisplay extends Component {
             properties,
             propertyInfo,
             title,
-            dragStart
+            dragStart,
+            showIcon
         } = this.props;
         const {
             primaryKey,
             labelKey
         } = propertyInfo;
-        return <div className="properties">
-            {title && <p className="title"> {title} </p>}
-            <div className="board">
+        const { show } = this.state;
+
+        return <div className="properties" onClick={this.onClick}>
+            {title && <p className={`title ${show ? 'up': 'down'}`}> {title} </p>}
+            <div className={`board ${show ? 'show': 'hide'}`}>
                 {
                     properties.map(property => {
                         return <div
@@ -34,7 +47,7 @@ class PropertyDisplay extends Component {
                             key={property[primaryKey]}
                             id={`${ELEMENTS.PROPERTY}${SPLITOR}${property[primaryKey]}`}
                         >
-                            {OperationBar.renderSvgIcon(property[primaryKey],  property[labelKey], property[labelKey])}
+                            {OperationBar.renderSvgIcon(property[primaryKey],  property[labelKey], showIcon)}
                         </div>;
                     })
                 }

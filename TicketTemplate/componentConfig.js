@@ -1,5 +1,6 @@
 import { CUSTOMERS, DEFAULT_DISPLAY_ITEMS, DISPLAY_ITEMS, ITEMS_STYLE } from './components/OperationBar/const';
 import * as components from './components/common/index';
+import showMask from './components/common/showMask';
 
 /**
  * 数据组件类型
@@ -26,23 +27,34 @@ const SHOW_ELEMENTS = {
  */
 const COMMON_ELEMENTS = {
     DATE: 'DATE',       // 日期
-    PAGE_HEADER: 'PAGE_HEADER', // 页眉
-    PAGE_FOOTER: 'PAGE_FOOTER', // 页脚
-    PAGINATION: 'PAGINATION', // 分页
-    CUSTOM: 'CUSTOM' // 自定义组件
+    // PAGE_HEADER: 'PAGE_HEADER', // 页眉
+    // PAGE_FOOTER: 'PAGE_FOOTER', // 页脚
+    PAGINATION: 'PAGINATION'
+    // , // 分页
+    // CUSTOM: 'CUSTOM' // 自定义组件
 };
 
 /**
  * 组件 key 和 组件的映射关系
  */
+const maskOptions = {
+    showInfoMask: true,
+    showBoundary: true
+};
+
+const noMaskOptions = {
+    showInfoMask: false,
+    showBoundary: true
+};
+
 const SHOW_ELEMENTS_KEY_TO_COMPONENT = {
-    [SHOW_ELEMENTS.BARCODE]: components.BarCode,
-    [SHOW_ELEMENTS.QRCode]: components.QrCode,
-    [SHOW_ELEMENTS.IMAGE]: components.ImageContainer,
-    [SHOW_ELEMENTS.TEXT]: components.TextDisplay,
-    [SHOW_ELEMENTS.LABEL]: components.Label,
-    [COMMON_ELEMENTS.DATE]: components.DateInfo,
-    [COMMON_ELEMENTS.PAGINATION]: components.DateInfo
+    [SHOW_ELEMENTS.BARCODE]: showMask(components.BarCode, maskOptions),
+    [SHOW_ELEMENTS.QRCode]: showMask(components.QrCode, maskOptions),
+    [SHOW_ELEMENTS.IMAGE]: showMask(components.ImageContainer, maskOptions),
+    [SHOW_ELEMENTS.TEXT]: showMask(components.TextDisplay, noMaskOptions),
+    [SHOW_ELEMENTS.LABEL]: showMask(components.Label, noMaskOptions),
+    [COMMON_ELEMENTS.DATE]: showMask(components.DateInfo, noMaskOptions),
+    [COMMON_ELEMENTS.PAGINATION]: showMask(components.DateInfo, noMaskOptions)
 };
 
 /**
@@ -92,15 +104,19 @@ const COMPONENT_DISPLAY_ITEMS = {
 };
 
 const OPERATIONS = {
+    SELECT_ALL: 'SELECT_ALL',
     VIEW: 'VIEW',
     EDIT: 'EDIT',
     DELETE: 'DELETE',
     COPY: 'COPY',
     UNDO: 'UNDO',
+    REDO: 'REDO',
     SETTING: 'SETTING',
     CLOSE: 'CLOSE',
     PRINT: 'PRINT',
-    SAVE: 'SAVE'
+    SAVE: 'SAVE',
+    QUIT: 'QUIT',
+    DESC: 'DESC'
 };
 
 // 数据图标
@@ -175,7 +191,7 @@ const DEFAULT_STYLE = {
     FIXED_TOP: 0
 };
 
-const ACTIONS_TYPE = [OPERATIONS.SAVE, DATA_ICONS.OPEN_EYES, DATA_ICONS.CLOSE_EYES, OPERATIONS.PRINT, OPERATIONS.VIEW, OPERATIONS.EDIT, OPERATIONS.COPY, DATA_ICONS.SOURCE];
+const ACTIONS_TYPE = [OPERATIONS.SAVE, DATA_ICONS.OPEN_EYES, DATA_ICONS.CLOSE_EYES, OPERATIONS.VIEW, OPERATIONS.EDIT, OPERATIONS.COPY, DATA_ICONS.SOURCE];
 export {
     SHOW_ELEMENTS,
     COMMON_ELEMENTS,

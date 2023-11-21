@@ -130,6 +130,8 @@ class Element extends Component {
                 ref={(ins => { this.doitsRef[this.getDoitKet(LINE_POSITION.DRAG_LINNER_LEFT)] =  ins})}
                 key={LINE_POSITION.DRAG_LINNER_LEFT}
                 style={dragLinnerLeftStyle}
+                onDragOver={this.preventEvent}
+                onDragEnd={this.preventEvent}
             >
                 <span className="info" ref={(ins => { this.doitsRef[this.getDoitKet(LINE_POSITION.ACTIVE_INFO_LEFT)] =  ins})} />
             </div>,
@@ -139,10 +141,16 @@ class Element extends Component {
                 ref={(ins => { this.doitsRef[this.getDoitKet(LINE_POSITION.DRAG_LINNER_BOTTOM)] =  ins})}
                 key={LINE_POSITION.DRAG_LINNER_BOTTOM}
                 style={dragLinnerBottomStyle}
+                onDragOver={this.preventEvent}
+                onDragEnd={this.preventEvent}
             >
                 <span className="info" ref={(ins => { this.doitsRef[this.getDoitKet(LINE_POSITION.ACTIVE_INFO_BOTTOM)] =  ins})} />
             </div>
         ];
+    }
+
+    preventEvent = (e) => {
+        e.preventDefault();
     }
 
     render() {
@@ -155,6 +163,8 @@ class Element extends Component {
             <div
                 className="elements_boundry"
                 onClick={activeElement}
+                onDragOver={this.preventEvent}
+                onDragEnd={this.preventEvent}
             >
                 {children}
                 {activeElementInfo && this.renderDrag()}

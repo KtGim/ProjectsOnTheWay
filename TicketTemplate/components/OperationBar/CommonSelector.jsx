@@ -35,12 +35,12 @@ class CommonSelector extends PureComponent {
     render() {
         const { value, title, desc, type } = this.props;
         return (
-            <span className="font-size-selector" key={type}>
+            <div className="font-size-selector" key={type}>
                 {title ? <span>{title}</span> : null}
                 <select onChange={this.handleChange} value={value} style={{ color: value || FONT_COLOR_ITEMS[0]}}>
                     {this.renderItems(type, desc)}
                 </select>
-            </span>
+            </div>
         );
     }
 }

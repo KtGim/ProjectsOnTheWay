@@ -5,9 +5,9 @@ import Tips from '../../common/Tips';
 import ItemDisplay from './ItemDisplay';
 
 const defaultBorderStyle = {
-  borderStyle: 'solid',
+  borderStyle: 'dashed',
   borderWidth: 1,
-  borderColor: '#000000',
+  borderColor: '#aaa',
   borderRadius: 0
 };
 
@@ -23,7 +23,7 @@ class Border extends PureComponent {
     const { oldValue } = preState;
     if(!oldValue) { // 每次打开的时候记住上一次的样式值
       return {
-        oldValue: value
+        oldValue: Object.keys(value).length ? value : defaultBorderStyle
       };
     }
     return {};

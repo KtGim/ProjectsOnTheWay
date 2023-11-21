@@ -148,7 +148,8 @@ const mm2px = (mm = 1, type = DPI_TYPE.X) => {
 // 1in = 72 pt = 25.4mm = 96px
 const px2in = (px = 1) => {
     // 打印机尺寸需要 * 96， in/96
-    return parseInt((px * 96) / 96, 10);
+    // 打印机只能接受整数
+    return Math.ceil(px);
 };
 
 const getSize = ({

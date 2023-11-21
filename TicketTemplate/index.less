@@ -24,21 +24,53 @@
     padding: 20px;
     position: relative;
     overflow: auto;
+    height: 100%;
 
     .ticket_info {
-        height: 80px;
-        border: 1px solid #eee;
         padding: 5px;
-        border-radius: 5px 5px 0 0;
-        margin: 0 10px;
-        background-color: #1207823b;
-        color: #fff;
-        display: flex;
+        box-shadow: 0px 5px 5px 0px #ccc;
+        -webkit-box-orient: vertical;
+        -ms-flex-direction: column;
         flex-direction: column;
+        -webkit-box-align: start;
+        -ms-flex-align: start;
         align-items: flex-start;
-        justify-content: space-between;
         z-index: 5;
         position: relative;
+
+        .operations {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-top: 5px;
+
+            .right-setting-list {
+                .property-setting {
+                    .properties {
+                        .hide {
+                            display: block;
+                        }
+                    }
+                }
+            }
+
+            .button-group {
+                span {
+                    padding: 3px 5px;
+                    cursor: pointer;
+                    border: 1px solid #eee;
+                    margin: 0 2px;
+                    border-radius: 3px;
+                }
+
+                .save {
+                    background-color: #1890ff;
+                    border: 1px solid #1890ff;
+                }
+            }
+        }
 
         .setting-list { // 顶部操作栏的样式
             width: auto;
@@ -50,21 +82,71 @@
 
     .ticket-main {
         position: relative;
-        background-color: #eee;
         width: 100%;
+        height: 80%;
+        z-index: 5;
+        overflow-y: auto;
         cursor: pointer;
+        background-color: #eee;
+        
+        .scroll-bar();
 
         &--content {
             position: relative;
             z-index: 1;
-            background-color: #5d5c1317;
+
+            .elements_boundry {
+                .mask-item {
+                    width: max-content;
+                    height: max-content;
+                    .mask {
+                        z-index: 1;
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        font-size: 16px;
+                        font-weight: bold;
+                        color: yellow;
+
+                        span {
+                            background-color: rgba(0, 0, 0, 50%);
+                            padding: 2px;
+                            position: absolute;
+                            left: 50%;
+                            top: 50%;
+                            transform: translate(-50%, -50%);
+                        }
+                    }
+                }
+                
+                .exceed {
+                    border:1px solid red;
+                    background-color: rgba(255,0,0, 0.3);
+                    height: 100%;
+                    width: 100%;
+                }
+
+                .error {
+                    position: relative;
+                }
+
+                .error::after {
+                    content: "EXCEED";
+                    position: absolute;
+                    right: -5px;
+                    top: -23px;
+                    font-size: 20px;
+                    color: red;
+                    font-weight: 700;
+                }
+            }
 
             .drag_item {
                 position: absolute;
                 border: 3px solid #000;
                 background-color: transparent;
                 z-index: 10000;
-                cursor: pointer;
+                cursor: move;
                 height: 20px;
                 width: 20px;
             }
@@ -139,7 +221,7 @@
                     position: absolute;
                     border: 2px solid #000;
                     background-color: transparent;
-                    z-index: 10001;
+                    z-index: 9999;
                     cursor: pointer;
                     height: 10px;
                     width: 10px;
@@ -175,8 +257,8 @@
             }
         }
         &--bar {
-            position: absolute;
-            z-index: 10;
+            position: fixed;
+            z-index: 9999;
             .setting {
                 position: absolute;
                 width: 18px;
@@ -202,7 +284,10 @@
                 padding: 5px;
                 border-radius: 4px;
                 left: -2px;
-                // display: flex;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
             }
 
             .custom-icon { // 自定义图标的样式修改
@@ -216,9 +301,15 @@
                     margin: 0;
 
                     .tips {
-                        width: 130px;
-                        .input-change {
-                            width: 164px;
+                        width: 200px;
+                        .input-change, .font-size-selector {
+                            width: 100%;
+                            span {
+                                width: 50%;
+                                display: inline-block;
+                                vertical-align: middle;
+                                text-align: left;
+                            }
                         }
                     }
                 }
@@ -234,45 +325,78 @@
     }
 
     .inherit {
-        // background-color: transparent;
-        border: 0!important;
+        background-color: #fff;
+    }
+
+    .origin {
         left: 0!important;
         top: 0!important;
+        border: 0!important;
         overflow: hidden;
+    }
+
+    .siblings {
+        margin-top: 10px;
+    }
+
+    .dis_visible {
+        visibility: hidden;
     }
 
     .no_border {
         border: 0!important;
     }
 
-    .setting-list {
+    .batch-item {
+        box-shadow: 0px 0px 2px 2px rgb(238, 255, 0);
+    }
+
+    .disabled {
+        cursor: not-allowed!important;
+        background-color: #aaa;
+        color: #eee;
+    }
+
+    .left-setting-list, .right-setting-list {
         width: 250px;
         display: inline-block;
         vertical-align: top;
         .property-setting {
-            min-height: 200px;
+            margin-bottom: 5px;
             .properties, .size {
                 .title {
                     font-size: 18px;
                     font-weight: 700;
                     background-color: #efefef;
-                    min-width: 90%;
-                    max-width: 97%;
-                    border-radius: 0 20px 20px 0;
-                    margin-bottom: 10px!important;
                     padding-left: 10px;
+                    position: relative;
+                    cursor: pointer;
+                }
+
+                .down::after {
+                    content: "▼";
+                    position: absolute;
+                    right: 5px;
+                    font-size: 14px;
+                }
+
+                .up::after {
+                    content: "▲";
+                    position: absolute;
+                    right: 5px;
+                    font-size: 14px;
                 }
     
                 .board {
                     max-height: 360px;
                     overflow-y: auto;
-
+                    padding: 5px 0;
                     .scroll-bar();
     
                     .property {
                         padding: 2px 5px;
                         border-radius: 3px;
-                        margin-right: 5px;
+                        margin: 5px 5px 0 5px;
                         background-color: #efefef;
                         display: inline-block;
                         cursor: pointer;
@@ -297,7 +421,7 @@
         width: calc(100% - 500px);
         display: inline-block;
         vertical-align: top;
-        // overflow: auto;
+        height: 100%;
         position: relative;
         .scroll-bar();
     }
@@ -343,7 +467,7 @@
     position: fixed!important;
     top: 15%;
     left: 70%;
-    z-index: 5;
+    z-index: 9999;
 
     cursor: pointer;
 
@@ -352,14 +476,22 @@
     }
 }
 
-.print-in-view {
+.print-in-hide {
     z-index: -10;
+}
+
+.print-in-view {
+    border:1px solid #eee;
+
+    .hide {
+        display: none;
+    }
 }
 
 .ticket-actions {
     position: absolute;
     top: 38px;
-    right: 2px;
+    right: -18px;
     z-index: 5;
     cursor: pointer;
 
@@ -388,7 +520,7 @@
     width: 1.2em;
     height: 1.2em;
     vertical-align: -0.15em;
-    fill: currentColor;
+    // fill: currentColor;
     overflow: hidden;
 }
 
@@ -437,11 +569,13 @@
     }
 }
 
-@media print {
-    body {
-        #print-view {
-            width: 40mm;
-            height: 20mm;
+@media screen and (max-width: 1375px) {
+    .operation-bar {
+        .font-size-selector {
+            width: auto!important;
+            span {
+                display: none;
+            }
         }
     }
 }

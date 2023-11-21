@@ -19,7 +19,7 @@ class View extends React.Component {
     }
 
     static openView = (props) => {
-        render(<View {...props} />, createViewRoot());
+        render(<View key={props.id} id={props.id} {...props} />, createViewRoot());
     }
 
     static closeView = () => {
@@ -60,15 +60,18 @@ class View extends React.Component {
      * @returns {{Array}} 返回数据源绑定的数据
      */
     renderSource = () => {
-        const { dataSource, templateRenderedProperties} = this.props;
-        if(!dataSource) {
+        const { dataSource, templateRenderedProperties, isView = false } = this.props;
+        if(!dataSource && !isView) {
             return templateRenderedProperties;
         }
         // console.log(dataSource, templateRenderedProperties, 'View');
         return templateRenderedProperties.map(item => {
             const { field } = item;
             // 如果是label，直接展示label
-            item.showData = field !== SHOW_ELEMENTS.LABEL ? dataSource[item.dataKey] : item.showData;
+            item.showData = (field !== SHOW_ELEMENTS.LABEL) ?
+                (
+                    isView ? 'XXXXXX' : dataSource[item.dataKey]
+                ) : item.showData;
             return item;
         });
     }
@@ -95,10 +98,15 @@ class View extends React.Component {
             current,
             isHide = false
         } = this.props;
-        const className = isHide ? 'ticket-show-in-time print-in-view' : 'ticket-show-in-time';
+        const classNames = ['ticket-show-in-time'];
+        if(isHide) {
+            classNames.push('print-in-hide');
+        } else {
+            classNames.push('print-in-view');
+        }
         return <Main
             key="ticket-show-in-time"
-            className={className}
+            className={classNames.join(' ')}
             layoutInfo={layoutInfo}
             templateOriginHeight={templateOriginHeight}
             templateOriginWidth={templateOriginWidth}
@@ -112,6 +120,7 @@ class View extends React.Component {
             action={DATA_ICONS.OPEN_EYES}
             total={total}
             current={current}
+            isPreview
         />;
     }
 }

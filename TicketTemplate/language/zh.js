@@ -22,6 +22,7 @@ export default {
     LABEL: '标签',
     BARCODE: '条码',
     BACKGROUND: '背景',
+    descForQuick: '快捷键说明',
 
     DATE: '当前时间',       // 日期
     PAGE_HEADER: '页眉', // 页眉
@@ -69,7 +70,15 @@ export default {
 
     isNull: '为空',
     noData: '无数据源',
+    noPrintSource: '无打印数据源',
 
     okTxt: '√',
-    cancelTxt: 'X'
+    cancelTxt: 'X',
+
+    preview: '预览',
+    edit: '编辑',
+    quit: '退出',
+    print:  '打印',
+
+    exceedMax: '超出画布!'
 };

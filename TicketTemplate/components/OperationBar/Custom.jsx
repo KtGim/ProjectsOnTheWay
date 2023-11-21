@@ -52,7 +52,7 @@ class Custom extends PureComponent {
         } = this.state;
         return  <div className="custom" title={title} key={type} onClick={this.showCard}>
           {
-            OperationBar.renderSvgIcon(COMMON_ELEMENTS.CUSTOM, title, title)
+            OperationBar.renderSvgIcon(COMMON_ELEMENTS.CUSTOM, title, true)
           }
           {
             show && <Tips

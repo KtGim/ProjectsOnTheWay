@@ -10,7 +10,7 @@ import BarcodeIns from 'react-barcode';
 import { isChinese } from '../../funcs';
 
 class Barcode extends PureComponent {
-    render() {
+    renderContent = () => {
         const {
             value = 'best-barcode', // 二维码内容
             fontSize = 12,
@@ -45,6 +45,10 @@ class Barcode extends PureComponent {
             margin={0}
             format={format}
         />;
+    }
+
+    render() {
+        return this.renderContent();
     }
 }
 

@@ -8,7 +8,7 @@ class SettingIcon extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            showSetting: false
+            showSetting: true
         };
     }
 
@@ -26,7 +26,7 @@ class SettingIcon extends PureComponent {
 
     render() {
         const { showSetting } = this.state;
-        const { activeStyle, txtInfo, elementInfo, style, onClick, getInstance, onDelete } = this.props;
+        const { activeStyle, txtInfo, elementInfo, style, onClick, getInstance, onDelete, onElement = false } = this.props;
         return (
             <div
                 className="ticket-main--bar"
@@ -37,10 +37,10 @@ class SettingIcon extends PureComponent {
                 }}
             >
                 {
-                    !showSetting && <div className="setting" style={{ left: 4 }} onClick={this.clickSetting} >{OperationBar.renderSvgIcon(OPERATIONS.SETTING, '*')}</div>
+                    !showSetting && <div className="setting" style={{ left: 4 }} onClick={this.clickSetting} >{OperationBar.renderSvgIcon(OPERATIONS.SETTING, '*', true)}</div>
                 }
                 {
-                    !showSetting && <div className="setting" style={{ left: 25 }} onClick={onDelete} >{OperationBar.renderSvgIcon(OPERATIONS.DELETE, '*')}</div>
+                    !showSetting && <div className="setting" style={{ left: 25 }} onClick={onDelete} >{OperationBar.renderSvgIcon(OPERATIONS.DELETE, '*', true)}</div>
                 }
                 {/** 组件单独使用例子 */}
                 {
@@ -62,10 +62,12 @@ class SettingIcon extends PureComponent {
                         customProps={{ // 自定义组件的特殊配置
                             [SHOW_ELEMENTS.BARCODE]: {
                                 [DISPLAY_ITEMS.WIDTH]: {
-                                    step: 0.1
+                                    step: 0.1,
+                                    needTrans: false
                                 }
                             }
                         }}
+                        onElement={onElement}
                         style={style}
                         showDelete
                         onDelete={onDelete}

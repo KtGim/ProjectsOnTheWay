@@ -4,10 +4,19 @@ import OperationBar from './OperationBar/index';
 import { DATA_ICONS } from '../componentConfig';
 
 class DataIndexDisplay extends Component {
+    state = {
+        show: false
+    }
 
     dragEnd = (property, type, e) => {
         const { dragEnd, dataInfo } = this.props;
         dragEnd(property, this[`${ELEMENTS.DATA}_${property[dataInfo.primaryKey]}`], e);
+    }
+
+    onClick = () => {
+        this.setState({
+            show: !this.state.show
+        });
     }
 
     renderFields = () => {
@@ -22,9 +31,11 @@ class DataIndexDisplay extends Component {
             primaryKey,
             labelKey
         } = dataInfo || {};
-        return <div className="properties">
-            <p className="title"> {title} </p>
-            <div className="board">
+        const { show } = this.state;
+
+        return <div className="properties" onClick={this.onClick}>
+            <p className={`title ${show ? 'up': 'down'}`}> {title} </p>
+            <div className={`board ${show ? 'show': 'hide'}`}>
                 {
                     (dataList && dataList.length) ? dataList.map(data => {
                         return <div

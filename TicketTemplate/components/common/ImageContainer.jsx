@@ -24,7 +24,7 @@ class ImageContainer extends PureComponent {
                 }
             }
         } = this.props;
-        return !isError ? <img draggable="false" crossOrigin="anonymous" onError={this.loadError} style={{ height, width }} src={src} /> : OperationBar.renderSvgIcon(SHOW_ELEMENTS.IMAGE, src, src, { height, width });
+        return !isError ? <img draggable="false" crossOrigin="anonymous" onError={this.loadError} style={{ height, width }} src={src} /> : OperationBar.renderSvgIcon(SHOW_ELEMENTS.IMAGE, src, true, src, { height, width });
     }
 }
 

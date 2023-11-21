@@ -16,11 +16,6 @@ class Main extends Component {
             showDrag: MODES.SHOW == this.props.mode, // 是否可以进行拖拽
 
             activeIndex: -1,
-            layoutInfo: {
-                left: 0,
-                top: 0
-            },
-            baseInfo: {},  // 左上角的相对于屏幕
             styleList: [
                 {
                     left: 0,
@@ -39,6 +34,7 @@ class Main extends Component {
                     top: 0
                 } // rignt_bottom
             ],
+            showDragIndex: 4, // 显示某一个拖拽按钮, 目前默认右下角
             // 预览模式下的拖拽样式
             viewStyle: {
                 left: 0,
@@ -67,51 +63,6 @@ class Main extends Component {
 
     }
 
-    componentDidMount() {
-        this.computedCurrentMainArea(true);
-    }
-
-    componentDidUpdate(nextProps, nextState) {
-        /**
-         * 不用 setTimeout 的话这个数据的改变总是会滞后，导致获取的信息不准确
-         * 保证在 react 渲染之后获取到正确的 UI 布局数据
-         */
-        const {
-            baseInfo,
-            layoutInfo
-        } = nextProps;
-        setTimeout(() => {
-            const {
-                left
-            } = this.mainRef.getBoundingClientRect();
-            /**
-             * 通过 state 的 一致性确定是否需要更改数据
-             */
-            if(nextState.layoutInfo.left !== left) {
-                const leftDistance = layoutInfo.left - left;
-
-                const baseInfoTemp = {
-                    ...baseInfo,
-                    left: baseInfo.left - leftDistance
-                };
-
-                const layoutInfoTemp = {
-                    ...layoutInfo,
-                    left
-                };
-                this.setState({
-                    baseInfo: baseInfoTemp,
-                    layoutInfo: layoutInfoTemp
-                }, () => {
-                    nextProps.handleInfo && nextProps.handleInfo({
-                        baseInfo: baseInfoTemp,
-                        layoutInfo: layoutInfoTemp
-                    });
-                });
-            }
-        }, 0);
-    }
-
     /**
      * 获取当前主区域的信息
      * @param {是否是页面初始化时的计算} init boolean
@@ -119,8 +70,6 @@ class Main extends Component {
     computedCurrentMainArea = (init) => {
         // 原始宽高
         const {
-            templateOriginWidth,
-            templateOriginHeight,
             layoutInfo,
             baseInfo
         } = this.props;
@@ -128,6 +77,7 @@ class Main extends Component {
             console.error('Render View occurred error');
             return;
         }
+
         const {  // 背景大小
             height,
             width,
@@ -137,19 +87,19 @@ class Main extends Component {
             bottom
         } = this.mainRef.getBoundingClientRect();
 
-        let baseHeight = templateOriginHeight;
-        let baseWidth = templateOriginWidth;
-        let baseTop = top + Math.abs(BASE_DISTANCE);
+        let baseHeight = baseInfo.height;
+        let baseWidth = baseInfo.width;
+        // let baseTop = top + Math.abs(BASE_DISTANCE);
+        let baseTop = top;
         // let baseLeft = (width - baseWidth) / 2 + left; // 居中
-        let baseLeft = left + Math.abs(BASE_DISTANCE);
+        // let baseLeft = left + Math.abs(BASE_DISTANCE);
+        let baseLeft = left;
         if(!init) {
-            baseHeight = baseInfo.height;
-            baseWidth = baseInfo.width;
             baseTop = baseInfo.top;
             baseLeft = baseInfo.left;
         }
         // 使用 this.state 临时储存一下 数据
-        this.state.baseInfo = {
+        const baseInfoTemp = {
             // 初始化时模板的原始宽高取默认值
             height: baseHeight,
             width: baseWidth,
@@ -158,7 +108,7 @@ class Main extends Component {
             right: baseLeft + baseWidth,
             bottom: baseTop + baseHeight
         };
-        this.state.layoutInfo = {
+        const layoutInfoTemp = {
             ...layoutInfo,
             height: height,
             width,
@@ -167,7 +117,7 @@ class Main extends Component {
             right,
             bottom
         };
-        this.setArea(baseWidth, baseHeight);
+        this.setArea(baseWidth, baseHeight, baseInfoTemp, layoutInfoTemp);
     }
 
     // 区域元素拖拽
@@ -181,28 +131,24 @@ class Main extends Component {
         } else {
             // 拖拽结束时调用，保存步骤
             actIndex = -1;
-            this.props.saveTemplateInfo();
         }
         this.setState({
             activeIndex: actIndex
         });
     }
 
-    setArea = (widthTemp, heightTemp, baseInfoInit = {}) => {
+    setArea = (widthTemp, heightTemp, baseInfoInit = this.props.baseInfo, layoutInfoInit = this.props.layoutInfo) => {
         const styleList = calculatePosition(widthTemp, heightTemp);
         this.setState({
-            styleList,
-            baseInfo: {
-                ...this.state.baseInfo,
-                height: heightTemp,
-                width: widthTemp,
-                ...baseInfoInit
-            },
-            layoutInfo: { ...this.state.layoutInfo }
+            styleList
         }, () => {
             this.props.handleInfo && this.props.handleInfo({
-                baseInfo: this.state.baseInfo,
-                layoutInfo: this.state.layoutInfo
+                baseInfo: {
+                    height: heightTemp,
+                    width: widthTemp,
+                    ...baseInfoInit
+                },
+                layoutInfo: {...layoutInfoInit}
             });
         });
     }
@@ -224,8 +170,8 @@ class Main extends Component {
             return {
                 hoverElement: activeElementInfo,
                 hoverStyle: {
-                    top: style.top,
-                    left: style.left,
+                    top: style.top + baseInfo.top,
+                    left: style.left + baseInfo.left,
                     width: style.width,
                     height: style.height
                 },
@@ -314,30 +260,38 @@ class Main extends Component {
         return `${element[propertyInfo.primaryKey]}${SPLITOR}${element.id}`;
     }
 
-    renderDragItems = (showDrag) => {
+    renderDragItemLayouts = (templateRenderedProperties, index) => {
         const {
-            styleList,
-            hoverElement
+            hoverElement,
+            showDrag
         } = this.state;
         const {
-            layoutInfo, baseInfo, templateRenderedProperties,
-            propertyInfo, onDragOver, dragStart, dragEnd, activeElement, activeElementInfo,
-            replaceActiveElementsInfo, isEdit, total, current
+            layoutInfo, baseInfo, onDragOver, dragStart, dragEnd, activeElement, activeElementInfo, isEdit, isPreview
         } = this.props;
         const { top, left, height = 0, width = 0 } = baseInfo;
         const style = {
             left: (left || 0) - (layoutInfo.left || 0),
             top: (top || 0) - (layoutInfo.top || 0),
             height,
-            width
+            width,
+            backgroundColor: isEdit ? '#5d5c1317' : undefined
         };
+        const clas = ['ticket-main--content'];
+        if(!isEdit) {
+            clas.push('inherit');
+        }
+        if(isPreview) {
+            clas.push('origin');
+        }
+        if(index > 0) {
+            clas.push('siblings');
+        }
         return <div
             ref={(ins) => { this.ref = ins; }}
-            className={isEdit ? 'ticket-main--content' : 'ticket-main--content inherit'}
+            className={clas.join(' ')}
             id={ELEMENTS.MAIN}
-            onDragEnd={isEdit ? this.dragEnd.bind(this, null) : undefined}
-            onDragStart={isEdit ? dragStart : undefined}
-            draggable={isEdit}
+            key={`${ELEMENTS.MAIN}${SPLITOR}${index}`}
+            draggable={false}
             style={style}
             onDragOver={isEdit ? onDragOver : undefined}
             onClick={isEdit ? activeElement : undefined}
@@ -351,39 +305,114 @@ class Main extends Component {
                 ref={(ins) => { this.elementRef = ins; }}
             >
                 {
-                    (templateRenderedProperties || []).map(element => {
-                        const { field, info, componentProps } = renderInitData(element, propertyInfo.labelKey, total, current);
-                        const Com = SHOW_ELEMENTS_KEY_TO_COMPONENT[field];
-                        const className = (activeElementInfo && activeElementInfo.id == element.id) ? 'property drawing' : (isEdit ? 'property' : 'property no_border');
-                        return <div
-                            draggable={isEdit}
-                            className={className}
-                            style={element.style}
-                            ref={ins => { this[this.getElementKey(element)] = ins; }}
-                            key={element.id}
-                            onDragEnd={isEdit ? this.dragEnd.bind(this, element) : undefined}
-                            onDragStart={isEdit ? dragStart : undefined}
-                            id={`${ELEMENTS.PROPERTY_IN_DRAW}${SPLITOR}${element.id}`}
-                        >
-                            {Com ? <Com elementProps={element} componentProps={componentProps} value={info} onChange={replaceActiveElementsInfo}  /> : (info)}
-                        </div>;
-                    })
+                    this.renderDragItems(templateRenderedProperties)
                 }
             </Element>
             {
-                isEdit && styleList.map((style, index) => {
-                    const className = showDrag ? `drag_item ${DRAG_ITEM_BASE_CLASS[index]} show` : `drag_item ${DRAG_ITEM_BASE_CLASS[index]} hide`;
-                    return  <div
-                        key={DRAG_ITEM_BASE_CLASS[index]}
-                        ref={(ins) => { this[DRAG_ITEM_BASE_CLASS[index]] = ins; }}
-                        className={className} style={style}
-                        draggable={showDrag}
-                        onClick={this.onStart.bind(this, index)}
-                    />;
-                })
+                this.showDragBars(showDrag)
             }
-            {isEdit && hoverElement && this.renderOperationBar()}
+            {isEdit && hoverElement && this.renderOperationBar(true)}
         </div>;
+    }
+
+    renderDragItems = (templateRenderedProperties) => {
+        const { propertyInfo, dragStart, activeElementInfo, activeElements,
+            replaceActiveElementsInfo, isEdit, total, current, isPreview, pageType} = this.props;
+        return (templateRenderedProperties || []).map(element => {
+            const { field, info, componentProps } = renderInitData(element, propertyInfo.labelKey, total, current, pageType);
+            const Com = SHOW_ELEMENTS_KEY_TO_COMPONENT[field];
+            let className = (activeElementInfo && activeElementInfo.id == element.id) ? 'property drawing' : (isEdit ? 'property' : 'property no_border');
+            const isInBatch = activeElements && activeElements.length > 0 && activeElements.some(item => item.id == element.id);
+            className = isInBatch ? `${className} batch-item` : className;
+            return <div
+                draggable={isEdit}
+                className={className}
+                style={element.style}
+                ref={ins => { this[this.getElementKey(element)] = ins; }}
+                key={element.id}
+                onDragEnd={isEdit ? this.dragEnd.bind(this, element) : undefined}
+                onDragStart={isEdit ? dragStart : undefined}
+                id={`${ELEMENTS.PROPERTY_IN_DRAW}${SPLITOR}${element.id}`}
+            >
+                {Com ? <Com isPreview={!isEdit || isPreview} elementProps={element} componentProps={componentProps} value={info} onChange={replaceActiveElementsInfo}  /> : (info)}
+            </div>;
+        });
+    }
+
+    onBarDragEnd = ({clientX, clientY}) => {
+        if(this.state.barItem) {
+            this.setArea(clientX + BASE_DISTANCE - this.currentBaseInfo.left, clientY + BASE_DISTANCE - this.currentBaseInfo.top, {
+                left: this.currentBaseInfo.left,
+                top: this.currentBaseInfo.top
+            }, {
+                left: this.currentLayoutInfo.left,
+                top: this.currentLayoutInfo.top,
+                width: this.currentLayoutInfo.width,
+                height: this.currentLayoutInfo.height
+            });
+            this.state.barItem.style.display = 'block';
+            this.state.barItem.target = null;
+            this.state.barItem = null;
+            this.currentLayoutInfo = null;
+            this.currentBaseInfo = null;
+        }
+    }
+
+    onBarDragStart = (e) => {
+        this.state.barItem = e.target;
+        this.currentLayoutInfo = this.mainRef.getBoundingClientRect();
+        this.currentBaseInfo = this.ref.getBoundingClientRect();
+    }
+
+    onDragOver = (e) => {
+        e.preventDefault();
+        const { onDragOver } = this.props;
+        const { showDragIndex } = this.state;
+        if(this.state.barItem && this.currentBaseInfo && this.currentLayoutInfo && showDragIndex >= 1) {
+            const target = this.state.barItem;
+            const { clientX, clientY } = e;
+            const { left, top } = this.currentLayoutInfo;
+            target.style.left = `${clientX - left + BASE_DISTANCE + ((BASE_DISTANCE) / 2)}px`;
+            target.style.top = `${clientY - top + BASE_DISTANCE + ((BASE_DISTANCE) / 2)}px`;
+            target.style.display = 'none';
+            // this.setArea(clientX + BASE_DISTANCE - baseInfo.left, clientY + BASE_DISTANCE - baseInfo.top);  // 比较卡
+            // 下面的方式比较流畅， 本身 react 最终也是需要经过 dom 操作的，而且还有其本身的框架逻辑所以直接使用 style 效果比使用 state 更好
+            this.ref.style.width = `${clientX + BASE_DISTANCE - this.currentBaseInfo.left}px`;
+            this.ref.style.height = `${clientY + BASE_DISTANCE - this.currentBaseInfo.top}px`;
+        } else {
+            onDragOver && onDragOver(e);
+        }
+    }
+
+    showDragBars = (showDrag) => {
+        const { styleList, showDragIndex } = this.state;
+        const { isEdit } = this.props;
+        if(!isEdit) return null;
+        if(showDragIndex >= 1) {
+            const index = showDragIndex - 1;
+            return <div
+                key={DRAG_ITEM_BASE_CLASS[index]}
+                ref={(ins) => { this[DRAG_ITEM_BASE_CLASS[index]] = ins; }}
+                className={`drag_item ${DRAG_ITEM_BASE_CLASS[index]} show`}
+                style={styleList[index]}
+                draggable={showDrag}
+                onDragStart={this.onBarDragStart}
+                onDragEnd={this.onBarDragEnd}
+                // onClick={this.onStart.bind(this, index)} // 目前不支持点击拖拽
+            />;
+        } else {
+            return styleList.map((style, index) => {
+                const className = showDrag ? `drag_item ${DRAG_ITEM_BASE_CLASS[index]} show` : `drag_item ${DRAG_ITEM_BASE_CLASS[index]} hide`;
+                return  <div
+                    key={DRAG_ITEM_BASE_CLASS[index]}
+                    ref={(ins) => { this[DRAG_ITEM_BASE_CLASS[index]] = ins; }}
+                    className={className}
+                    style={style}
+                    draggable={showDrag}
+                    // onClick={this.onStart.bind(this, index)}
+                />;
+            });
+        }
     }
 
     /**
@@ -411,19 +440,17 @@ class Main extends Component {
      * 操作栏图标
      * @returns {ReactNode}
      */
-    renderOperationBar = () => {
+    renderOperationBar = (onElement = false) => {
         const { hoverStyle } = this.state;
-        const { baseInfo, layoutInfo, replaceActiveElementsInfo, activeElementInfo, onDelete } = this.props;
+        const { replaceActiveElementsInfo, activeElementInfo, onDelete } = this.props;
         return <SettingIcon
             activeStyle={hoverStyle}
             txtInfo={this.props.txtInfo}
             elementInfo={activeElementInfo}
             getInstance={(ins) => { this.settingIconRef = ins; }}
-            style={{
-                width: layoutInfo.width - baseInfo.left + layoutInfo.left - hoverStyle.left - 5
-            }}
             onClick={replaceActiveElementsInfo}
             onDelete={onDelete}
+            onElement={onElement}
         />;
     }
 
@@ -465,10 +492,12 @@ class Main extends Component {
     }
 
     render() {
-        const { showDrag, activeIndex, layoutInfo } = this.state;
+        const { showDrag, activeIndex } = this.state;
         const {
-            txtInfo, baseInfo, activeElementInfo, layoutInfo: layoutInfoProps, replaceActiveElementsInfo,
-            handleActions, isEdit, action, className, actionItems, propertyInfo, dragStart, dragEnd, onDragOver, draggable = true
+            txtInfo, baseInfo, layoutInfo, replaceActiveElementsInfo,
+            handleActions, isEdit, action, className, actionItems, propertyInfo, dragStart, dragEnd,
+            isPreview = false, showActions = false, activeElementInfo, activeElements, showQuit,
+            viewSourceList = [], sourceMax = 2, templateRenderedProperties, onElement = false
         } = this.props;
         if(!baseInfo) {
             console.error('baseInfo is required');
@@ -476,58 +505,81 @@ class Main extends Component {
         }
         // 此时可以改变模板的大小
         const canChangeTemplate = !(!showDrag || activeIndex < 0);
-        const mainStyle= isEdit ?{
-            height: layoutInfo.height || layoutInfoProps.height
-        } : {};
-        const containerStyle = isEdit ? {
-            minWidth: baseInfo.width
-        } : {
-            width: baseInfo.width,
-            height: baseInfo.height
+        let containerStyle = {
+            // minWidth: baseInfo.width
         };
         const cls = isEdit ? 'draw-container' : 'draw-container ticket-center';
-        const props = isEdit ? {
-            draggable,
+        const mainProps = isEdit ? {
+            draggable: true,
             onMouseMove: this.handleMouseMove,
-            onDragOver
-         } : {
-            draggable,
-            onDragStart: this.dragContainerStart,
-            onDragEnd: this.dragContainerEnd,
-            onDragOver: this.onMouseMove
-        };
+            onDragOver: this.onDragOver
+        } : {};
+        let containerProps = {};
+        if(isPreview) { // // View.OpenView 的参数 和 pageType 不同
+            containerStyle = this.state.viewStyle.isDrag ? {
+                width: baseInfo.width,
+                height: baseInfo.height,
+                left: this.state.viewStyle.left,
+                top: this.state.viewStyle.top
+            } : {
+                width: baseInfo.width,
+                height: baseInfo.height
+            };
+            //  预览模式 展示边框
+            containerStyle.height = containerStyle.height + 2;
+            containerStyle.width = containerStyle.width + 2;
+
+            //  预览模式 直接可以拖拽
+            containerProps = {
+                draggable: true,
+                onDragStart: this.dragContainerStart,
+                onDragEnd: this.dragContainerEnd,
+                onDragOver: this.onMouseMove
+            };
+        }
+        let showSource = [templateRenderedProperties];
+        if(!isEdit && viewSourceList && viewSourceList.length) { // 最多只展示两张
+            showSource = viewSourceList.slice(0, sourceMax);
+        }
         return <div
             className={className ? `${cls} ${className}` : cls}
             style={containerStyle}
-            {...props}
+            {...containerProps}
         >
-            {isEdit && <HeaderInfo
+            {!isPreview && <HeaderInfo
                 baseInfo={baseInfo}
                 layoutInfo={layoutInfo}
                 activeElementInfo={activeElementInfo}
+                activeElements={activeElements}
                 txtInfo={txtInfo}
                 ref={(ins) => { this.headerRef = ins; }}
                 propertyInfo={propertyInfo}
                 onChange={replaceActiveElementsInfo}
                 dragEnd={dragEnd}
                 onDragStart={dragStart}
+                handleActions={handleActions}
+                isEdit={isEdit}
+                showQuit={showQuit}
+                onElement={onElement}
             />}
             <div
                 ref={(ins) => { this.mainRef = ins; }}
                 className={isEdit ? 'ticket-main' : 'ticket-main inherit'}
-                style={mainStyle}
                 id={ELEMENTS.LAYOUT}
+                {...mainProps}
             >
-                {this.renderDragItems(showDrag)}
+                {
+                    showSource.map(this.renderDragItemLayouts)
+                }
                 {this.renderOperations(canChangeTemplate)}
             </div>
-            <Actions
+            {showActions && <Actions
                 textInfo={txtInfo}
                 handleClick={handleActions}
                 isEdit={isEdit}
                 showInTime={action == DATA_ICONS.OPEN_EYES}
                 showItems={actionItems}
-            />
+            />}
         </div>;
     }
 }

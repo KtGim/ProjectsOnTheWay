@@ -59,7 +59,7 @@ class TextDecoration extends PureComponent {
             ...style
         } = this.getStyle();
         return <div key={type} className={active ? 'text-decoration active' : 'text-decoration'} onClick={this.handleClick} style={style}>
-            {OperationBar.renderSvgIcon(type, title, desc)}
+            {OperationBar.renderSvgIcon(type, title, true, desc)}
         </div>;
     }
 }

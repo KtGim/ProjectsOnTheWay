@@ -22,7 +22,7 @@ class DateInfo extends PureComponent {
             case COMMON_ELEMENTS.DATE:
                 return getDateByFormat(new Date(), format);
             case COMMON_ELEMENTS.PAGINATION:
-                console.log('pagination', value);
+                // console.log('pagination', value);
                 return value;
         }
     }

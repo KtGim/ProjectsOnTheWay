@@ -29,12 +29,14 @@ class ItemDisplay extends PureComponent {
                 type={BORDER_STYLE_ITEMS.BORDER_RADIUS}
                 value={borderRadius}
                 handleChange={handleChange}
+                needTrans={false}
                 onAfter={false}
             />
             <InputChange
                 title={borderWidthText}
                 type={BORDER_STYLE_ITEMS.BORDER_WIDTH}
                 value={borderWidth}
+                needTrans={false}
                 handleChange={handleChange}
                 onAfter={false}
             />
@@ -43,6 +45,7 @@ class ItemDisplay extends PureComponent {
                 type={BORDER_STYLE_ITEMS.BORDER_COLOR}
                 inputType="text"
                 value={borderColor}
+                needTrans={false}
                 handleChange={handleChange}
                 onAfter={false}
             />

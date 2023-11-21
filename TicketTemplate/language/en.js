@@ -24,6 +24,7 @@ export default {
     BARCODE: 'Barcode',
     BACKGROUND: 'Background',
     QRCode: 'QrCode',
+    descForQuick: 'Description For Shortcut Keys',
 
     // 常用组件
     DATE: 'Date',       // 日期
@@ -72,7 +73,15 @@ export default {
     // 提示
     isNull: 'Not Null',
     noData: 'No Data',
+    noPrintSource: 'No Print Source',
 
     okTxt: '√',
-    cancelTxt: 'X'
+    cancelTxt: 'X',
+
+    preview: 'Preview',
+    edit: 'Edit',
+    quit: 'Quit',
+    print:  'Print',
+
+    exceedMax: 'Exceed Base Layout!'
 };

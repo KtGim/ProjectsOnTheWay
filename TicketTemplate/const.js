@@ -25,7 +25,8 @@ const ELEMENTS = {
     PROPERTY: 'FUNC$PROPERTY',              // 组件属性元素通用名称
     PROPERTY_IN_DRAW: 'PROPERTY$IN$DRAW',   // 画布中的属性元素通用名称
     DATA: 'DATA$PROPERTY',                  // 数据元素通用名称
-    PROPERTY_LINNER: 'PROPERTY$LINNER'      // 元素的边框线，业务暂时未使用
+    PROPERTY_LINNER: 'PROPERTY$LINNER',      // 元素的边框线，业务暂时未使用
+    MASK: 'MASK'                          // 遮罩层
 };
 
 // 缓存步骤信息
@@ -88,12 +89,17 @@ const SOURCE_BTN_TYPE = {
     cancel: 'SOURCE_BTN_TYPE_CANCEL',
     confirm: 'SOURCE_BTN_TYPE_CONFIRM'
 };
+// 包含以下字符串的 prop 默认是 图片类型的
+const LICK_IMAGE_PROP_KEYS = ['image', 'logo', 'img', 'url', 'icon'];
+const LICK_BAR_CODE_PROP_KEYS = ['barcode'];
 
 export {
     CANVAS_ID,
     DRAG_ITEM_BASE_CLASS,
     BASE_DISTANCE,
     MODES,
+    LICK_IMAGE_PROP_KEYS,
+    LICK_BAR_CODE_PROP_KEYS,
 
     SAVE_STEP_BY_TIMELINE,
 

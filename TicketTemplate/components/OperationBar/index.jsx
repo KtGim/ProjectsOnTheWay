@@ -85,12 +85,13 @@ class OperationBar extends PureComponent {
     /**
      * @param {string} type 组件展示的类型，iconNameMap 的 key 值
      * @param {string} value 默认展示的数值，如果 iconNameMap 中不存在则展示这个值
+     * @param {boolean} showIcon 是否展示 icon
      * @param {string} title svg 的 title 属性
      * @param {object} style svg 的样式,只有在 svg 能渲染时才生效
      * @returns {React.Component | string}
      */
-    static renderSvgIcon = (type, value, title, style) => {
-        return iconNameMap[type] ? <svg style={style ? style : undefined} className="icon" aria-hidden="true">
+    static renderSvgIcon = (type, value, showIcon = false, title, style) => {
+        return (iconNameMap[type] && showIcon) ? <svg style={style ? style : undefined} className="icon" aria-hidden="true">
             {title ? <title>{title}</title> : null}
             <use xlinkHref={`${ICON_PREFIX}${iconNameMap[type]}`}></use>
         </svg> : value || title;
@@ -102,7 +103,7 @@ class OperationBar extends PureComponent {
      * @returns {React.Component}
      */
     renderItem = (type = FONT_ITEMS.SIZE) => {
-        const { elementInfo, txtInfo, restProps = {}, customProps = {} } = this.props;
+        const { elementInfo, txtInfo, restProps = {}, customProps = {}, onElement = false } = this.props;
         let Com = null;
         let unit = UNIT.PX;
         switch (type) {
@@ -136,6 +137,7 @@ class OperationBar extends PureComponent {
                 break;
         }
         if(Com) {
+            const comProps = getCurrentStyleOrProps(elementInfo, txtInfo, type) || {};
             return <Com
                 key={type}
                 elementInfo={elementInfo}
@@ -148,23 +150,31 @@ class OperationBar extends PureComponent {
                 }
                 unit={unit} // 可以通过 restProps 来传递
                 {...restProps}
-                {...((getCurrentStyleOrProps(elementInfo, txtInfo, type)) || {})}  // 获取当前的属性值：样式属性或者组件属性
+                {...comProps}  // 获取当前的属性值：样式属性或者组件属性
+                title={onElement && type == FONT_ITEMS.SIZE ? undefined : comProps.title} // 如果是在元素上展示字体大小，则不展示 title
             />;
         }
         return null;
     }
 
     render() {
-        const { style, elementInfo, showDelete, onDelete, onClose } = this.props;
+        const { style, elementInfo, showDelete, onDelete, onClose, visible = true, onElement = false } = this.props;
         const { field } = elementInfo;
-        const showBars = COMPONENT_DISPLAY_ITEMS[field] || DEFAULT_DISPLAY_ITEMS;
+        let showBars = COMPONENT_DISPLAY_ITEMS[field] || DEFAULT_DISPLAY_ITEMS;
         if(!showBars || !showBars.length) return null;
-        // console.log('showBars', showBars);
+        const className = ['operation-bar'];
+        if(!visible) {
+            className.push('dis_visible');
+        }
+        if(onElement && !showBars.includes(DISPLAY_ITEMS.BORDER)) {
+            showBars = [...showBars];
+            showBars.splice(-4, 0, DISPLAY_ITEMS.BORDER);
+        }
         return (
-                <div className="operation-bar" id={OPERATION_BAR_ID} key="operation-bar" style={style}>
-                    {this.renderItems((showBars))}
-                    {showDelete && onDelete && <div className="delete" onClick={onDelete}>{OperationBar.renderSvgIcon(OPERATIONS.DELETE, 'X')}</div>}
-                    {onClose && <div className="delete" onClick={onClose}>{OperationBar.renderSvgIcon(OPERATIONS.CLOSE, 'X')}</div>}
+                <div className={className.join(' ')} id={OPERATION_BAR_ID} key="operation-bar" style={style}>
+                    {this.renderItems(showBars)}
+                    {showDelete && onDelete && <div className="delete" onClick={onDelete}>{OperationBar.renderSvgIcon(OPERATIONS.DELETE, 'X', true)}</div>}
+                    {onClose && <div className="delete" onClick={onClose}>{OperationBar.renderSvgIcon(OPERATIONS.CLOSE, 'X', true)}</div>}
                 </div>
             );
     }

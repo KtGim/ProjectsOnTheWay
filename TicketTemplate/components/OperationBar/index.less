@@ -8,6 +8,7 @@
 
     .font-size-selector {
         .commonStyle();
+
         span {
             font-weight: bold;
             padding-right: 5px;
@@ -40,14 +41,42 @@
             left: -2px;
             top: -2px;
             z-index: 5;
-            background: #693fad;
+            background: #000;
             color: #fff;
             padding: 5px;
             border-radius: 5px;
-            width: 120px;
+            width: 210px;
 
             .input-change {
-                width: 134px;
+                width: 200px;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+
+                input {
+                    color: #000;
+                }
+
+                input[type="text"] {
+                    appearance: auto;
+                }
+            }
+
+            .font-size-selector {
+                width: 200px;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+
+                select {
+                    color: rgb(0, 0, 0);
+                    min-width: 35px;
+                    width: 50%;
+                    outline: none;
+                    margin-top: 1px;
+                }
             }
 
             .tips_footer {
@@ -60,15 +89,9 @@
                     text-align: center;
 
                     &:hover{
-                        background: #e6e6e6;
-                        color: rgba(38, 0, 255, 0.726);
+                        background: #e8ce12;
+                        font-weight: bold;
                     }
-                }
-                .ok {
-                    background: green;
-                }
-                .cancel {
-                    background: red;
                 }
             }
         }
@@ -78,6 +101,7 @@
         .commonStyle();
         width: 12%;
         min-width: 80px;
+        height: 25px;
         span {
             font-weight: bold;
             padding-right: 5px;
@@ -85,9 +109,7 @@
         input {
             min-width: 35px;
             width: 50%;
-            border: 0;
             outline: none;
-            color: rgb(15, 207, 15);
         }
     }
 
