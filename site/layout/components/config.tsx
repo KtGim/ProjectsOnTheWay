@@ -5,7 +5,7 @@ const moduleNames: {
     [key in moduleNameType]: string
 } = {
     'business': '业务组件',
-    // 'common': '通用组件'
+    'common': '通用组件'
 };
 
 

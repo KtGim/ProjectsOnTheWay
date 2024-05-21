@@ -22,7 +22,7 @@
     export default routerConfig;
 
 
-    type moduleNameType = 'business';
+    type moduleNameType = 'business' | 'common';
     type componentNameType = 'A' | 'B';
 
     export {
