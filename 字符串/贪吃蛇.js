@@ -9,6 +9,7 @@ const getStep = (snake, ox, oy, op, hdx, hdy, env, n, m) => {
 	let x = ox;
 	let y = oy;
 	let isOver = false;
+	console.log(op, n, m);
 	while (op.length) {
 		switch (op.shift()) {
 			case 'U':
@@ -26,23 +27,29 @@ const getStep = (snake, ox, oy, op, hdx, hdy, env, n, m) => {
 			case 'G':
 				x += stepX;
 				y += stepY;
+				console.log(x, y, stepX, stepY);
 				if (env[x][y] == 'F') {
 					snake.push({
 						x: ox,
 						y: oy,
 					});
-				} else if (
-					x > n ||
-					x < 0 ||
-					y < 0 ||
-					y > m ||
-					snake.some((s) => s.x == x && s.y == y)
-				) {
-					isOver = true;
-					break;
+					if (
+						x > n ||
+						x < 0 ||
+						y < 0 ||
+						y > m ||
+						snake.some((s) => s.x == x && s.y == y)
+					) {
+						isOver = true;
+						break;
+					}
 				}
 				break;
 		}
+		snake[0] = {
+			x,
+			y,
+		};
 	}
 
 	return {
@@ -55,10 +62,10 @@ const getStep = (snake, ox, oy, op, hdx, hdy, env, n, m) => {
 	};
 };
 
-const getSnakeLength = (operate, grids, env, n, m) => {
-	const startX = 0;
-	const startY = 0;
-
+const getSnakeLength = (operate, env, n, m) => {
+	let startX = 0;
+	let startY = 0;
+	const dEnv = [];
 	for (let i = 0; i < n; i++) {
 		for (let j = 0; j < m; j++) {
 			if (env[i][j] == 'H') {
@@ -68,7 +75,7 @@ const getSnakeLength = (operate, grids, env, n, m) => {
 			}
 		}
 	}
-
+	console.log(startX, startY, 'start');
 	let headDirectionX = 0;
 	let headDirectionY = 0;
 	const snake = [];
@@ -80,7 +87,7 @@ const getSnakeLength = (operate, grids, env, n, m) => {
 		snake,
 		startX,
 		startY,
-		operate,
+		operate.split(''),
 		headDirectionX,
 		headDirectionY,
 		env,
@@ -96,3 +103,14 @@ const getSnakeLength = (operate, grids, env, n, m) => {
 	}
 	console.log(snake.length);
 };
+
+getSnakeLength(
+	'DGGG',
+	[
+		['F', 'F', 'F'],
+		['F', 'F', 'E'],
+		['E', 'F', 'H'],
+	],
+	3,
+	3
+);
