@@ -1,19 +1,3 @@
-/**
- * AA001A001A01
- * AM001A001A01
- * BD001A001A01
- * BH001A001A01
- * SA001B001A01
- * SA001B001A01
- * SC001A001A01
- * SQ001A001A01
- * SO001A001A01
- * SO002A001
- * SO002A001A01
- * SZ002A001A01
- * ZO001A001A01
- */
-
 const arr = [
 	'ZO001A001A01',
 	'SO001A001A01',
@@ -26,7 +10,7 @@ const arr = [
 	'AA001A001A01',
 	'BH001A001A01',
 	'BD001A001A01',
-	'SO002A001A01',
+	'SO2A001A01',
 	'SO002A001',
 ];
 
@@ -90,7 +74,7 @@ const sortByChar = (arr, maxLength) => {
 		}
 	});
 	if (!markList.length || !markList) {
-		return [];
+		return sortedArr;
 	}
 	return markList.reduce((pre, next) => {
 		return [...pre, ...sortByChar(markToArrList[next], maxLength)];
