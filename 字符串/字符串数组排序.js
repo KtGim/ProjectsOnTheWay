@@ -74,7 +74,7 @@ const sortByChar = (arr, maxLength) => {
 	const markToArrList = {};
 	const sortedArr = arr
 		.map(({ value, sortIndex = 0 }) => {
-			return getSortInfo(value, sortIndex, maxLength);
+			return getSortInfo(`${value}`, sortIndex, maxLength);
 		})
 		.sort(sortFunc);
 	sortedArr.forEach((item) => {
