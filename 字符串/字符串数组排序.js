@@ -55,11 +55,20 @@ const getSortInfo = (str, startIndex = 0, maxLength) => {
 	};
 };
 
+const sortFunc = (a, b) => {
+	if (a.sortType == 'number' && b.sortType == 'number') {
+		return a.sortMark - b.sortMark;
+	} else {
+		return String(a.sortMark).localeCompare(String(b.sortMark));
+	}
+};
+
 const sortByChar = (arr, maxLength) => {
-	console.log('++++++++++++++++++++++++++++++++++');
-	console.log(arr);
 	if (!arr || !arr.length) {
 		return [];
+	}
+	if (arr.length === 1) {
+		return arr;
 	}
 	const markList = [];
 	const markToArrList = {};
@@ -67,13 +76,7 @@ const sortByChar = (arr, maxLength) => {
 		.map(({ value, sortIndex = 0 }) => {
 			return getSortInfo(value, sortIndex, maxLength);
 		})
-		.sort((a, b) => {
-			if (a.sortType == 'number' && b.sortType == 'number') {
-				return a.sortMark - b.sortMark;
-			} else {
-				return String(a.sortMark).localeCompare(String(b.sortMark));
-			}
-		});
+		.sort(sortFunc);
 	sortedArr.forEach((item) => {
 		const { sortMark } = item;
 		if (sortMark) {
@@ -86,7 +89,6 @@ const sortByChar = (arr, maxLength) => {
 			markToArrList[sortMark].push(item);
 		}
 	});
-	// console.log(markList);
 	if (!markList.length || !markList) {
 		return [];
 	}
@@ -107,7 +109,8 @@ const sortStrings = (arr) => {
 			sortIndex: 0,
 		});
 	});
-	return sortByChar(sortArr, maxLength);
+	const list = sortByChar(sortArr, maxLength);
+	return list;
 };
 
 sortStrings(arr).forEach((item) => {
