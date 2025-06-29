@@ -1,0 +1,122 @@
+# Vite 和 Webpack 热更新（HMR）详解
+
+## 一、热更新时如何失活旧模块
+
+### Vite 失活机制
+- Vite 利用原生 ES 模块（ESM）和浏览器的模块特性实现热更新。
+- 当文件变更时，Vite 通过 WebSocket 通知浏览器，浏览器会调用对应模块的 HMR 回调。
+- **失活过程**：
+  1. 如果模块注册了 `import.meta.hot.dispose` 回调，Vite 会在替换前调用它，让你有机会清理副作用（如定时器、事件监听、全局状态等）。
+  2. 旧模块的实例和副作用被清理，新的模块代码被动态加载并执行。
+  3. 如果有 `accept` 回调，则只替换当前模块；否则会向上递归，直到找到能处理 HMR 的父模块，否则全页刷新。
+
+### Webpack 失活机制
+- Webpack HMR 通过在运行时维护一个模块依赖关系图和模块缓存（`__webpack_require__.c`），实现模块的热替换。
+- **失活过程**：
+  1. 当模块被替换前，Webpack 会调用该模块注册的 `dispose` 回调，开发者可在此清理副作用。
+  2. Webpack 会从模块缓存中删除旧模块（`__webpack_require__.c[moduleId]`），并用新代码替换。
+  3. 如果有 `accept` 回调，则只热替换当前模块；否则会递归向上查找父模块，直到找到能处理 HMR 的模块，否则全页刷新。
+
+---
+
+## 二、Vite 热更新详细流程
+
+1. **文件变更检测**：Vite 使用文件监听（如 chokidar）监控源码文件。
+2. **构建和依赖分析**：Vite 只重新编译变更的模块（利用 ESBuild 或 Rollup），分析模块依赖关系。
+3. **HMR 消息推送**：Vite 通过 WebSocket 向浏览器推送 HMR 消息，包含变更模块的路径和类型。
+4. **浏览器端接收 HMR 消息**：浏览器端 Vite HMR 客户端监听 WebSocket 消息。
+5. **模块热替换**：浏览器端通过 ESM 的 `import()` 动态加载新模块代码。
+6. **失活旧模块**：在替换前，Vite 会调用 `import.meta.hot.dispose` 回调，开发者可在此清理副作用。
+7. **新模块激活**：新模块代码加载并执行，页面状态保持不变，完成热更新。
+
+### Vite HMR 流程图
+```mermaid
+flowchart TD
+  A[文件变更] --> B[Vite 服务器分析依赖]
+  B --> C[WebSocket 推送 HMR 消息]
+  C --> D[浏览器 HMR 客户端接收]
+  D --> E[动态 import 新模块]
+  E --> F[调用 dispose 清理旧模块]
+  F --> G[执行 accept 激活新模块]
+  G --> H[页面局部热更新]
+  G --无 accept 回调--> I[全页刷新]
+```
+
+---
+
+## 三、Webpack 热更新详细流程
+
+1. **文件变更检测**：Webpack Dev Server 或 HMR 插件监听文件变更。
+2. **构建和依赖分析**：Webpack 重新编译受影响的模块，生成新的模块代码（chunk），生成 HMR manifest。
+3. **HMR 消息推送**：Webpack Dev Server 通过 WebSocket 向浏览器推送 HMR 消息，包含变更模块的 hash、chunk id 等信息。
+4. **浏览器端接收 HMR 消息**：浏览器端 HMR runtime 监听 WebSocket 消息，请求新的 HMR manifest 和变更模块的代码。
+5. **模块热替换**：HMR runtime 加载新模块代码，替换旧模块（更新 `__webpack_require__.c` 缓存）。
+6. **失活旧模块**：在替换前，Webpack 会调用 `module.hot.dispose` 回调，开发者可在此清理副作用。
+7. **新模块激活**：新模块代码加载并执行，页面状态保持不变，完成热更新。
+
+### Webpack HMR 流程图
+```mermaid
+flowchart TD
+  A[文件变更] --> B[Webpack 重新编译模块]
+  B --> C[生成 HMR manifest]
+  C --> D[WebSocket 推送 HMR 消息]
+  D --> E[浏览器 HMR runtime 接收]
+  E --> F[请求新模块代码]
+  F --> G[调用 dispose 清理旧模块]
+  G --> H[替换模块缓存]
+  H --> I[执行 accept 激活新模块]
+  I --> J[页面局部热更新]
+  I --无 accept 回调--> K[全页刷新]
+```
+
+---
+
+## 四、Vite 和 Webpack HMR 对比
+
+| 步骤           | Vite                                      | Webpack                                  |
+|----------------|-------------------------------------------|------------------------------------------|
+| 文件监听       | chokidar                                  | chokidar/内置                            |
+| 构建           | 只编译变更模块，利用 ESM                  | 重新编译变更模块，生成 chunk             |
+| 消息推送       | WebSocket，推送模块路径                   | WebSocket，推送 hash、chunk id           |
+| 客户端加载     | ESM 动态 import                           | HMR runtime 加载新 chunk                 |
+| 失活旧模块     | import.meta.hot.dispose                   | module.hot.dispose                       |
+| 激活新模块     | import.meta.hot.accept                    | module.hot.accept                        |
+| 缓存管理       | 浏览器原生 ESM 缓存                       | Webpack runtime 的模块缓存               |
+| 无法热替换时   | 递归查找父模块，无 accept 时全页刷新      | 递归查找父模块，无 accept 时全页刷新     |
+
+---
+
+## 五、总结
+
+- 两者流程类似，都是"文件变更→编译→推送消息→客户端加载新模块→失活旧模块→激活新模块"。
+- Vite 利用原生 ESM，Webpack 依赖自定义模块系统。
+- 两者都支持 dispose/accept 钩子，开发者可清理副作用，保证热更新安全。
+- 失活机制的核心是让开发者在 dispose 回调中主动清理副作用，避免内存泄漏和状态污染。
+
+---
+
+## 六、代码示例
+
+### Vite HMR 示例
+```js
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    // 清理副作用
+  });
+  import.meta.hot.accept(() => {
+    // 新模块已加载
+  });
+}
+```
+
+### Webpack HMR 示例
+```js
+if (module.hot) {
+  module.hot.dispose(() => {
+    // 清理副作用
+  });
+  module.hot.accept(() => {
+    // 新模块已加载
+  });
+}
+``` 

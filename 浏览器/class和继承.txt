@@ -1,0 +1,16 @@
+1. 构造函数中 super(props) 的作用：
+- 在 React 类组件中，构造函数里如果 super 不传入 props，则无法在构造函数中通过 this.props 访问到 props。建议始终写 super(props)。
+
+2. instanceof 判断：
+- 只要原型链设置正确，无论是 prototype 继承还是 class 继承，instanceof 都能判断实例属于哪个类。
+- 传统 prototype 继承容易写错，导致原型链混乱，instanceof 判断失效；class 继承自动设置原型链，更安全规范。
+
+3. class 继承中 this 的初始化：
+- ES6 class 继承时，子类构造函数必须先调用 super()，否则无法访问 this。
+- 子类实例的 this 是由父类构造函数创建的，super() 调用后 this 才被初始化。
+- 这样做是为了保证继承链的正确性和安全性。
+
+4. 基类构造器与派生类构造器：
+- 基类构造器（Base Constructor）：没有通过 extends 继承其他类的构造函数。this 在构造函数开始时自动创建。
+- 派生类构造器（Derived Constructor）：通过 extends 继承其他类的构造函数。必须先调用 super()，super() 调用后 this 才被初始化。
+- 规范要求派生类构造器在 super() 之前不能访问 this。

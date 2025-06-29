@@ -1,0 +1,48 @@
+# 浏览器渲染相关知识总结
+
+## 一、分层（Layering）
+- 浏览器会根据特定规则（如 transform、will-change、position: fixed、opacity 动画、filter、canvas、video、iframe 等）将部分元素单独成层。
+- 分层的目的是优化渲染性能，便于动画、合成和栅格化。
+- 分层处理可能滞后于 DOM/CSSOM 变化，浏览器会合并多次变更，批量处理。
+
+## 二、分层到栅格化的流程
+1. 生成 Layer Tree（层树），每个 Layer 记录需要绘制的内容。
+2. 每个 Layer 生成 Display List（绘制指令列表）。
+3. Layer 被切分为多个 Tile（小块），以便并行处理。
+4. 主线程将 Tile 及 Display List 提交给栅格化线程。
+5. 栅格化线程将矢量指令转为像素，生成位图 Tile。
+6. 合成线程将所有 Layer 的位图 Tile 合成为最终页面。
+
+```mermaid
+flowchart TD
+  A[DOM/CSSOM 变化] --> B[分层处理\n生成 Layer Tree]
+  B --> C[Display List]
+  C --> D[Tiling\n切片]
+  D --> E[栅格化线程\n生成位图 Tile]
+  E --> F[合成线程\n合成显示]
+```
+
+## 三、栅格化（Rasterization）
+- 栅格化是将矢量绘制指令转为像素位图的过程，通常在 GPU 上并行完成。
+- 只栅格化可见区域，未变化的 Tile 可直接复用缓存。
+- 并行栅格化提升效率。
+
+## 四、浏览器样式/布局批处理
+- 浏览器会对同一帧内的多次样式/布局变更进行批处理，合并渲染，提升性能。
+- 批处理流程：
+  1. JS 执行过程中多次修改样式/DOM，浏览器收集变更。
+  2. JS 执行栈清空后，统一执行 Reflow（布局）和 Repaint（重绘）。
+  3. 如果中间读取了布局属性（如 offsetWidth），会强制同步渲染，打断批处理。
+
+```mermaid
+flowchart TD
+  A[JS 执行多次样式/DOM修改] --> B[浏览器收集变更]
+  B --> C[JS 执行栈清空]
+  C --> D[统一 Reflow/Repaint]
+  B --强制同步操作--> D
+```
+
+## 五、优化建议
+- 合理安排 DOM 读写顺序，避免交替进行，减少强制同步布局。
+- 合并多次样式修改，使用 classList 或 cssText 一次性修改。
+- 使用 requestAnimationFrame，将动画相关 DOM 操作放到下一帧执行。 
