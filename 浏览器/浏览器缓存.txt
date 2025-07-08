@@ -75,4 +75,156 @@
 - 浏览器缓存分为强缓存、协商缓存和存储型缓存。
 - from memory 和 from cache 代表缓存来源的不同（内存/磁盘）。
 - 协商缓存依赖本地副本，不会单独存在。
-- 合理利用缓存可大幅提升页面性能和用户体验。 
+- 合理利用缓存可大幅提升页面性能和用户体验。
+
+---
+
+## 九、常见缓存相关问答
+
+### 1. 为什么缓存 HTML 时使用的是协商缓存？
+
+缓存 HTML 时通常使用**协商缓存**（如 ETag、Last-Modified），而不是强缓存（如 Cache-Control: max-age），主要有以下几个原因：
+
+1. **HTML 内容变化频繁**
+   - HTML 文件通常是页面的入口，内容经常更新（比如页面结构、数据、广告等）。
+   - 如果使用强缓存，用户在缓存有效期内始终拿到旧的 HTML，无法及时获取页面最新内容，影响用户体验。
+
+2. **协商缓存能保证内容实时性**
+   - 协商缓存（如 ETag、Last-Modified）会让浏览器每次请求时带上标识（If-None-Match、If-Modified-Since）询问服务器资源是否有更新。
+   - 如果没变，服务器返回 304，浏览器用本地缓存；如果变了，服务器返回最新内容。
+   - 这样既能利用缓存减少带宽，又能保证用户拿到的是最新的页面。
+
+3. **HTML 是入口文件，影响全局**
+   - HTML 文件通常引用了 JS、CSS 等静态资源。
+   - 如果 HTML 被强缓存，页面结构或资源引用变了，用户却还在用旧的 HTML，可能导致页面加载异常（比如 JS/CSS 404 或版本不匹配）。
+
+4. **强缓存适合静态资源**
+   - JS、CSS、图片等静态资源一般用 hash 命名，内容变了文件名也变，可以放心用强缓存（max-age, immutable）。
+   - HTML 文件一般不带 hash，内容变了文件名不变，所以更适合用协商缓存。
+
+**总结**：HTML 用协商缓存，保证内容更新及时，避免页面入口"卡死"在旧版本。静态资源用强缓存，提升加载速度，减少请求。
+
+---
+
+### 2. html 为什么一般存在内存缓存中？
+
+HTML 一般会存在**内存缓存（Memory Cache）**中，主要原因如下：
+
+1. **提升页面切换和返回速度**
+   - 内存缓存是浏览器中速度最快的缓存（比硬盘缓存快很多），用于存储最近访问过的页面资源。
+   - 当用户在浏览器中前进/后退（如点击返回按钮）时，浏览器可以直接从内存缓存中读取 HTML，几乎瞬间恢复页面，无需重新请求服务器，也不用从硬盘读取缓存文件。
+
+2. **优化用户体验**
+   - 内存缓存让页面的"前进/后退"操作变得非常流畅，用户体验更好。
+   - 如果没有内存缓存，每次返回页面都要重新加载，速度慢、体验差。
+
+3. **浏览器的缓存层级机制**
+   - 浏览器缓存分为多层：内存缓存（Memory Cache）、磁盘缓存（Disk Cache）、Service Worker 缓存等。
+   - 内存缓存优先级最高，专门用于短时间内频繁访问的资源（如 HTML、内联 JS/CSS）。
+   - 只要页面还在同一个会话、标签页没被关闭，HTML 通常会保留在内存缓存中。
+
+4. **HTML 是页面入口，访问频率高**
+   - HTML 是页面的入口文件，用户在同一会话内很可能多次访问（如前进/后退、刷新）。
+   - 浏览器会优先将这类高频资源保存在内存缓存中，以提升性能。
+
+**总结**：HTML 一般存在内存缓存中，是为了加快页面的前进/后退和刷新速度，优化用户体验。内存缓存是浏览器缓存体系中速度最快的一层，适合存放短时间内频繁访问的关键资源（如 HTML）。
+
+---
+
+### 3. 如何使用 service worker 进行缓存？
+
+Service Worker 是浏览器提供的一种在后台运行的脚本，可以拦截和处理网络请求，实现离线缓存、资源预缓存等功能。使用 Service Worker 进行缓存，通常有以下几个步骤：
+
+1. **注册 Service Worker**
+
+```js
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('ServiceWorker 注册成功:', registration);
+      })
+      .catch(error => {
+        console.log('ServiceWorker 注册失败:', error);
+      });
+  });
+}
+```
+
+2. **编写 Service Worker 脚本（如 sw.js）**
+
+- 安装阶段：预缓存资源
+
+```js
+const CACHE_NAME = 'my-cache-v1';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/styles.css',
+  '/main.js',
+  // 其他需要缓存的资源
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+  );
+});
+```
+
+- 激活阶段：清理旧缓存
+
+```js
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+```
+
+- 拦截请求并缓存响应
+
+```js
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        if (response) {
+          return response;
+        }
+        return fetch(event.request).then(networkResponse => {
+          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+            return networkResponse;
+          }
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+          return networkResponse;
+        });
+      })
+  );
+});
+```
+
+3. **常见缓存策略**
+- Cache First（优先缓存）：先查缓存，没有再请求网络。
+- Network First（优先网络）：先请求网络，失败再查缓存。
+- Stale-While-Revalidate（陈旧-先返回缓存，再异步更新缓存）。
+
+4. **注意事项**
+- Service Worker 只能在 HTTPS 或 localhost 下使用。
+- sw.js 必须在网站根目录下，才能控制整个站点。
+- 需要处理缓存更新和失效策略，避免缓存过期资源。
+
+**总结**：Service Worker 通过拦截请求、管理缓存，实现了离线访问、加速资源加载等功能，是现代 Web 性能优化和离线体验的关键技术之一。 

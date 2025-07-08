@@ -34,4 +34,36 @@ function quickSort(arr, left = 0, right = arr.length - 1) {
   return arr;
 }
 
+//3. 最长递增子序列
+// LIS（最长递增子序列）算法实现步骤分析：
+// 1. 初始化一个空数组 tails，用于存储当前所有长度的递增子序列的最小结尾元素。
+// 2. 遍历输入数组 nums 中的每个元素 num：
+//    a. 对 tails 数组进行二分查找，查找 num 应该插入的位置（left）。
+//       - left 初始为 0，right 初始为 tails.length。
+//       - 当 left < right 时，取中间位置 mid：
+//         - 如果 num > tails[mid]，说明 num 可以接在 tails[mid] 后面，left = mid + 1。
+//         - 否则，num 更小或相等，right = mid。
+//    b. 将 num 放到 tails[left] 位置，表示长度为 left+1 的递增子序列的最小结尾被 num 更新。
+// 3. 遍历结束后，tails 的长度即为最长递增子序列的长度，tails 数组内容为每种长度下的最小结尾元素（不一定是实际子序列）。
+// 4. 返回 tails 数组。
+
+function LIS(nums) {
+  const tails = [];
+  for(const num of nums) {
+    let left = 0;
+    let right = tails.length;
+    // 二分查找 num 应插入的位置
+    while(left < right) {
+      const mid = (left + right) >>> 1;
+      if(num > tails[mid]) {
+        left = mid + 1;
+      } else {
+        right = mid;
+      }
+    }
+    // 更新 tails[left] 为 num
+    tails[left] = num;
+  }
+  return tails;
+}
 
